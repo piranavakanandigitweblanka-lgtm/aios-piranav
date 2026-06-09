@@ -1,0 +1,154 @@
+{{ 'halloween-collection.css' | asset_url | stylesheet_tag }}
+<div class="halloween-collection" data-section-id="{{ section.id }}">
+  {%- assign collection = collections[section.settings.collection] -%}
+
+  {% if collection and collection.products_count > 0 %}
+    <div class="halloween-collection__header">
+      {% comment %}
+        Show custom heading if entered; if cleared, heading will be empty.
+      {% endcomment %}
+      {% if section.settings.custom_heading != blank %}
+        <h2 class="halloween-collection__title">{{ section.settings.custom_heading }}</h2>
+      {% endif %}
+      
+      <p class="halloween-collection__description">{{ collection.description }}</p>
+    </div>
+
+    <div class="halloween-collection__grid halloween-collection__grid--{{ section.settings.grid_columns }}-cols">
+      {% for product in collection.products %}
+        <div class="halloween-collection__item" data-product-id="{{ product.id }}">
+          {% render 'halloween-product-card', product: product %}
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="halloween-collection__empty">
+      <p>No products found in this collection.</p>
+    </div>
+  {% endif %}
+</div>
+
+{% schema %}
+{
+  "name": "Halloween Collection",
+  "class": "halloween-collection-section",
+  "settings": [
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Select Collection"
+    },
+    {
+      "type": "text",
+      "id": "custom_heading",
+      "label": "Custom Heading",
+      "default": "Halloween Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "min": 1,
+      "max": 24,
+      "step": 1,
+      "label": "Products per page",
+      "default": 12
+    },
+    {
+      "type": "select",
+      "id": "grid_columns",
+      "label": "Products per row",
+      "options": [
+        {"value": "2", "label": "2"},
+        {"value": "3", "label": "3"},
+        {"value": "4", "label": "4"},
+        {"value": "5", "label": "5"}
+      ],
+      "default": "5"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Halloween Collection",
+      "category": "Collection"
+    }
+  ]
+}
+{% endschema %}
+
+<!--piranav add2025.10.24 halloween script -->
+<script>
+// Halloween collection script
+document.addEventListener('DOMContentLoaded', function() {
+  // Halloween Description popup functionality
+  const halloweenDescriptionTriggers = document.querySelectorAll('[data-halloween-description-popup-trigger]');
+  const halloweenDescriptionPopups = document.querySelectorAll('[data-halloween-description-popup]');
+  
+  // Open popup when description button is clicked
+  halloweenDescriptionTriggers.forEach(trigger => {
+    trigger.addEventListener('click', function() {
+      const productHandle = this.getAttribute('data-product-handle');
+      const popup = document.getElementById(`halloween-description-popup-${productHandle}`);
+      
+      if (popup) {
+        popup.classList.add('is-active');
+        document.body.style.overflow = 'hidden';
+      }
+    });
+  });
+  
+  // Close popup when close button or overlay is clicked
+  halloweenDescriptionPopups.forEach(popup => {
+    const closeButtons = popup.querySelectorAll('[data-halloween-description-popup-close]');
+    
+    closeButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        popup.classList.remove('is-active');
+        document.body.style.overflow = '';
+      });
+    });
+    
+    // Close on Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && popup.classList.contains('is-active')) {
+        popup.classList.remove('is-active');
+        document.body.style.overflow = '';
+      }
+    });
+  });
+
+  // Add to cart functionality for HALLOWEEN collection
+  document.querySelectorAll('.halloween-product-card__form').forEach(form => {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const button = form.querySelector('[data-add-to-cart]');
+      const originalText = button.textContent;
+      
+      button.textContent = 'Adding...';
+      button.disabled = true;
+      
+      try {
+        const response = await fetch('/cart/add.js', {
+          method: 'POST',
+          body: new FormData(form),
+          headers: { 'Accept': 'application/json' }
+        });
+        
+        if (response.ok) {
+          button.textContent = 'View Cart';
+          button.style.background = '#28a745';
+          button.disabled = false;
+          button.type = 'button';
+          button.onclick = () => window.location.href = '/cart';
+        }
+      } catch (error) {
+        button.textContent = 'Error!';
+        setTimeout(() => {
+          button.textContent = originalText;
+          button.disabled = false;
+        }, 2000);
+      }
+    });
+  });
+});
+</script>

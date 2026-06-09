@@ -1,0 +1,77 @@
+/* Daily promotion — layout & timer overlays only; product cards use theme product.css */
+.bls__daily-promotion .daily-promotion__layout {
+  display: grid;
+  gap: var(--bls-gutter-x, 15px);
+  align-items: start;
+}
+
+.bls__daily-promotion .daily-promotion__layout:not(.daily-promotion__layout--no-timer) {
+  grid-template-columns: minmax(200px, 280px) 1fr;
+}
+
+.bls__daily-promotion .daily-promotion__timer-card {
+  background: var(--heading-color, #012f6d);
+  color: var(--color-white, #fff);
+  border-radius: var(--btn-border-radius, 8px);
+  padding: 2rem 1.5rem;
+  text-align: center;
+  box-shadow: var(--bls-box-shadow, 0 5px 30px rgba(0, 0, 0, 0.08));
+}
+
+.bls__daily-promotion .daily-promotion__timer-card-title {
+  color: inherit;
+  margin-bottom: 0.5rem;
+}
+
+.bls__daily-promotion .daily-promotion__timer-card-sub {
+  font-size: calc(var(--base-font-size, 14px) - 1px);
+  opacity: 0.9;
+  margin-bottom: 1.5rem;
+}
+
+.bls__daily-promotion .daily-promotion__timer-main {
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.05em;
+  line-height: 1.2;
+}
+
+.bls__daily-promotion .daily-promotion__card-timer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  background: var(--overlay-bg, rgba(0, 0, 0, 0.5));
+  color: var(--color-white, #fff);
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--btn-border-radius, 6px);
+  font-size: calc(var(--base-font-size, 14px) - 1px);
+  z-index: 3;
+  pointer-events: none;
+}
+
+.bls__daily-promotion .daily-promotion__card-timer-value {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.bls__daily-promotion .daily-promotion__item--fifth {
+  display: block;
+}
+
+@media (max-width: 1200px) {
+  .bls__daily-promotion .daily-promotion__layout:not(.daily-promotion__layout--no-timer) {
+    grid-template-columns: 1fr;
+  }
+
+  .bls__daily-promotion .daily-promotion__layout:not(.daily-promotion__layout--no-timer) .daily-promotion__item--fifth {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .bls__daily-promotion .daily-promotion__item--fifth {
+    display: none !important;
+  }
+}

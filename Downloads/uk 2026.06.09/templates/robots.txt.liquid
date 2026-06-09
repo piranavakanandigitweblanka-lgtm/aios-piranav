@@ -1,0 +1,193 @@
+# we use Shopify as our ecommerce platform
+{%- comment -%}
+# Caution! Please read https://help.shopify.com/en/manual/promoting-marketing/seo/editing-robots-txt before proceeding to make changes to this file.
+{% endcomment %}
+{% for group in robots.default_groups %}
+  {{- group.user_agent -}}
+
+ {% for rule in group.rules %}
+      {%- if group.user_agent.value == '*' -%}
+        {{'Disallow: /*?q=*'}}
+        {{'Disallow: /services/login_with_shop'}}
+        {{'Disallow: /?filter/'}}
+        {{'Disallow: /a/downloads/-/*'}}
+        {{'Disallow: /admin'}}
+        {{'Disallow: /60277031118/checkouts'}}
+        {{'Disallow: /60277031118/orders'}}
+        {{'Disallow: /collections/*sort_by*'}}
+        {{'Disallow: /*/collections/*sort_by*'}}
+        {{'Disallow: /*/collections/*+*'}}
+        {{'Disallow: /*/collections/*%2B*'}}
+        {{'Disallow: /*/collections/*%2b*'}}
+        {{'Disallow: */collections/*filter*&*filter*'}}
+        {{'Disallow: /*?filter'}}       
+        {{'Disallow: /*/blogs/*+*'}}
+        {{'Disallow: /*/blogs/*%2B*'}}
+        {{'Disallow: /*/blogs/*%2b*'}}
+        {{'Disallow: /*?*oseid=*'}}
+        {{'Disallow: /*preview_theme_id*'}}
+        {{'Disallow: /*preview_script_id*'}}
+        {{'Disallow: /*/policies/'}}
+        {{'Disallow: /*/*?*ls=*&ls='}}
+        {{'Disallow: /*/*?*ls%3D*%3Fls%3D*'}}
+        {{'Disallow: /*/*?*ls%3d*%3fls%3d*'}}
+        {{'Disallow: /search'}}
+        {{'Disallow: /apple-app-site-association'}}
+        {{'Disallow: /.well-known/shopify/monorail'}}
+        {{'Disallow: /cdn/wpm/*.js'}}
+        {{'Disallow: /recommendations/products'}}
+        {{'Disallow: /*/recommendations/products'}}
+        {{'Disallow: /*?*srsltid'}}
+        {{'Disallow: /*?page=*'}}
+        {{'Disallow: /*?_pos*'}}
+        {{'Disallow: /*?pr_prod_strat=*'}}
+        {{'Disallow: /*?filter.p.m.custom.model=*'}}
+        {{'Disallow: /*?filter.p.m.custom.colour=*'}}
+        {{'Disallow: /*?filter.p.m.custom*'}}
+        {{'Disallow: /*.atom'}}
+        {{ 'Disallow: /blogs/new/tagged/' }}
+
+        {% elsif group.user_agent.value == 'Googlebot' %} 
+        {{ 'Disallow: /checkouts/'}}
+        {{ 'Disallow: /orders'}}
+        {{ 'Disallow: /60277031118/checkouts'}}
+        {{ 'Disallow: /60277031118/orders'}}
+        {{ 'Disallow: /*?*oseid=*'}}
+        {{ 'Disallow: /*preview_theme_id*'}}
+        {{ 'Disallow: /*preview_script_id*'}}
+        {{'Disallow: /*?*srsltid'}}
+        {{'Disallow: /*?page=*'}}       
+        {{'Disallow: /*?filter'}}
+        {{'Disallow: /*?_pos'}}
+        {{'Disallow: /*?pr_prod_strat='}}  
+              
+                
+        {% elsif group.user_agent.value == 'adsbot-google' %} 
+        {{ 'Disallow: /checkouts/'}}
+        {{ 'Disallow: /orders'}}
+        {{ 'Disallow: /60277031118/checkouts'}}
+        {{ 'Disallow: /60277031118/orders'}}
+        {{ 'Disallow: /*?*oseid=*'}}
+        {{ 'Disallow: /*preview_theme_id*'}}
+        {{ 'Disallow: /*preview_script_id*'}}
+        {{'Disallow: /*?*srsltid'}} 
+        {{'Disallow: /*?page=*'}}     
+        {{'Disallow: /*?filter'}}  
+        {{'Disallow: /*?_pos'}}
+                
+                
+        {% elsif  group.user_agent.value == 'AhrefsBot' %}
+        {% comment %} {{ 'Crawl-delay: 10' }} {% endcomment %}
+        {{'Disallow: /a/downloads/-/*'}}
+        {{'Disallow: /admin'}}
+        {{'Disallow: /cart'}}
+        {{'Disallow: /orders'}}
+        {{'Disallow: /checkouts/'}}
+        {{'Disallow: /checkout'}}
+        {{'Disallow: /60277031118/checkouts'}}
+        {{'Disallow: /60277031118/orders'}}
+        {{'Disallow: /carts'}}
+        {{'Disallow: /account'}}
+        {{'Disallow: /collections/*sort_by*'}}
+        {{'Disallow: /*/collections/*sort_by*'}}
+        {{'Disallow: /collections/*+*'}}
+        {{'Disallow: /collections/*%2B*'}}
+        {{'Disallow: /collections/*%2b*'}}
+        {{'Disallow: /*/collections/*+*'}}
+        {{'Disallow: /*/collections/*%2B*'}}
+        {{'Disallow: /*/collections/*%2b*'}}
+        {{'Disallow: */collections/*filter*&*filter*'}}
+        {{'Disallow: /blogs/*+*'}}
+        {{'Disallow: /blogs/*%2B*'}}
+        {{'Disallow: /blogs/*%2b*'}}
+        {{'Disallow: /*/blogs/*+*'}}
+        {{'Disallow: /*/blogs/*%2B*'}}
+        {{'Disallow: /*/blogs/*%2b*'}}
+        {{'Disallow: /*?*oseid=*'}}
+        {{'Disallow: /*preview_theme_id*'}}
+        {{'Disallow: /*preview_script_id*'}}
+        {{'Disallow: /policies/'}}
+        {{'Disallow: /*/policies/'}}
+        {{'Disallow: /*/*?*ls=*&ls=*'}}
+        {{'Disallow: /*/*?*ls%3D*%3Fls%3D*'}}
+        {{'Disallow: /*/*?*ls%3d*%3fls%3d*'}}
+        {{'Disallow: /search'}}
+        {{'Disallow: /apple-app-site-association'}}
+        {{'Disallow: /.well-known/shopify/monorail'}}
+        {{'Disallow: /recommendations/products'}}
+        {{'Disallow: /*/recommendations/products'}}  
+        {{'Disallow: /*?*srsltid'}}          
+                
+        {% elsif group.user_agent.value == 'AhrefsSiteAudit' %}
+        {{'Disallow: /a/downloads/-/*'}}
+        {{'Disallow: /admin'}}
+        {{'Disallow: /orders'}}
+        {{'Disallow: /checkouts/'}}
+        {{'Disallow: /checkout'}}
+        {{'Disallow: /60277031118/checkouts'}}
+        {{'Disallow: /60277031118/orders'}}
+        {{'Disallow: /carts'}}
+        {{'Disallow: /collections/*sort_by*'}}
+        {{'Disallow: /*/collections/*sort_by*'}}
+        {{'Disallow: /collections/*+*'}}
+        {{'Disallow: /collections/*%2B*'}}
+        {{'Disallow: /collections/*%2b*'}}
+        {{'Disallow: /*/collections/*+*'}}
+        {{'Disallow: /*/collections/*%2B*'}}
+        {{'Disallow: /*/collections/*%2b*'}}
+        {{'Disallow: */collections/*filter*&*filter*'}}
+        {{'Disallow: /blogs/*+*'}}
+        {{'Disallow: /blogs/*%2B*'}}
+        {{'Disallow: /blogs/*%2b*'}}
+        {{'Disallow: /*/blogs/*+*'}}
+        {{'Disallow: /*/blogs/*%2B*'}}
+        {{'Disallow: /*/blogs/*%2b*'}}
+        {{'Disallow: /*?*oseid=*'}}
+        {{'Disallow: /*preview_theme_id*'}}
+        {{'Disallow: /*preview_script_id*'}}
+        {{'Disallow: /policies/'}}
+        {{'Disallow: /*/policies/'}}
+        {{'Disallow: /*/*?*ls=*&ls=*'}}
+        {{'Disallow: /*/*?*ls%3D*%3Fls%3D*'}}
+        {{'Disallow: /*/*?*ls%3d*%3fls%3d*'}}
+        {{'Disallow: /apple-app-site-association'}}
+        {{'Disallow: /.well-known/shopify/monorail'}}
+        {{'Disallow: /recommendations/products'}}
+        {{'Disallow: /*/recommendations/products'}}
+        {{'Disallow: /*?*srsltid'}}         
+        {%- endif -%}
+ {% endfor %}
+  
+  {%- if group.sitemap != blank -%}
+    {{ group.sitemap }}
+  {%- endif -%}
+{% endfor %}
+# AI bots
+# AI Crawlers اجازه
+{{ 'User-agent: ChatGPT-User' }}
+{{ 'Allow: /' }}
+
+{{ 'User-agent: OAI-SearchBot' }}
+{{ 'Allow: /' }}
+
+{{ 'User-agent: PerplexityBot' }}
+{{ 'Allow: /' }}
+
+{{ 'User-agent: ClaudeBot' }}
+{{ 'Allow: /' }}
+
+{{ 'User-agent: Google-Extended' }}
+{{ 'Allow: /' }}
+
+{{ 'User-agent: GPTBot' }}
+{{ 'Allow: /' }}
+
+{{ 'User-agent: Google-Extended' }}
+{{ 'Allow: /' }}
+
+{{ 'User-agent: Claude-Web' }}
+{{ 'Allow: /' }}
+
+{{ 'User-agent: PerplexityBot' }}
+{{ 'Allow: /' }}
+

@@ -1,0 +1,71 @@
+{%- layout none -%}<?xml version="1.0" encoding="UTF-8" ?>
+<rss xmlns:g="http://base.google.com/ns/1.0" version="2.0">
+
+
+<channel>
+    <title>{{shop.name | escape }} Products</title>
+    <link>https://ledsone.co.uk/</link>
+
+
+    {% assign target_collection = collections['top-sell-2021'] %}
+    {% paginate target_collection.products by 5000000 %}
+
+
+    {% assign gbp_to_eur = 1.15 %}  <!-- Example fixed exchange rate for GBP to EUR -->
+    {% assign vat_rate = 1.20 %}     <!-- Adding 20% VAT -->
+
+
+    {% for product in target_collection.products %}
+        <item>
+            <g:id>{{ product.id }}</g:id>
+            <g:title><![CDATA[{{ product.title | strip_html | escape_once }}]]></g:title>
+            <g:description><![CDATA[{{ product.description | strip_html | escape_once }}]]></g:description>
+            <g:link>{{ shop.url }}{{ product.url }}</g:link>
+            <g:image_link>{{ product.featured_image | product_img_url: 'large' }}</g:image_link>
+            <g:brand>{{ product.vendor | escape }}</g:brand>
+            <g:product_type>{{ product.type | escape }}</g:product_type>
+            <g:condition>New</g:condition>
+           
+            <!-- Convert Price to EUR and Add 20% VAT -->
+            <g:price>{{ product.price | times: gbp_to_eur | times: vat_rate | money_without_currency }} EUR</g:price>
+           
+            <!-- Availability (stock status) -->
+            <g:availability>{% if product.available %}in_stock{% else %}out_of_stock{% endif %}</g:availability>
+           
+            <!-- GTIN or Barcode -->
+            <g:gtin>{% assign current_variant = product.selected_or_first_available_variant %}
+            {% if current_variant.barcode %}{{ current_variant.barcode }}{% else %}{% endif %}</g:gtin>
+        </item>
+
+
+        {% if product.variants.size > 1 %}
+            {% for variant in product.variants %}
+                <item>
+                    <g:id>{{ variant.id }}</g:id>
+                    <g:title><![CDATA[{{ product.title | strip_html | escape_once }} - Variant: {{ variant.title | escape }}]]></g:title>
+                    <g:description><![CDATA[{{ variant.description | strip_html | escape_once }}]]></g:description>
+                    <g:link>{{ shop.url }}{{ variant.url }}</g:link>
+                    <g:image_link>{{ variant.featured_image | product_img_url: 'large' }}</g:image_link>
+                    <g:brand>{{ product.vendor | escape }}</g:brand>
+                    <g:product_type>{{ product.type | escape }}</g:product_type>
+                    <g:condition>New</g:condition>
+                   
+                    <!-- Convert Price to EUR and Add 20% VAT -->
+                    <g:price>{{ variant.price | times: gbp_to_eur | times: vat_rate | money_without_currency }} EUR</g:price>
+                   
+                    <!-- Availability (stock status) -->
+                    <g:availability>{% if variant.available %}in_stock{% else %}out_of_stock{% endif %}</g:availability>
+                   
+                    <!-- GTIN or Barcode for Variant -->
+                    <g:gtin>{{ variant.barcode }}</g:gtin>
+                </item>
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
+   
+    {% endpaginate %}
+</channel>
+</rss>
+
+
+

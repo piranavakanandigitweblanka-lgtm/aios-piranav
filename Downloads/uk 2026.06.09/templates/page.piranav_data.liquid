@@ -1,0 +1,53 @@
+
+<style>
+
+</style>
+<div class="main_cont">
+
+{% assign collection_handle = 'all_products' %}
+{%	paginate collections[collection_handle].products by 1000 %}
+       {% assign same_type_available_products_array = collections[collection_handle].products %}
+ {%	endpaginate %}
+
+ <div class="container-fluid section-full">              
+{% for product in same_type_available_products_array %}
+  <div>
+     
+       {% if product.variants.size > 1 %}   
+         
+                {% for variant in product.variants %}
+               <table >
+                  <tr style="height: 20px; padding:0px;">
+                   <td class="img_size">
+                   {{ product.title }}
+                  <!-- <img src="{{ variant.image | product_img_url: 'large' }}" alt="{{ product.title }}" style="width:200px; height:200px; object-fit:contain;" >  -->
+                     </td> 
+                  
+                    <td class="desc">
+                      <P>{{ variant.sku}}</P> 
+                    </td>
+                  </tr>
+               </table>
+                {% endfor %}
+         
+         {% else %}     
+                   
+                <table class="gallery">
+                 <tr class="">
+                     <td>
+                       {{ product.title }}
+                  <!-- <img src="{{ product.images.first.src | product_img_url: 'large' }}" alt="{{ product.title }}" style="width:200px; height:200px; object-fit:contain;"> -->
+                  </td>
+               
+                  <td>
+                  <P> {{ product.first_available_variant.sku}}</P>
+                 </td>
+                    </tr>
+      
+              </table>
+             
+          {% endif %}
+  </div>
+{% endfor %}
+</div>
+</div>

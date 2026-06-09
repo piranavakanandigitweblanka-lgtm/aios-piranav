@@ -1,0 +1,1090 @@
+{% assign matched_collections_array = '' | split: ',' %}
+
+{% if product.collections contains collections['conduit-lightings'] %}
+  {% assign matched_collection = collections['conduit-accessories'] %}
+{% elsif product.collections contains collections['conduit-accessories'] %}
+  {% assign matched_collection = collections['conduit-lightings'] %}
+  {% elsif product.collections contains collections['pipe-lighting'] %}
+  {% assign matched_collections_array = 'pipe-lighting-accessories,easy-fit-shades' | split: ',' %}
+{% elsif product.collections contains collections['plugin-lighting'] %}
+  {% assign matched_collection = collections['diy-lighting-new'] %}
+{% elsif product.collections contains collections['all-transformers'] %}
+  {% assign matched_collection = collections['led-modules'] %}
+{% elsif product.collections contains collections['pendant-lights'] %}
+  {% assign matched_collections_array = 'easy-fit-shades,led-bulbs' | split: ',' %}
+  {% elsif product.collections contains collections['vintage-cables'] %}
+  {% assign matched_collections_array = 'single-outlet-ceiling-rose,metal-holders' | split: ',' %}
+    {% elsif product.collections contains collections['single-outlet-ceiling-rose'] %}
+  {% assign matched_collections_array = 'vintage-cables,metal-holders' | split: ',' %}
+     {% elsif product.collections contains collections['spider-light'] %}
+  {% assign matched_collections_array = 'hooks-and-rings,wire-cage' | split: ',' %}
+{% elsif product.collections contains collections['easy-fit-shades'] %}
+  {% assign matched_collections_array = 'pendant-holder,pendant-lights' | split: ',' %}
+{% endif %}
+
+{% assign has_matched_collections = false %}
+{% if matched_collections_array.size > 0 and matched_collections_array[0] != '' %}
+  {% assign has_matched_collections = true %}
+{% elsif matched_collection != null %}
+  {% assign has_matched_collections = true %}
+  {% assign matched_collections_array = matched_collection.handle | split: ',' %}
+{% endif %}
+
+{% if has_matched_collections %}
+  <div class="fbt-list-wrapper">
+    <div class="fbt-header">
+      <h2 class="fbt-title">Frequently bought together</h2>
+      <div class="fbt-nav">
+        <button class="fbt-nav-btn fbt-nav-prev" aria-label="Previous products" disabled>
+          <svg
+            viewBox="0 0 24 24"
+            width="16"
+            height="16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+        <button class="fbt-nav-btn fbt-nav-next" aria-label="Next products">
+          <svg
+            viewBox="0 0 24 24"
+            width="16"
+            height="16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    {% assign recommended_count = 0 %}
+    {% assign col1_handle = matched_collections_array[0] %}
+    {% assign col2_handle = matched_collections_array[1] %}
+
+    <div class="fbt-list{% if col2_handle == nil or col2_handle == "" %} fbt-list--single{% endif %}">
+
+      {% assign col1 = collections[col1_handle] %}
+      {% assign col2 = collections[col2_handle] %}
+
+      {% if col2_handle == null or col2_handle == '' %}
+        <!-- OLD METHOD: Single collection loop -->
+        {% if col1 %}
+          {% for p in col1.products %}
+            {% unless p.id == product.id %}
+              {% assign recommended_count = recommended_count | plus: 1 %}
+              {% assign page_num = recommended_count | plus: 1 | divided_by: 2 %}
+
+              <div
+                class="fbt-item {% if page_num > 1 %}is-hidden{% endif %}"
+                data-page="{{ page_num }}"
+                data-index="{{ recommended_count }}"
+                data-collection="{{ col1_handle }}"
+              >
+                <!-- LEFT: IMAGE -->
+                <a href="{{ p.url }}" class="fbt-img-wrapper">
+                  <img
+                    class="fbt-img"
+                    src="{{ p.featured_image | image_url: width: 120 }}"
+                    alt="{{ p.title }}"
+                    loading="lazy"
+                    width="{{ p.featured_image.width }}"
+                    height="{{ p.featured_image.height }}"
+                  >
+                </a>
+
+                <!-- MIDDLE: INFO -->
+                <div class="fbt-info">
+                  <a href="{{ p.url }}" class="fbt-name">
+                    {{ p.title }}
+                  </a>
+
+                  <div class="fbt-bottom-row">
+                    {% if p.variants.size > 1 %}
+                      <div class="fbt-variant-wrapper">
+                        <select class="fbt-variant" data-id="{{ p.id }}">
+                          {% for v in p.variants %}
+                            <option
+                              value="{{ v.id }}"
+                              data-price="{{ v.price | money | strip_html }}"
+                              data-compare-price="{% if v.compare_at_price > v.price %}{{ v.compare_at_price | money | strip_html }}{% endif %}"
+                              {% if v.id == p.selected_or_first_available_variant.id %}
+                                selected
+                              {% endif %}
+                              {% unless v.available %}
+                                disabled
+                              {% endunless %}
+                            >
+                              {{ v.title }}
+                            </option>
+                          {% endfor %}
+                        </select>
+                        <svg
+                          class="fbt-select-chevron"
+                          viewBox="0 0 24 24"
+                          width="12"
+                          height="12"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                      </div>
+                    {% endif %}
+
+                    {% assign active_val = p.selected_or_first_available_variant | default: p.variants.first %}
+                    <div class="fbt-price">
+                      <span class="fbt-current-price">{{ active_val.price | money }}</span>
+                      {% if active_val.compare_at_price > active_val.price %}
+                        <del class="fbt-compare-price">{{ active_val.compare_at_price | money }}</del>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- RIGHT: BUTTON -->
+                <button
+                  class="fbt-btn"
+                  data-variant="{{ active_val.id }}"
+                  aria-label="Add {{ p.title }} to Cart"
+                  {% unless active_val.available %}
+                    disabled
+                  {% endunless %}
+                >
+                  <span class="fbt-btn-text">
+                    {% if active_val.available %}
+                      + Add
+                    {% else %}
+                      Out of Stock
+                    {% endif %}
+                  </span>
+                  <span class="fbt-btn-spinner" style="display: none;">
+                    <svg
+                      class="spinner-icon"
+                      viewBox="0 0 24 24"
+                      width="14"
+                      height="14"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="10" stroke-dasharray="35 15"></circle>
+                    </svg>
+                  </span>
+                </button>
+              </div>
+            {% endunless %}
+          {% endfor %}
+        {% endif %}
+      {% else %}
+        {%- comment -%}
+          TWO-COLLECTION METHOD: Direct iteration (no all_products limit)
+          Uses col1.products and col2.products directly instead of
+          all_products[handle] which has a 20-lookup cap per page.
+          Col1 products fill row 1, col2 products fill row 2, 2 items each per page.
+        {%- endcomment -%}
+
+        {% assign col1_product_count = 0 %}
+        {% if col1 %}
+          {% for p in col1.products %}
+            {% unless p.id == product.id %}
+              {% assign col1_product_count = col1_product_count | plus: 1 %}
+            {% endunless %}
+          {% endfor %}
+        {% endif %}
+
+        {% assign col2_product_count = 0 %}
+        {% if col2 %}
+          {% for p in col2.products %}
+            {% unless p.id == product.id %}
+              {% assign col2_product_count = col2_product_count | plus: 1 %}
+            {% endunless %}
+          {% endfor %}
+        {% endif %}
+
+        {% assign col1_pages = col1_product_count | plus: 1 | divided_by: 2 %}
+        {% assign col2_pages = col2_product_count | plus: 1 | divided_by: 2 %}
+        {% assign max_pages = col1_pages %}
+        {% if col2_pages > max_pages %}
+          {% assign max_pages = col2_pages %}
+        {% endif %}
+
+        {% if max_pages > 0 %}
+
+          {%- comment -%} === Col1 products (appear in row 1 of each page) === {%- endcomment -%}
+          {% assign col1_idx = 0 %}
+          {% if col1 %}
+            {% for p in col1.products %}
+              {% unless p.id == product.id %}
+                {% assign col1_idx = col1_idx | plus: 1 %}
+                {% assign recommended_count = recommended_count | plus: 1 %}
+                {% assign page_num = col1_idx | plus: 1 | divided_by: 2 %}
+
+                <div
+                  class="fbt-item {% if page_num > 1 %}is-hidden{% endif %}"
+                  data-page="{{ page_num }}"
+                  data-index="{{ recommended_count }}"
+                  data-collection="{{ col1_handle }}"
+                >
+                  <!-- LEFT: IMAGE -->
+                  <a href="{{ p.url }}" class="fbt-img-wrapper">
+                    <img
+                      class="fbt-img"
+                      src="{{ p.featured_image | image_url: width: 120 }}"
+                      alt="{{ p.title }}"
+                      loading="lazy"
+                      width="{{ p.featured_image.width }}"
+                      height="{{ p.featured_image.height }}"
+                    >
+                  </a>
+
+                  <!-- MIDDLE: INFO -->
+                  <div class="fbt-info">
+                    <a href="{{ p.url }}" class="fbt-name">
+                      {{ p.title }}
+                    </a>
+
+                    <div class="fbt-bottom-row">
+                      {% if p.variants.size > 1 %}
+                        <div class="fbt-variant-wrapper">
+                          <select class="fbt-variant" data-id="{{ p.id }}">
+                            {% for v in p.variants %}
+                              <option
+                                value="{{ v.id }}"
+                                data-price="{{ v.price | money | strip_html }}"
+                                data-compare-price="{% if v.compare_at_price > v.price %}{{ v.compare_at_price | money | strip_html }}{% endif %}"
+                                {% if v.id == p.selected_or_first_available_variant.id %}
+                                  selected
+                                {% endif %}
+                                {% unless v.available %}
+                                  disabled
+                                {% endunless %}
+                              >
+                                {{ v.title }}
+                              </option>
+                            {% endfor %}
+                          </select>
+                          <svg
+                            class="fbt-select-chevron"
+                            viewBox="0 0 24 24"
+                            width="12"
+                            height="12"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          >
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                          </svg>
+                        </div>
+                      {% endif %}
+
+                      {% assign active_val = p.selected_or_first_available_variant | default: p.variants.first %}
+                      <div class="fbt-price">
+                        <span class="fbt-current-price">{{ active_val.price | money }}</span>
+                        {% if active_val.compare_at_price > active_val.price %}
+                          <del class="fbt-compare-price">{{ active_val.compare_at_price | money }}</del>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- RIGHT: BUTTON -->
+                  <button
+                    class="fbt-btn"
+                    data-variant="{{ active_val.id }}"
+                    aria-label="Add {{ p.title }} to Cart"
+                    {% unless active_val.available %}
+                      disabled
+                    {% endunless %}
+                  >
+                    <span class="fbt-btn-text">
+                      {% if active_val.available %}
+                        + Add
+                      {% else %}
+                        Out of Stock
+                      {% endif %}
+                    </span>
+                    <span class="fbt-btn-spinner" style="display: none;">
+                      <svg
+                        class="spinner-icon"
+                        viewBox="0 0 24 24"
+                        width="14"
+                        height="14"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="3"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <circle cx="12" cy="12" r="10" stroke-dasharray="35 15"></circle>
+                      </svg>
+                    </span>
+                  </button>
+                </div>
+              {% endunless %}
+            {% endfor %}
+          {% endif %}
+
+          {%- comment -%} === Col2 products (appear in row 2 of each page) === {%- endcomment -%}
+          {% assign col2_idx = 0 %}
+          {% if col2 %}
+            {% for p in col2.products %}
+              {% unless p.id == product.id %}
+                {% assign col2_idx = col2_idx | plus: 1 %}
+                {% assign recommended_count = recommended_count | plus: 1 %}
+                {% assign page_num = col2_idx | plus: 1 | divided_by: 2 %}
+
+                <div
+                  class="fbt-item {% if page_num > 1 %}is-hidden{% endif %}"
+                  data-page="{{ page_num }}"
+                  data-index="{{ recommended_count }}"
+                  data-collection="{{ col2_handle }}"
+                >
+                  <!-- LEFT: IMAGE -->
+                  <a href="{{ p.url }}" class="fbt-img-wrapper">
+                    <img
+                      class="fbt-img"
+                      src="{{ p.featured_image | image_url: width: 120 }}"
+                      alt="{{ p.title }}"
+                      loading="lazy"
+                      width="{{ p.featured_image.width }}"
+                      height="{{ p.featured_image.height }}"
+                    >
+                  </a>
+
+                  <!-- MIDDLE: INFO -->
+                  <div class="fbt-info">
+                    <a href="{{ p.url }}" class="fbt-name">
+                      {{ p.title }}
+                    </a>
+
+                    <div class="fbt-bottom-row">
+                      {% if p.variants.size > 1 %}
+                        <div class="fbt-variant-wrapper">
+                          <select class="fbt-variant" data-id="{{ p.id }}">
+                            {% for v in p.variants %}
+                              <option
+                                value="{{ v.id }}"
+                                data-price="{{ v.price | money | strip_html }}"
+                                data-compare-price="{% if v.compare_at_price > v.price %}{{ v.compare_at_price | money | strip_html }}{% endif %}"
+                                {% if v.id == p.selected_or_first_available_variant.id %}
+                                  selected
+                                {% endif %}
+                                {% unless v.available %}
+                                  disabled
+                                {% endunless %}
+                              >
+                                {{ v.title }}
+                              </option>
+                            {% endfor %}
+                          </select>
+                          <svg
+                            class="fbt-select-chevron"
+                            viewBox="0 0 24 24"
+                            width="12"
+                            height="12"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          >
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                          </svg>
+                        </div>
+                      {% endif %}
+
+                      {% assign active_val = p.selected_or_first_available_variant | default: p.variants.first %}
+                      <div class="fbt-price">
+                        <span class="fbt-current-price">{{ active_val.price | money }}</span>
+                        {% if active_val.compare_at_price > active_val.price %}
+                          <del class="fbt-compare-price">{{ active_val.compare_at_price | money }}</del>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- RIGHT: BUTTON -->
+                  <button
+                    class="fbt-btn"
+                    data-variant="{{ active_val.id }}"
+                    aria-label="Add {{ p.title }} to Cart"
+                    {% unless active_val.available %}
+                      disabled
+                    {% endunless %}
+                  >
+                    <span class="fbt-btn-text">
+                      {% if active_val.available %}
+                        + Add
+                      {% else %}
+                        Out of Stock
+                      {% endif %}
+                    </span>
+                    <span class="fbt-btn-spinner" style="display: none;">
+                      <svg
+                        class="spinner-icon"
+                        viewBox="0 0 24 24"
+                        width="14"
+                        height="14"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="3"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <circle cx="12" cy="12" r="10" stroke-dasharray="35 15"></circle>
+                      </svg>
+                    </span>
+                  </button>
+                </div>
+              {% endunless %}
+            {% endfor %}
+          {% endif %}
+
+        {% endif %}
+      {% endif %}
+    </div>
+  </div>
+
+  <style>
+    /* Modern Styling & Exact Aesthetic Match to Screenshot */
+    .fbt-list-wrapper {
+      --fbt-accent-color: #00a8c5;
+      --fbt-accent-hover: #008aa3;
+      --fbt-text-dark: #1a1a1a;
+      --fbt-text-muted: #718096;
+      --fbt-border-color: #e2e8f0;
+      --fbt-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+
+      font-family: var(--fbt-font-family);
+      margin: 24px 0;
+      width: 100%;
+    }
+
+    .fbt-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      border-bottom: 1px solid #f1f5f9;
+      padding-bottom: 12px;
+    }
+
+    .fbt-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--fbt-text-dark);
+      margin: 0;
+      letter-spacing: -0.01em;
+    }
+
+    /* HEADER NAVIGATION BUTTONS */
+    .fbt-nav {
+      display: flex !important;
+      align-items: center !important;
+      gap: 8px;
+      visibility: visible !important;
+      opacity: 1 !important;
+    }
+
+    .fbt-nav-btn {
+      background: transparent !important;
+      border: 1px solid var(--fbt-border-color) !important;
+      color: var(--fbt-text-dark) !important;
+      width: 28px !important;
+      height: 28px !important;
+      min-width: 28px !important;
+      min-height: 28px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border-radius: 50% !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      line-height: 1 !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      position: relative !important;
+      overflow: visible !important;
+    }
+
+    .fbt-nav-btn svg {
+      display: block !important;
+      visibility: visible !important;
+      width: 16px !important;
+      height: 16px !important;
+    }
+
+    .fbt-nav-btn:hover:not(:disabled) {
+      background: #f1f5f9 !important;
+      border-color: #cbd5e1 !important;
+    }
+
+    .fbt-nav-btn:disabled {
+      color: #cbd5e1 !important;
+      cursor: not-allowed;
+      opacity: 0.4 !important;
+      border-color: #e2e8f0 !important;
+    }
+
+    /* 2-COLUMN GRID OF HORIZONTAL ROW CARDS */
+    .fbt-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      position: relative;
+    }
+
+    .fbt-list.fbt-list--single {
+      grid-template-columns: 1fr;
+    }
+
+    /* ROW-STYLE CARD - REDUCED HEIGHT */
+    .fbt-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid var(--fbt-border-color);
+      border-radius: 8px;
+      padding: 10px 14px;
+      background: #ffffff;
+      gap: 12px;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+      opacity: 1;
+      transform: translateY(0);
+      min-height: auto;
+    }
+
+    .fbt-item.is-hidden {
+      display: none !important;
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    .fbt-item:hover {
+      border-color: #cbd5e1;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    /* LEFT: IMAGE WRAPPER (Gray container like screenshot) */
+    .fbt-img-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 56px;
+      height: 56px;
+      background: #f7fafc;
+      border: 1px solid #edf2f7;
+      border-radius: 6px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .fbt-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      mix-blend-mode: multiply;
+      transition: transform 0.3s ease;
+    }
+
+    .fbt-item:hover .fbt-img {
+      transform: scale(1.06);
+    }
+
+    /* MIDDLE: INFO */
+    .fbt-info {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      flex-grow: 1;
+      min-width: 0;
+    }
+
+    .fbt-name {
+      font-size: 13px;
+      font-weight: 500;
+      text-decoration: none;
+      color: var(--fbt-text-dark);
+      line-height: 1.3;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      transition: color 0.2s ease;
+    }
+
+    .fbt-name:hover {
+      color: var(--fbt-accent-color);
+    }
+
+    /* BOTTOM ROW: Variant & Price side by side */
+    .fbt-bottom-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+
+    /* Inline minimal Variant Selector matching screenshot */
+    .fbt-variant-wrapper {
+      display: inline-flex;
+      align-items: center;
+      position: relative;
+    }
+
+    .fbt-variant {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--fbt-text-muted);
+      border: none;
+      background: transparent;
+      padding: 2px 18px 2px 0;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .fbt-variant:focus {
+      outline: none;
+      color: var(--fbt-text-dark);
+    }
+
+    .fbt-select-chevron {
+      position: absolute;
+      right: 2px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--fbt-text-muted);
+      pointer-events: none;
+    }
+
+    /* PRICE - Now on the right */
+    .fbt-price {
+      font-size: 12px;
+      color: var(--fbt-accent-color);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    .fbt-price del {
+      color: var(--fbt-text-muted);
+      font-size: 10px;
+      font-weight: 400;
+    }
+
+    /* RIGHT: BUTTON */
+    .fbt-btn {
+      background: var(--fbt-accent-color);
+      color: #ffffff;
+      border: none;
+      padding: 7px 12px;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 62px;
+      height: 30px;
+      flex-shrink: 0;
+    }
+
+    .fbt-btn:hover {
+      background: var(--fbt-accent-hover);
+    }
+
+    /* Loading Spinner */
+    .spinner-icon {
+      animation: fbt-spin 0.8s linear infinite;
+    }
+
+    @keyframes fbt-spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* RESPONSIVE BREAKPOINTS */
+    @media (max-width: 991px) {
+      .fbt-list {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+    }
+ @media (max-width: 767px) {
+      .fbt-list {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .fbt-item {
+        flex-direction: row;
+        text-align: left;
+        padding: 12px 10px;
+        gap: 12px;
+      }
+
+      .fbt-img-wrapper {
+        width: 64px;
+        height: 64px;
+        flex-shrink: 0;
+      }
+      
+      .fbt-info {
+        align-items: flex-start;
+        flex-grow: 1;
+      }
+
+      .fbt-bottom-row {
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        width: 100%;
+        gap: 4px;
+        margin-top: 2px;
+      }
+      
+      .fbt-btn {
+        width: auto;
+        flex-shrink: 0;
+      }
+    }
+  </style>
+
+  <script>
+    (() => {
+      const initFBT = () => {
+        const wrappers = document.querySelectorAll('.fbt-list-wrapper');
+        wrappers.forEach((wrapper) => {
+          if (wrapper.dataset.fbtInitialized) return;
+          wrapper.dataset.fbtInitialized = 'true';
+
+          const items = wrapper.querySelectorAll('.fbt-item');
+          const nav = wrapper.querySelector('.fbt-nav');
+          const prevBtn = wrapper.querySelector('.fbt-nav-prev');
+          const nextBtn = wrapper.querySelector('.fbt-nav-next');
+
+          let maxPage = 1;
+          items.forEach((item) => {
+            const page = parseInt(item.dataset.page, 10);
+            if (page > maxPage) maxPage = page;
+          });
+          const totalPages = maxPage;
+
+          // Restore state from localStorage
+          let currentPage = parseInt(localStorage.getItem('fbt_current_page'), 10) || 1;
+          if (currentPage > totalPages) currentPage = 1;
+
+          let lastSlideTime = parseInt(localStorage.getItem('fbt_last_slide_time'), 10) || Date.now();
+          const slideIntervalMs = 1 * 60 * 1000; // 1 minute
+
+          // If away for longer than the interval, bump one page on load
+          if (Date.now() - lastSlideTime > slideIntervalMs) {
+            currentPage++;
+            if (currentPage > totalPages) currentPage = 1;
+            lastSlideTime = Date.now();
+          }
+
+          localStorage.setItem('fbt_current_page', currentPage);
+          localStorage.setItem('fbt_last_slide_time', lastSlideTime);
+
+          // Always show navigation buttons
+          if (nav) {
+            nav.style.display = 'flex';
+          }
+
+          // Function to render active page
+          function showPage(page) {
+            items.forEach((item) => {
+              item.classList.add('is-hidden');
+            });
+
+            const pageItems = wrapper.querySelectorAll(`.fbt-item[data-page="${page}"]`);
+            pageItems.forEach((item) => {
+              item.classList.remove('is-hidden');
+            });
+
+            // Update button disabled states
+            if (prevBtn) prevBtn.disabled = page === 1;
+            if (nextBtn) nextBtn.disabled = page === totalPages;
+            
+            // Save current page state
+            localStorage.setItem('fbt_current_page', page);
+          }
+
+          // Apply restored state immediately
+          showPage(currentPage);
+
+          // Navigation Click Events
+          if (prevBtn) {
+            prevBtn.addEventListener('click', () => {
+              if (currentPage > 1) {
+                currentPage--;
+                showPage(currentPage);
+                localStorage.setItem('fbt_last_slide_time', Date.now()); // reset timer on click
+              }
+            });
+          }
+
+          if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+              if (currentPage < totalPages) {
+                currentPage++;
+                showPage(currentPage);
+                localStorage.setItem('fbt_last_slide_time', Date.now()); // reset timer on click
+              }
+            });
+          }
+
+          // Auto-slide that persists across refreshes
+          if (totalPages > 1) {
+            setInterval(() => {
+              const now = Date.now();
+              const savedTime = parseInt(localStorage.getItem('fbt_last_slide_time'), 10) || now;
+              
+              if (now - savedTime >= slideIntervalMs) {
+                currentPage = parseInt(localStorage.getItem('fbt_current_page'), 10) || 1;
+                currentPage++;
+                if (currentPage > totalPages) currentPage = 1;
+                
+                showPage(currentPage);
+                localStorage.setItem('fbt_last_slide_time', now);
+              }
+            }, 1000); // Checks every second
+          }
+
+          // Variant dropdown change listener
+          wrapper.querySelectorAll('.fbt-variant').forEach((select) => {
+            select.addEventListener('change', function () {
+              const item = this.closest('.fbt-item');
+              if (item) {
+                const btn = item.querySelector('.fbt-btn');
+                if (btn) {
+                  btn.dataset.variant = this.value;
+                  const selectedOption = this.options[this.selectedIndex];
+                  if (selectedOption.hasAttribute('disabled')) {
+                    btn.disabled = true;
+                    const btnText = btn.querySelector('.fbt-btn-text');
+                    if (btnText) btnText.textContent = 'Out of Stock';
+                  } else {
+                    btn.disabled = false;
+                    const btnText = btn.querySelector('.fbt-btn-text');
+                    if (btnText) btnText.textContent = '+ Add';
+                  }
+
+                  // Update dynamic variant price
+                  const priceEl = item.querySelector('.fbt-current-price');
+                  const compareEl = item.querySelector('.fbt-compare-price');
+                  if (priceEl && selectedOption.dataset.price) {
+                    priceEl.textContent = selectedOption.dataset.price;
+                  }
+                  if (selectedOption.dataset.comparePrice) {
+                    if (compareEl) {
+                      compareEl.textContent = selectedOption.dataset.comparePrice;
+                      compareEl.style.display = 'inline';
+                    } else {
+                      const priceWrapper = item.querySelector('.fbt-price');
+                      if (priceWrapper) {
+                        const newCompare = document.createElement('del');
+                        newCompare.className = 'fbt-compare-price';
+                        newCompare.textContent = selectedOption.dataset.comparePrice;
+                        priceWrapper.appendChild(newCompare);
+                      }
+                    }
+                  } else if (compareEl) {
+                    compareEl.style.display = 'none';
+                  }
+                }
+              }
+            });
+          });
+
+          // AJAX Cart Add with premium loading animations
+          wrapper.querySelectorAll('.fbt-btn').forEach((btn) => {
+            btn.addEventListener('click', function (e) {
+              e.preventDefault();
+
+              const variantId = btn.dataset.variant;
+              if (!variantId) return;
+
+              const btnText = btn.querySelector('.fbt-btn-text');
+              const spinner = btn.querySelector('.fbt-btn-spinner');
+
+              if (btn.disabled) return;
+              btn.disabled = true;
+
+              if (btnText && spinner) {
+                btnText.style.display = 'none';
+                spinner.style.display = 'inline-flex';
+              } else {
+                btn.textContent = '...';
+              }
+
+              const cart = document.querySelector('cart-notification') || document.querySelector('cart-drawer');
+              const formData = new FormData();
+              formData.append('id', variantId);
+              formData.append('quantity', '1');
+               // Add hidden line item property for tracking in Shopify admin
+              formData.append('properties[_source]', 'Frequently Bought Together');
+
+              if (cart && typeof cart.getSectionsToRender === 'function') {
+                formData.append(
+                  'sections',
+                  cart.getSectionsToRender().map((section) => section.id)
+                );
+                formData.append('sections_url', window.location.pathname);
+              }
+
+              fetch('/cart/add.js', {
+                method: 'POST',
+                headers: {
+                  'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: formData,
+              })
+                .then((res) => {
+                  if (!res.ok) throw new Error('Response error');
+                  return res.json();
+                })
+                .then((parsedState) => {
+                  if (btnText && spinner) {
+                    spinner.style.display = 'none';
+                    btnText.style.display = 'inline';
+                    btnText.textContent = 'Added ✓';
+                  } else {
+                    btn.textContent = 'Added ✓';
+                  }
+
+                  fetch('/cart.json')
+                    .then((res) => res.json())
+                    .then((cartData) => {
+                      document.querySelectorAll('.cart-count').forEach((el) => {
+                        el.innerHTML = cartData.item_count;
+                      });
+                      if (document.querySelector('header-total-price')) {
+                        document.querySelector('header-total-price').updateTotal(cartData);
+                      }
+                      const freeShip = document.querySelector('free-ship-progress-bar');
+                      if (freeShip) {
+                        freeShip.init(cartData.items_subtotal_price);
+                      }
+                    })
+                    .catch((err) => console.error(err));
+
+                  if (cart && typeof cart.getSectionsToRender === 'function' && parsedState.sections) {
+                    cart.getSectionsToRender().forEach((section) => {
+                      const elementToReplace = document.getElementById(section.id);
+                      if (elementToReplace && parsedState.sections[section.id]) {
+                        const html = new DOMParser().parseFromString(parsedState.sections[section.id], 'text/html');
+                        const newContent = html.querySelector('#form-mini-cart');
+                        if (newContent) {
+                          elementToReplace.innerHTML = newContent.innerHTML;
+                        }
+
+                        const cart_threshold = document.querySelector('.bls__cart-thres-js');
+                        if (cart_threshold) {
+                          const newThres = html.querySelector('.bls__cart-thres-js');
+                          if (newThres) {
+                            if (newThres.classList.contains('cart_shipping_free')) {
+                              cart_threshold.classList.add('cart_shipping_free');
+                            } else {
+                              cart_threshold.classList.remove('cart_shipping_free');
+                            }
+                            const innerThres = html.querySelector('.bls__cart-thres');
+                            if (innerThres) {
+                              cart_threshold.querySelector('.bls__cart-thres').innerHTML = innerThres.innerHTML;
+                            }
+                            setTimeout(function () {
+                              const bar = html.querySelector('.percent_shipping_bar');
+                              if (bar) {
+                                cart_threshold
+                                  .querySelector('.percent_shipping_bar')
+                                  .setAttribute('style', bar.getAttribute('style'));
+                              }
+                            }, 500);
+                          }
+                        }
+                      }
+                    });
+
+                    if (typeof cart.cartAction === 'function') {
+                      cart.cartAction();
+                    }
+                    if (typeof cart.open === 'function') {
+                      cart.open();
+                    }
+                    if (typeof BlsLazyloadImg !== 'undefined' && typeof BlsLazyloadImg.init === 'function') {
+                      BlsLazyloadImg.init();
+                    }
+                  }
+
+                  document.dispatchEvent(new CustomEvent('cart:updated', { bubbles: true }));
+
+                  setTimeout(() => {
+                    if (btnText) {
+                      btnText.textContent = '+ Add';
+                    } else {
+                      btn.textContent = '+ Add';
+                    }
+                    btn.disabled = false;
+                  }, 1500);
+                })
+                .catch((err) => {
+                  console.error(err);
+                  if (btnText && spinner) {
+                    spinner.style.display = 'none';
+                    btnText.style.display = 'inline';
+                    btnText.textContent = 'Error ✕';
+                  } else {
+                    btn.textContent = 'Error ✕';
+                  }
+
+                  setTimeout(() => {
+                    if (btnText) {
+                      btnText.textContent = '+ Add';
+                    } else {
+                      btn.textContent = '+ Add';
+                    }
+                    btn.disabled = false;
+                  }, 1500);
+                });
+            });
+          });
+        });
+      };
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initFBT);
+      } else {
+        initFBT();
+      }
+    })();
+  </script>
+{% endif %}

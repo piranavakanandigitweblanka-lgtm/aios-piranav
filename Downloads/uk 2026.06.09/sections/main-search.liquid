@@ -1,0 +1,366 @@
+{%comment%} by kuberan on 04/03/2026 for infinity scroll 
+{{ 'product.css' | asset_url | stylesheet_tag }}
+{{ 'page-heading.css' | asset_url | stylesheet_tag }}
+{%- liquid
+  assign th_st = settings
+  assign product_style = th_st.product_style
+  assign st = section.settings
+  assign results_per_page = st.results_per_page
+-%}
+{%- paginate search.results by results_per_page -%}
+  <section class="page-heading not-bg">
+    <div class="{{ section.settings.layout }}">
+      <div class="page-head text-center">
+        {% if search.performed %}
+          <h1 class="heading-title search-result">
+            {{ 'general.search.results_with_count' | t: terms: search.terms, count: search.results_count }}
+          </h1>
+        {% else %}
+          <h3 class="">{{ 'general.search.title' | t }}</h3>
+        {% endif %}
+        {%- if th_st.enable_search_input -%}
+          {%comment%} Changed by kuberan on 03/09/2025 
+          <form
+            action="/search"
+            method="GET"
+            novalidate
+            class="search-modal__form col-md-8 mx-auto mt-30"
+          >
+            <div class="field">
+              <input type="hidden" name="type" value="product">
+              <input type="hidden" name="options[unavailable_products]" value="last">
+              <input type="hidden" name="options[prefix]" value="last">
+              <input type="hidden" name="options[fields]" value="title,vendor,product_type,variants.title">
+              <input
+                type="text"
+                placeholder="{{ 'general.search.search' | t }}"
+                name="q"
+                required
+                autocomplete="off"
+                class="search__input"
+              >
+              <button type="submit" class="search__button field__button">
+                <svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M11.9 11.731C11.8 11.731 11.8 11.731 11.9 11.731C11.8 11.8304 11.8 11.8304 11.8 11.8304C11.3 12.3275 10.7 12.7251 9.9 13.0234C9.2 13.3216 8.4 13.4211 7.6 13.4211C6.8 13.4211 6 13.2222 5.3 12.924C4.6 12.6257 4 12.2281 3.4 11.6316C2.9 11.1345 2.4 10.4386 2.1 9.74269C1.8 9.1462 1.7 8.45029 1.7 7.65497C1.7 6.85965 1.9 6.06433 2.2 5.36842C2.5 4.5731 2.9 3.97661 3.4 3.38012C4 2.88304 4.6 2.48538 5.3 2.18713C6 1.88889 6.8 1.69006 7.6 1.69006C8.4 1.69006 9.2 1.88889 9.9 2.18713C10.6 2.48538 11.3 2.88304 11.8 3.47953C12.3 3.97661 12.7 4.67251 13.1 5.36842C13.4 6.06433 13.6 6.76023 13.6 7.65497C13.6 8.45029 13.4 9.24561 13.1 9.94152C12.8 10.538 12.4 11.1345 11.9 11.731ZM16.7 15.4094L13.6 12.3275C14.1 11.6316 14.5 10.9357 14.8 10.1404C15.1 9.34503 15.2 8.45029 15.2 7.55556C15.2 6.46199 15 5.46784 14.6 4.5731C14.2 3.67836 13.7 2.88304 13 2.18713C12.3 1.49123 11.5 0.994152 10.6 0.596491C9.7 0.19883 8.7 0 7.6 0C6.6 0 5.6 0.19883 4.6 0.596491C3.7 0.994152 2.9 1.49123 2.2 2.18713C1.5 2.88304 1 3.67836 0.6 4.67251C0.2 5.56725 0 6.5614 0 7.65497C0 8.64912 0.2 9.64327 0.6 10.6374C1 11.5322 1.6 12.3275 2.3 13.0234C3 13.7193 3.8 14.2164 4.7 14.7134C5.6 15.0117 6.6 15.2105 7.6 15.2105C8.5 15.2105 9.4 15.1111 10.2 14.8129C11 14.5146 11.8 14.117 12.4 13.6199L15.5 16.7018C15.7 16.9006 15.9 17 16.1 17C16.3 17 16.5 16.9006 16.7 16.7018C16.9 16.5029 17 16.3041 17 16.1053C17 15.807 16.9 15.6082 16.7 15.4094Z" fill="#111111"/>
+                </svg>
+              </button>
+            </div>
+          </form>{%endcomment %}
+        {%- endif -%}
+      </div>
+    </div>
+  </section>
+  <section
+    class="facest-filters-section"
+    data-section-type="page-search"
+    data-section-id="{{ section.id }}"
+    data-view="{{ template.name }}"
+  >
+    <div class="{{ section.settings.layout }} bls__search-page-main ">
+      {% if search.performed %}
+        <div class="row bls__grid {{ product_style }}">
+          {% if search.results_count != 0 %}
+            {%- for item in search.results limit: results_per_page -%}
+              {%- if item.object_type == 'product' -%}
+                <div class="col-lg-3 col-md-4 col-6 bls__product-load">
+                  {%- render 'product-item' | product: item -%}
+                </div>
+              {%- endif -%}
+            {%- endfor -%}
+          {% endif %}
+        </div>
+      {% endif %}
+      {% if paginate.pages > 1 %}
+        <div class="mt-30">
+          {% render 'pagination', paginate: paginate %}
+        </div>
+      {% endif %}
+    </div>
+  </section>
+{%- endpaginate -%}
+
+{% schema %}
+{
+  "name": "Search",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Pagination"
+    },
+    {
+      "type": "range",
+      "id": "results_per_page",
+      "label": "Results per page",
+      "default": 4,
+      "min": 1,
+      "max": 50,
+      "step": 1
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "default": "container",
+      "options": [
+        {
+          "value": "container",
+          "label": "Default"
+        },
+        {
+          "value": "container-fluid",
+          "label": "Fluid container"
+        },
+        {
+          "value": "full-width",
+          "label": "Full width"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
+{%endcomment %}
+
+{{ 'product.css' | asset_url | stylesheet_tag }}
+{{ 'page-heading.css' | asset_url | stylesheet_tag }}
+
+<style>
+#infinite-loader { display:none; justify-content:center; padding:30px 0; gap:8px; font-size:14px; color:#666; }
+#infinite-loader.visible { display:flex; }
+.loader-dots span { width:8px; height:8px; background:#111; border-radius:50%; display:inline-block; margin:0 3px; animation:bounce .7s infinite alternate; }
+.loader-dots span:nth-child(2){animation-delay:.15s}
+.loader-dots span:nth-child(3){animation-delay:.3s}
+@keyframes bounce { from{transform:translateY(0);opacity:.4} to{transform:translateY(-6px);opacity:1} }
+#all-loaded-msg { display:none; text-align:center; padding:20px; font-size:13px; color:#999; }
+#all-loaded-msg.visible { display:block; }
+</style>
+
+{%- assign product_style = settings.product_style -%}
+{%- assign products_column = section.settings.products_column | default: 4 -%}
+
+{%- paginate search.results by 250 -%}
+
+<section class="page-heading not-bg">
+  <div class="{{ section.settings.layout }}">
+    <div class="page-head text-center">
+      {% if search.performed %}
+        <h1 class="heading-title search-result">
+          {{ 'general.search.results_with_count' | t: terms: search.terms, count: search.results_count }}
+        </h1>
+      {% else %}
+        <h3>{{ 'general.search.title' | t }}</h3>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<section class="facest-filters-section" data-section-type="page-search" data-section-id="{{ section.id }}">
+  <div class="{{ section.settings.layout }} bls__search-page-main">
+    
+    {% if search.performed and search.results_count > 0 %}
+      <div class="toolbar toolbar-products d-flex justify-content-between align-items-center mb-30 pb-10 border-bottom">
+        <div class="toolbar-amount">
+          {{ 'templates.search.results_with_count' | t: terms: search.terms, count: search.results_count }}
+        </div>
+        <div class="toolbar-sorter sorter d-flex align-items-center">
+          <label for="SortBy" class="mr-10 mb-0" style="white-space: nowrap;">{{ 'products.facets.sort_by_label' | t }}</label>
+          <select name="sort_by" id="SortBy" class="form-select" onchange="location.href = window.location.pathname + '?q={{ search.terms | url_escape }}&type=product&sort_by=' + this.value">
+            {%- assign sort_by = search.sort_by | default: search.default_sort_by -%}
+            {%- for option in search.sort_options -%}
+              <option value="{{ option.value | escape }}" {% if option.value == sort_by %}selected="selected"{% endif %}>
+                {{ option.name | escape }}
+              </option>
+            {%- endfor -%}
+          </select>
+        </div>
+      </div>
+    {% endif %}
+
+    {% if search.performed %}
+      {% if search.results_count == 0 %}
+        <div class="search-empty text-center" style="padding: 60px 0;">
+           <div class="mb-20">
+             <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="color: #ccc;">
+               <circle cx="11" cy="11" r="8"></circle>
+               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+             </svg>
+           </div>
+           <p style="font-size: 18px; color: #555;">
+             No products found for <strong>"{{ search.terms }}"</strong>.
+           </p>
+           <a href="/collections/all" class="btn btn-primary mt-20" style="display: inline-block; padding: 10px 25px; border: 1px solid #111; color: #111; text-transform: uppercase; font-size: 13px; font-weight: 600;">
+             Browse All Products
+           </a>
+        </div>
+      {% else %}
+
+        <div class="row bls__grid {{ product_style }} row-cols-2 row-cols-md-3 row-cols-lg-{{ products_column }}" id="search-product-grid">
+          {% for item in search.results %}
+            {% if item.object_type == 'product' %}
+              <div class="bls__product-load mb-30">
+                {% render 'product-item', product: item %}
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        <div id="infinite-loader">
+          <div class="loader-dots"><span></span><span></span><span></span></div>
+          &nbsp;Loading...
+        </div>
+
+        <div id="all-loaded-msg">All products loaded</div>
+
+      {% endif %}
+    {% endif %}
+
+  </div>
+</section>
+
+<script>
+(function(){
+  var totalPages  = {{ paginate.pages | default: 1 }};
+  var searchTerms = {{ search.terms | json }};
+  var sectionId   = '{{ section.id }}';
+
+  var grid    = document.getElementById('search-product-grid');
+  var loader  = document.getElementById('infinite-loader');
+  var doneMsg = document.getElementById('all-loaded-msg');
+
+  var nextPage = 2;
+  var fetching = false;
+
+  if (!grid) return;
+  if (totalPages <= 1) { doneMsg.classList.add('visible'); return; }
+
+  var sentinel = document.createElement('div');
+  sentinel.id = 'scroll-sentinel';
+  grid.after(sentinel);
+
+  var observer = new IntersectionObserver(function(entries){
+    if (entries[0].isIntersecting && !fetching) {
+      loadNext();
+    }
+  }, { rootMargin: '400px' });
+
+  observer.observe(sentinel);
+
+  function activateImages(container){
+    container.querySelectorAll('source').forEach(function(source){
+      if (source.dataset.srcset) {
+        source.srcset = source.dataset.srcset;
+        source.removeAttribute('data-srcset');
+      }
+    });
+
+    container.querySelectorAll('img').forEach(function(img){
+      img.setAttribute('loading', 'eager');
+      img.setAttribute('decoding', 'async');
+
+      if (img.dataset.src) {
+        img.src = img.dataset.src;
+        img.removeAttribute('data-src');
+      }
+
+      if (img.dataset.srcset) {
+        img.srcset = img.dataset.srcset;
+        img.removeAttribute('data-srcset');
+      }
+
+      if (img.srcset && !img.sizes) {
+        img.sizes = '(max-width: 576px) 50vw, (max-width: 992px) 33vw, 25vw';
+      }
+
+      img.classList.remove('lazy', 'lazyload', 'lazyloading');
+      img.classList.add('lazyloaded');
+    });
+
+    container.querySelectorAll('[data-bg]').forEach(function(el){
+      el.style.backgroundImage = 'url(' + el.dataset.bg + ')';
+      el.removeAttribute('data-bg');
+    });
+  }
+
+  function triggerLazysizesRescan(){
+    if (!window.lazySizes) return;
+    try { window.lazySizes.autoSizer.checkElems(); } catch(e){}
+    try { window.lazySizes.loader.checkElems(); } catch(e){}
+    document.querySelectorAll('#search-product-grid img.lazyload').forEach(function(img){
+      try { window.lazySizes.loader.unveil(img); } catch(e){}
+    });
+  }
+
+  function loadNext(){
+    if (fetching || nextPage > totalPages) { finish(); return; }
+
+    fetching = true;
+    loader.classList.add('visible');
+
+    var url = new URL(window.location.href);
+    url.searchParams.set('page', nextPage);
+    url.searchParams.set('section_id', sectionId);
+    url.searchParams.set('type', 'product');
+
+    fetch(url.href)
+      .then(function(r){ return r.text(); })
+      .then(function(html){
+        var temp = document.createElement('div');
+        temp.innerHTML = html;
+
+        var newItems = temp.querySelectorAll('#search-product-grid .bls__product-load');
+
+        newItems.forEach(function(item){ activateImages(item); });
+        newItems.forEach(function(item){ grid.appendChild(item); });
+
+        triggerLazysizesRescan();
+
+        nextPage++;
+        fetching = false;
+        loader.classList.remove('visible');
+
+        if (nextPage > totalPages) finish();
+      })
+      .catch(function(err){
+        console.error('Infinite scroll error:', err);
+        fetching = false;
+        loader.classList.remove('visible');
+      });
+  }
+
+  function finish(){
+    doneMsg.classList.add('visible');
+    observer.disconnect();
+  }
+
+})();
+</script>
+
+{%- endpaginate -%}
+
+{% schema %}
+{
+  "name": "Search",
+  "settings": [
+    {
+      "type": "range",
+      "id": "products_column",
+      "label": "Items per row (Desktop)",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "default": "container",
+      "options": [
+        { "value": "container", "label": "Default" },
+        { "value": "container-fluid", "label": "Fluid container" },
+        { "value": "full-width", "label": "Full width" }
+      ]
+    }
+  ]
+}
+{% endschema %}

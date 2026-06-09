@@ -1,0 +1,519 @@
+{{ 'instagram.css' | asset_url | stylesheet_tag }}
+{%- liquid
+  assign st = section.settings
+  assign container = st.container
+  assign text_align = st.text_alignment
+  assign heading = st.heading
+  assign description = st.description
+  assign bg_color = st.ig_background_color
+
+  assign item_desktop_grid = st.images_per_row_grid_d
+  assign carousel_autoplay = st.carousel_autoplay
+  assign carousel_loop = st.carousel_loop
+  assign carousel_arrows = st.carousel_arrows
+  assign carousel_bullets = st.carousel_bullets
+  assign show_bullet_mobile = st.show_bullet_mobile
+  assign column_gap = st.column_gap
+  assign items_to_show = st.ig_num_imgs
+  assign ins_images_style = st.ins_images_style
+  assign ig_ac = st.ig_ac
+  assign ig_type = st.ig_type
+  assign ig_type_get = st.ig_image_show
+  assign aspect_ratio = st.aspect_ratio
+  assign enabled_animations = settings.animations_enabled
+  assign column_gap_tablet = ''
+  if column_gap > 30
+    assign column_gap_tablet = ' gap-tablet'
+  endif
+  assign column_gap_mobile = ''
+  if column_gap > 15
+    assign column_gap_mobile = ' gap-mobile'
+  endif
+
+  assign reset_spacing = ''
+  if st.reset_spacing
+    assign reset_spacing = ' remove_spacing'
+  endif
+  assign spt_tablet = ''
+  if st.padding_top > 50
+    assign spt_tablet = ' spt-tablet'
+  endif
+  assign spt_mobile = ''
+  if st.padding_top > 30
+    assign spt_mobile = ' spt-mobile'
+  endif
+  assign spb_tablet = ''
+  if st.padding_bottom > 50
+    assign spb_tablet = ' spb-tablet'
+  endif
+  assign spb_mobile = ''
+  if st.padding_bottom > 30
+    assign spb_mobile = ' spb-mobile'
+  endif
+
+  assign has_bg = ''
+  if bg_color != blank
+    assign has_bg = ' has-bg'
+  endif
+-%}
+
+{%- capture style -%}
+  {%- if bg_color != blank -%}
+    --section-bg-color: {{ bg_color }};
+  {%- endif -%}
+  --section-padding-top: {{ st.padding_top }}px; --section-padding-bottom:
+  {{ st.padding_bottom }}px; --bls-gutter-x: {{ column_gap }}px;
+{%- endcapture -%}
+<section
+  data-id="{{ section.id }}"
+  data-type="instagram"
+  {% if ig_type_get == 'ig_type_api' %}
+    data-ig-type="{{ ig_type }}"
+    data-access-token="{{ ig_ac }}"
+    data-images="{{ items_to_show }}"
+  {% endif %}
+  class="bls__section {{ has_bg }}{{ spt_tablet }}{{ spb_tablet }}{{ spt_mobile }}{{ spb_mobile }} {% if ig_type_get == 'ig_type_api' %}bls__instagram-api{% endif %} bls__instagram-section {{ reset_spacing }}"
+  style="{{ style | strip | strip_newlines }}"
+>
+  <div class="{{ container }}">
+    {%- if heading != blank or description != blank -%}
+      <div class="bls__section-header {{ text_align }} {% if enabled_animations %}scroll-trigger animate--slide-in{% endif %}">
+        {%- if heading != blank -%}
+          <h2 class="bls__section-heading mb-5">{{ heading }}</h2>
+        {%- endif -%}
+        {%- if description != blank -%}
+          <div class="bls__section-des">
+            {{ description }}
+          </div>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+    {%- if ig_type == 'carousel' -%}
+      <div
+        class="bls__instagram swiper bls__swiper hover__show-nav"
+        id="bls__swiper-{{ section.id }}"
+        data-section-id="{{ section.id }}"
+        data-autoplay="{{ carousel_autoplay }}"
+        data-loop="{{ carousel_loop }}"
+        data-mobile="2"
+        data-tablet="3"
+        data-desktop="{{ item_desktop_grid }}"
+        data-spacing="{{ column_gap }}"
+      >
+        <div class="swiper-wrapper" style="--perload-gap: {{ column_gap }}px">
+          {%- if ig_type_get == 'ig_type_api' -%}
+            {%- if ig_ac == blank -%}
+              {%- for i in (1..item_desktop_grid) -%}
+                <div class="swiper-slide {% if enabled_animations %}scroll-trigger animate--slide-in{% endif %}"
+                  {% if enabled_animations %}
+                    data-cascade
+                    style="--animation-order: {{ forloop.index }};"
+                  {% endif %}
+                >
+                  <a href="#" class="bls__instagram-item ins-{{ ins_images_style }}">
+                    {%- render 'responsive-image' | type: image | cls: 'bls_instagram-image' -%}
+                    <span class="bls__instagram-icon"></span>
+                  </a>
+                </div>
+              {%- endfor -%}
+            {%- endif -%}
+          {%- endif -%}
+
+          {%- if ig_type_get == 'ig_type_local' -%}
+            {%- for block in section.blocks -%}
+              <div class="swiper-slide {% if enabled_animations %}scroll-trigger animate--slide-in{% endif %}"
+                {% if enabled_animations %}
+                  data-cascade
+                  style="--animation-order: {{ forloop.index }};"
+                {% endif %}
+              >
+                <div class="bls__instagram-item ins-{{ ins_images_style }}">
+                  <a
+                    aria-label="links"
+                    {% if block.settings.ig_link != blank %}
+                      href="{{ block.settings.ig_link }}"
+                    {% else %}
+                      role="link" aria-disabled="true"
+                    {% endif %}
+                  >
+                    {%- if block.settings.ig_up_image != blank -%}
+                      {% render 'responsive-image',
+                        image: block.settings.ig_up_image,
+                        cls: 'bls_instagram-image',
+                        aspect_ratio: aspect_ratio
+                      %}
+                    {%- else -%}
+                      {%- render 'responsive-image' | type: image | cls: 'bls_instagram-image' -%}
+                    {%- endif -%}
+                    <span class="bls__instagram-icon"></span>
+                  </a>
+                </div>
+              </div>
+            {%- endfor -%}
+          {%- endif -%}
+        </div>
+        {%- render 'swiper-control',
+          show_bullet: carousel_bullets,
+          show_arrow: carousel_arrows,
+          show_bullet_mobile: show_bullet_mobile
+        -%}
+      </div>
+    {%- else -%}
+      <div class="bls__instagram-grid" data-section-id="{{ section.id }}">
+        <div
+          class="row row-cols-lg-{{ item_desktop_grid }} row-cols-sm-3 row-cols-2{{ column_gap_tablet }}{{ column_gap_mobile }}"
+          style="--bs-gutter-x: {{ column_gap }}px;"
+        >
+          {%- if ig_type_get == 'ig_type_api' -%}
+            {%- if ig_ac == blank -%}
+              {%- for i in (1..items_to_show) -%}
+                <div class="bls__instagram-item ins-{{ ins_images_style }} {% if enabled_animations %}scroll-trigger animate--slide-in{% endif %}"
+                  {% if enabled_animations %}
+                    data-cascade
+                    style="--animation-order: {{ forloop.index }};"
+                  {% endif %}
+                >
+                  <a href="#">
+                    {%- render 'responsive-image' | type: image | cls: 'bls_instagram-image' -%}
+                    <span class="bls__instagram-icon"></span>
+                  </a>
+                </div>
+              {%- endfor -%}
+            {%- endif -%}
+          {%- endif -%}
+
+          {%- if ig_type_get == 'ig_type_local' -%}
+            {%- for block in section.blocks -%}
+              <div class="bls__instagram-item ins-{{ ins_images_style }} {% if enabled_animations %}scroll-trigger animate--slide-in{% endif %}"
+                {% if enabled_animations %}
+                  data-cascade
+                  style="--animation-order: {{ forloop.index }};"
+                {% endif %}
+              >
+                <a
+                  {% if block.settings.ig_link != blank %}
+                    href="{{ block.settings.ig_link }}"
+                  {% else %}
+                    role="link" aria-disabled="true"
+                  {% endif %}
+                >
+                  {%- if block.settings.ig_up_image != blank -%}
+                    {% render 'responsive-image',
+                      image: block.settings.ig_up_image,
+                      cls: 'bls_instagram-image',
+                      aspect_ratio: aspect_ratio
+                    %}
+                  {%- else -%}
+                    {%- render 'responsive-image' | type: image | cls: 'bls_instagram-image' -%}
+                  {%- endif -%}
+                  <span class="bls__instagram-icon"></span>
+                </a>
+              </div>
+            {%- endfor -%}
+          {%- endif -%}
+        </div>
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Instagram",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section header"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Instagram"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "default": "<p>Follow us in instagram.</p>"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text Alignment",
+      "default": "text-center",
+      "options": [
+        {
+          "value": "text-left",
+          "label": "Left"
+        },
+        {
+          "value": "text-center",
+          "label": "Center"
+        },
+        {
+          "value": "text-right",
+          "label": "Right"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "General settings"
+    },
+    {
+      "type": "select",
+      "id": "container",
+      "label": "Layout",
+      "default": "container",
+      "options": [
+        {
+          "value": "container",
+          "label": "Default"
+        },
+        {
+          "value": "container-fluid",
+          "label": "Fluid container"
+        },
+        {
+          "value": "full-width",
+          "label": "Full width"
+        }
+      ]
+    },
+    {
+      "type": "color",
+      "id": "ig_background_color",
+      "label": "Background color"
+    },
+    {
+      "type": "range",
+      "min": 0,
+      "max": 50,
+      "unit": "px",
+      "step": 5,
+      "default": 10,
+      "label": "Column gap",
+      "id": "column_gap"
+    },
+    {
+      "type": "header",
+      "content": "Instagram settings"
+    },
+    {
+      "type": "select",
+      "id": "ig_image_show",
+      "label": "Image type show",
+      "default": "ig_type_local",
+      "options": [
+        {
+          "value": "ig_type_local",
+          "label": "Instagram upload manual"
+        },
+        {
+          "value": "ig_type_api",
+          "label": "Instagram get api"
+        }
+      ],
+      "info": "*If you choose type instagram upload manual please add a block and upload the image"
+    },
+    {
+      "type": "select",
+      "id": "aspect_ratio",
+      "label": "Aspect ratio",
+      "default": "1/1",
+      "options": [
+        {
+          "value": "original",
+          "label": "Original aspect ratio"
+        },
+        {
+          "value": "16/9",
+          "label": "16:9"
+        },
+        {
+          "value": "3/4",
+          "label": "3:4"
+        },
+        {
+          "value": "4/3",
+          "label": "4:3"
+        },
+        {
+          "value": "1/1",
+          "label": "1:1"
+        }
+      ],
+      "info": "*Apply type instagram upload manual"
+    },
+    {
+      "type": "textarea",
+      "id": "ig_ac",
+      "label": "User's photos via Instagram API",
+      "info": "Add Instagram Access Token Key here."
+    },
+    {
+      "type": "select",
+      "id": "ins_images_style",
+      "label": "Images style",
+      "default": "square",
+      "options": [
+        {
+          "value": "square",
+          "label": "Square"
+        },
+        {
+          "value": "rounded",
+          "label": "Rounded"
+        },
+        {
+          "value": "radius",
+          "label": "Radius"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "min": 1,
+      "max": 20,
+      "step": 1,
+      "default": 8,
+      "id": "ig_num_imgs",
+      "label": "Total images to show"
+    },
+    {
+      "type": "select",
+      "id": "ig_type",
+      "label": "Instagram type",
+      "default": "carousel",
+      "options": [
+        {
+          "value": "grid",
+          "label": "Grid"
+        },
+        {
+          "value": "carousel",
+          "label": "Carousel"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "images_per_row_grid_d",
+      "label": "Items per row (Desktop)",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "default": 6
+    },
+    {
+      "type": "header",
+      "content": "Carousel settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "carousel_autoplay",
+      "label": "Autoplay",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "carousel_loop",
+      "label": "Infinity",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "carousel_arrows",
+      "label": "Show arrows",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "carousel_bullets",
+      "label": "Show bullets both on desktop and mobile",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_bullet_mobile",
+      "label": "Only show bullets on mobile",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "default": 0,
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "default": 0,
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "checkbox",
+      "id": "reset_spacing",
+      "label": "Remove default space between sections",
+      "default": false
+    }
+  ],
+  "blocks": [
+    {
+      "type": "ig_img_local",
+      "name": "Instagram upload manual",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "ig_up_image",
+          "label": "Image",
+          "info": "231 x 231px recommended"
+        },
+        {
+          "type": "url",
+          "id": "ig_link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Instagram",
+      "blocks": [
+        {
+          "type": "ig_img_local"
+        },
+        {
+          "type": "ig_img_local"
+        },
+        {
+          "type": "ig_img_local"
+        },
+        {
+          "type": "ig_img_local"
+        },
+        {
+          "type": "ig_img_local"
+        },
+        {
+          "type": "ig_img_local"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

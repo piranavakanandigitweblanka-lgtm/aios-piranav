@@ -1,0 +1,331 @@
+<!-- PENDANT TOAST POPUPS -->
+
+<!-- Pop 1: Buy 2 alert (1 pendant in cart) -->
+<div id="pendant-pop1" class="pendant-toast pop1">
+  <div class="toast-inner">
+    <button class="toast-close" aria-label="Close">&times;</button>
+    <div class="toast-icon">💡</div>
+    <div class="toast-body">
+      <p class="toast-title">Buy 2 Pendant Lights</p>
+      <p class="toast-message">Add one more pendant light to unlock the discount.</p>
+    </div>
+  </div>
+  <div class="toast-progress"></div>
+</div>
+
+<!-- Pop 2: Eligible discount (2 pendants in cart) -->
+<div id="pendant-pop2" class="pendant-toast pop2">
+  <div class="toast-inner">
+    <button class="toast-close" aria-label="Close">&times;</button>
+    <div class="toast-icon">🎉</div>
+    <div class="toast-body">
+      <p class="toast-title">You're eligible for the discount!</p>
+      <p class="toast-discount">Buy 2 Pendant Lights</p>
+      <p class="toast-message">Click below to copy your discount code.</p>
+      <div class="toast-code" id="toast-copy-btn" title="Click to copy">
+        <span class="code-label">Use Code</span>
+        <span class="code-value">HLIGHT10</span>
+        <span class="copy-icon" id="copy-icon">📋</span>
+      </div>
+    </div>
+  </div>
+  <div class="toast-progress"></div>
+</div>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+
+  .pendant-toast {
+    font-family: 'DM Sans', sans-serif;
+    position: fixed;
+    top: 50%;
+    right: 24px;
+    transform: translateY(-50%) translateX(calc(100% + 40px));
+    width: 320px;
+    border-radius: 14px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.28), 0 1.5px 4px rgba(0,0,0,0.12);
+    z-index: 9999;
+    overflow: hidden;
+    opacity: 0;
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease;
+    pointer-events: none;
+  }
+
+  /* Pop 1 style: dark neutral */
+  .pendant-toast.pop1 {
+    background: #1a1a1a;
+    color: #f5f5f5;
+  }
+
+  /* Pop 2 style: warm dark with golden accent */
+  .pendant-toast.pop2 {
+    background: #1c1a0f;
+    color: #f5f5f5;
+    border: 1px solid rgba(245, 200, 66, 0.2);
+  }
+
+  .pendant-toast.is-open {
+    transform: translateY(-50%) translateX(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .toast-inner {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 18px 18px 16px 18px;
+    position: relative;
+  }
+
+  .toast-close {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 2px 5px;
+    border-radius: 6px;
+    transition: color 0.2s, background 0.2s;
+  }
+
+  .toast-close:hover {
+    color: #f5f5f5;
+    background: rgba(255,255,255,0.08);
+  }
+
+  .toast-icon {
+    font-size: 26px;
+    line-height: 1;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .toast-body {
+    flex: 1;
+    padding-right: 20px;
+  }
+
+  .toast-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #ffffff;
+    margin: 0 0 4px 0;
+    letter-spacing: -0.01em;
+  }
+
+  /* Pop 2 eligible subtitle */
+  .toast-discount {
+    font-size: 13px;
+    font-weight: 600;
+    color: #f5c842;
+    margin: 0 0 6px 0;
+    letter-spacing: 0.01em;
+  }
+
+  .toast-message {
+    font-size: 13px;
+    color: #aaa;
+    margin: 0 0 12px 0;
+    line-height: 1.45;
+  }
+
+  /* Pop 1 has no code block, so no bottom margin needed */
+  .pop1 .toast-message {
+    margin-bottom: 0;
+  }
+
+  /* Copy code block (Pop 2 only) */
+  .toast-code {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(245, 200, 66, 0.1);
+    border: 1px dashed rgba(245, 200, 66, 0.4);
+    border-radius: 8px;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, transform 0.1s;
+    user-select: none;
+  }
+
+  .toast-code:hover {
+    background: rgba(245, 200, 66, 0.18);
+    border-color: rgba(245, 200, 66, 0.7);
+  }
+
+  .toast-code:active {
+    transform: scale(0.97);
+  }
+
+  .code-label {
+    font-size: 11px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  .code-value {
+    font-size: 13px;
+    font-weight: 700;
+    color: #f5c842;
+    letter-spacing: 0.06em;
+  }
+
+  .copy-icon {
+    font-size: 13px;
+    margin-left: 2px;
+    line-height: 1;
+  }
+
+  .toast-code.copied .code-label {
+    color: #6ee7b7;
+  }
+
+  /* Progress bar */
+  .toast-progress {
+    height: 3px;
+    background: #f5c842;
+    width: 100%;
+    transform-origin: left;
+    transform: scaleX(0);
+    border-radius: 0 0 14px 14px;
+    transition: none;
+  }
+
+  .pop1 .toast-progress {
+    background: #888;
+  }
+
+  .pendant-toast.is-open .toast-progress {
+    transform: scaleX(1);
+    transition: transform 6s linear;
+  }
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  var pop1 = document.getElementById("pendant-pop1");
+  var pop2 = document.getElementById("pendant-pop2");
+  var timers = { pop1: null, pop2: null };
+  var previousPendantCount = 0; // Track previous cart state
+
+  function openToast(popup, key) {
+    // Close the other one first
+    closeToast(key === 'pop1' ? pop2 : pop1, key === 'pop1' ? 'pop2' : 'pop1');
+
+    popup.classList.add("is-open");
+    clearTimeout(timers[key]);
+    timers[key] = setTimeout(function () {
+      closeToast(popup, key);
+    }, 6000);
+  }
+
+  function closeToast(popup, key) {
+    popup.classList.remove("is-open");
+    clearTimeout(timers[key]);
+  }
+
+  // Close buttons
+  pop1.querySelector(".toast-close").addEventListener("click", function () { closeToast(pop1, 'pop1'); });
+  pop2.querySelector(".toast-close").addEventListener("click", function () { closeToast(pop2, 'pop2'); });
+
+  // Copy code (Pop 2 only)
+  var copyBtn = document.getElementById("toast-copy-btn");
+  var copyIcon = document.getElementById("copy-icon");
+  var codeLabel = copyBtn.querySelector(".code-label");
+  var copyResetTimer = null;
+
+  copyBtn.addEventListener("click", function () {
+    navigator.clipboard.writeText("HLIGHT10")
+      .then(showCopied)
+      .catch(function () {
+        var el = document.createElement("textarea");
+        el.value = "HLIGHT10";
+        el.style.position = "fixed";
+        el.style.opacity = "0";
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand("copy");
+        document.body.removeChild(el);
+        showCopied();
+      });
+  });
+
+  function showCopied() {
+    copyBtn.classList.add("copied");
+    copyIcon.textContent = "✅";
+    codeLabel.textContent = "Copied!";
+    clearTimeout(copyResetTimer);
+    copyResetTimer = setTimeout(function () {
+      copyBtn.classList.remove("copied");
+      copyIcon.textContent = "📋";
+      codeLabel.textContent = "Use Code";
+    }, 2000);
+  }
+
+  // Function to check cart and show appropriate popup
+  function checkCartAndShowPopup() {
+    fetch('/cart.js')
+      .then(function (res) { return res.json(); })
+      .then(function (cart) {
+        var pendantTotal = 0;
+        cart.items.forEach(function (item) {
+          if (item.handle && item.handle.includes('pendant')) {
+            pendantTotal += item.quantity;
+          }
+        });
+
+        // Show popup based on total pendant count
+        if (pendantTotal >= 2 && previousPendantCount < 2) {
+          // Transitioned to 2+: show Pop 2
+          openToast(pop2, 'pop2');
+        } else if (pendantTotal === 1 && previousPendantCount === 0) {
+          // First pendant added: show Pop 1
+          openToast(pop1, 'pop1');
+        }
+
+        // Update previous count
+        previousPendantCount = pendantTotal;
+      })
+      .catch(function (err) {
+        console.error("Failed to fetch cart:", err);
+      });
+  }
+
+  // Add to cart listener (product page)
+  document.body.addEventListener("click", function (e) {
+    if (e.target.closest('[name="add"]')) {
+      setTimeout(checkCartAndShowPopup, 1200);
+    }
+  });
+
+  // Cart quantity change listener (cart drawer)
+  document.body.addEventListener("change", function (e) {
+    // Listen for quantity changes in cart (common selectors)
+    if (e.target.matches('[name="updates[]"]') || 
+        e.target.matches('.cart-item__quantity') || 
+        e.target.matches('input[type="number"][name*="quantity"]')) {
+      setTimeout(checkCartAndShowPopup, 800);
+    }
+  });
+
+  // Also listen for + / - button clicks in cart drawer
+  document.body.addEventListener("click", function (e) {
+    if (e.target.closest('.cart-item__quantity-button') || 
+        e.target.closest('[data-quantity-button]') ||
+        e.target.closest('.quantity__button')) {
+      setTimeout(checkCartAndShowPopup, 800);
+    }
+  });
+
+});
+</script>
+

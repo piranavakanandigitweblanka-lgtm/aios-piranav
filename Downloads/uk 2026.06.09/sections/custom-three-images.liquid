@@ -1,0 +1,318 @@
+{% schema %}
+{
+  "name": "Custom Three Images",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading_title",
+      "label": "Heading Title",
+      "default": "Special Offers"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_heading",
+      "label": "Show Heading",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "image_1",
+      "label": "Image 1"
+    },
+    {
+      "type": "url",
+      "id": "link_1",
+      "label": "Link for Image 1"
+    },
+    {
+      "type": "text",
+      "id": "timer_end_date_1",
+      "label": "Timer End Date for Image 1 (YYYY-MM-DD)"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_2",
+      "label": "Image 2"
+    },
+    {
+      "type": "url",
+      "id": "link_2",
+      "label": "Link for Image 2"
+    },
+    {
+      "type": "text",
+      "id": "timer_end_date_2",
+      "label": "Timer End Date for Image 2 (YYYY-MM-DD)"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_3",
+      "label": "Image 3"
+    },
+    {
+      "type": "url",
+      "id": "link_3",
+      "label": "Link for Image 3"
+    },
+    {
+      "type": "text",
+      "id": "timer_end_date_3",
+      "label": "Timer End Date for Image 3 (YYYY-MM-DD)"
+    },
+    {
+      "type": "text",
+      "id": "copy_text",
+      "label": "Text to Copy",
+      "default": "DISCOUNT2025"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_auto_copy",
+      "label": "Enable Auto Copy on Image Click",
+      "default": true
+    },
+    {
+      "type": "number",
+      "id": "desktop_image_width",
+      "label": "Desktop Image Width (px)",
+      "default": 500
+    },
+    {
+      "type": "number",
+      "id": "desktop_image_height",
+      "label": "Desktop Image Height (px)",
+      "default": 500
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom Three Images"
+    }
+  ]
+}
+{% endschema %}
+
+<div class="custom-three-images">
+  {% if section.settings.show_heading %}
+    <h2 class="section-heading">{{ section.settings.heading_title }}</h2>
+  {% endif %}
+
+  <!-- Up Container: Timers -->
+  <div class="up-container">
+    <div class="timer-box">
+      {% if section.settings.timer_end_date_1 != blank %}
+        <div class="timer" data-end-date="{{ section.settings.timer_end_date_1 }}"></div>
+      {% endif %}
+    </div>
+    <div class="timer-box">
+      {% if section.settings.timer_end_date_2 != blank %}
+        <div class="timer" data-end-date="{{ section.settings.timer_end_date_2 }}"></div>
+      {% endif %}
+    </div>
+    <div class="timer-box">
+      {% if section.settings.timer_end_date_3 != blank %}
+        <div class="timer" data-end-date="{{ section.settings.timer_end_date_3 }}"></div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Down Container: Images -->
+  <div class="down-container">
+    <!-- Desktop Layout -->
+    <div class="image-container desktop-view">
+      <div class="image-box">
+        <a href="{{ section.settings.link_1 }}" class="image-link">
+          <img src="{{ section.settings.image_1 | img_url: 'master' }}" alt="Image 1" style="width: {{ section.settings.desktop_image_width }}px; height: {{ section.settings.desktop_image_height }}px;">
+        </a>
+      </div>
+      <div class="image-box">
+        <a href="{{ section.settings.link_2 }}" class="image-link">
+          <img src="{{ section.settings.image_2 | img_url: 'master' }}" alt="Image 2" style="width: {{ section.settings.desktop_image_width }}px; height: {{ section.settings.desktop_image_height }}px;">
+        </a>
+      </div>
+      <div class="image-box">
+        <a href="{{ section.settings.link_3 }}" class="image-link">
+          <img src="{{ section.settings.image_3 | img_url: 'master' }}" alt="Image 3" class="click-to-copy" data-code="{{ section.settings.copy_text }}" style="width: {{ section.settings.desktop_image_width }}px; height: {{ section.settings.desktop_image_height }}px;">
+        </a>
+      </div>
+    </div>
+
+    <!-- Mobile Swiper -->
+    <div class="image-container mobile-view swiper">
+      <div class="swiper-wrapper">
+        <div class="image-box swiper-slide">
+          <a href="{{ section.settings.link_1 }}" class="image-link">
+            <img src="{{ section.settings.image_1 | img_url: 'master' }}" alt="Image 1">
+            {% if section.settings.timer_end_date_1 != blank %}
+              <div class="timer" data-end-date="{{ section.settings.timer_end_date_1 }}"></div>
+            {% endif %}
+          </a>
+        </div>
+        <div class="image-box swiper-slide">
+          <a href="{{ section.settings.link_2 }}" class="image-link">
+            <img src="{{ section.settings.image_2 | img_url: 'master' }}" alt="Image 2">
+            {% if section.settings.timer_end_date_2 != blank %}
+              <div class="timer" data-end-date="{{ section.settings.timer_end_date_2 }}"></div>
+            {% endif %}
+          </a>
+        </div>
+        <div class="image-box swiper-slide">
+          <a href="{{ section.settings.link_3 }}" class="image-link">
+            <img src="{{ section.settings.image_3 | img_url: 'master' }}" alt="Image 3" class="click-to-copy" data-code="{{ section.settings.copy_text }}">
+            {% if section.settings.timer_end_date_3 != blank %}
+              <div class="timer" data-end-date="{{ section.settings.timer_end_date_3 }}"></div>
+            {% endif %}
+          </a>
+        </div>
+      </div>
+      <div class="swiper-pagination"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Copy Code Popup -->
+<div id="copy-popup" class="copy-popup">
+  <span>Code copied: <span id="copied-code"></span></span>
+</div>
+
+<style>
+  .custom-three-images {
+    text-align: center;
+    padding: 20px;
+  }
+  .section-heading {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  .up-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 20px;
+   
+  }
+  
+ 
+  .timer-box {
+   /* flex: 1;*/
+    width:200px;
+    text-align: center;
+  }
+.timer {
+  background: linear-gradient(rgba(255, 165, 0, 0.9), rgba(255, 0, 0, 0.9));
+    opacity: 0.7; /* This affects everything inside the element */
+    color: White;
+    padding: 9px;
+    border-radius: 5px;
+    font-size: 20px;
+ letter-spacing: 2px;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+  }
+  
+  .down-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .image-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+     box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+  }
+  .mobile-view {
+    display: none;
+  }
+  .image-box {
+    position: relative;
+  }
+  .image-box img {
+    width: 100%;
+    height: auto;
+    display: block;
+    cursor: pointer;
+    transition: transform 0.3s ease-in-out;
+  }
+  .copy-popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    text-align: center;
+  }
+
+  @media screen and (max-width: 768px) {
+    .up-container {
+      display: none; /* Hide timers in mobile view */
+    }
+    .desktop-view {
+      display: none;
+    }
+    .mobile-view {
+      display: block;
+    }
+    .image-box {
+      text-align: center;
+    }
+    .timer {
+      margin-top: 10px;
+    }
+  }
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  // Initialize Swiper for mobile view
+  var swiper = new Swiper(".mobile-view", {
+    slidesPerView: 1,
+    spaceBetween: 10,
+    pagination: {
+      el: ".swiper-pagination",
+      clickable: true,
+    },
+  });
+
+  // Timer Logic
+  function updateTimers() {
+    document.querySelectorAll(".timer").forEach(function (timer) {
+      var endDate = new Date(timer.getAttribute("data-end-date")).getTime();
+      var now = new Date().getTime();
+      var timeLeft = endDate - now;
+
+      if (timeLeft > 0) {
+        var days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+        var hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        var minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+        var seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+        timer.innerHTML = days + "d " + hours + "h " + minutes + "m " + seconds + "s";
+      } else {
+        timer.innerHTML = "EXPIRED";
+      }
+    });
+  }
+
+  setInterval(updateTimers, 1000);
+
+  // Copy Code Logic (Only for Image 3)
+  document.querySelector(".click-to-copy").addEventListener("click", function () {
+    if ({{ section.settings.enable_auto_copy | json }}) {
+      var code = this.getAttribute("data-code");
+      navigator.clipboard.writeText(code).then(function () {
+        var popup = document.getElementById("copy-popup");
+        var copiedCode = document.getElementById("copied-code");
+        copiedCode.textContent = code;
+        popup.style.display = "block";
+        setTimeout(function () {
+          popup.style.display = "none";
+        }, 2000);
+      });
+    }
+  });
+});
+</script>

@@ -1,0 +1,582 @@
+<!-- SPICELY COLLECTION — BUY 2 GET 10% TOAST POPUPS -->
+<!-- Pop 1: Buy 2 alert (1 qualifying item in cart) -->
+<div id="spicely-pop1" class="spicely-toast pop1">
+  <div class="toast-inner">
+    <button class="toast-close" aria-label="Close">&times;</button>
+    <div class="toast-icon">🔥</div>
+    <div class="toast-body">
+      <p class="toast-title">Add One More to Save!</p>
+      <p class="toast-message">Buy 2 items get <strong>15% off</strong> both.</p>
+    </div>
+  </div>
+  <div class="toast-progress"></div>
+</div>
+
+<!-- Pop 2: Eligible discount (2+ qualifying items in cart) -->
+<div id="spicely-pop2" class="spicely-toast pop2">
+  <div class="toast-inner">
+    <button class="toast-close" aria-label="Close">&times;</button>
+    <div class="toast-icon">🎉</div>
+    <div class="toast-body">
+      <p class="toast-title">You're eligible for 15% off now!</p>
+      <p class="toast-discount">Save 15%</p>
+      <p class="toast-message">Click below to copy your discount code.</p>
+      <div class="toast-code" id="spicely-copy-btn" title="Click to copy">
+        <span class="code-label">Use Code</span>
+        <span class="code-value">B2P10</span>
+        <span class="copy-icon" id="spicely-copy-icon">📋</span>
+      </div>
+    </div>
+  </div>
+  <div class="toast-progress"></div>
+</div>
+
+<style>
+  {% comment %} @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap'); {% endcomment %}
+
+  .spicely-toast {
+    font-family: 'DM Sans', sans-serif;
+    position: fixed;
+    top: 50%;
+    right: 24px;
+    transform: translateY(-50%) translateX(calc(100% + 40px));
+    width: 320px;
+    border-radius: 14px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.28), 0 1.5px 4px rgba(0,0,0,0.12);
+    z-index: 9999;
+    overflow: hidden;
+    opacity: 0;
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease;
+    pointer-events: none;
+  }
+
+  .spicely-toast.pop1 {
+    background: #1a1a1a;
+    color: #f5f5f5;
+  }
+
+  .spicely-toast.pop2 {
+    background: #1c0f0f;
+    color: #f5f5f5;
+    border: 1px solid rgba(220, 80, 50, 0.25);
+  }
+
+  .spicely-toast.is-open {
+    transform: translateY(-50%) translateX(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .toast-inner {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 18px 18px 16px 18px;
+    position: relative;
+  }
+
+  .toast-close {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 2px 5px;
+    border-radius: 6px;
+    transition: color 0.2s, background 0.2s;
+  }
+
+  .toast-close:hover {
+    color: #f5f5f5;
+    background: rgba(255,255,255,0.08);
+  }
+
+  .toast-icon {
+    font-size: 26px;
+    line-height: 1;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .toast-body {
+    flex: 1;
+    padding-right: 20px;
+  }
+
+  .toast-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #ffffff;
+    margin: 0 0 4px 0;
+    letter-spacing: -0.01em;
+  }
+
+  .toast-discount {
+    font-size: 13px;
+    font-weight: 600;
+    color: #f57642;
+    margin: 0 0 6px 0;
+    letter-spacing: 0.01em;
+  }
+
+  .toast-message {
+    font-size: 13px;
+    color: #aaa;
+    margin: 0 0 12px 0;
+    line-height: 1.45;
+  }
+
+  .toast-message strong {
+    color: #f5f5f5;
+  }
+
+  .pop1 .toast-message {
+    margin-bottom: 0;
+  }
+
+  /* Copy code block */
+  .toast-code {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(245, 118, 66, 0.1);
+    border: 1px dashed rgba(245, 118, 66, 0.4);
+    border-radius: 8px;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, transform 0.1s;
+    user-select: none;
+  }
+
+  .toast-code:hover {
+    background: rgba(245, 118, 66, 0.2);
+    border-color: rgba(245, 118, 66, 0.7);
+  }
+
+  .toast-code:active {
+    transform: scale(0.97);
+  }
+
+  .code-label {
+    font-size: 11px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  .code-value {
+    font-size: 13px;
+    font-weight: 700;
+    color: #f57642;
+    letter-spacing: 0.06em;
+  }
+
+  .copy-icon {
+    font-size: 13px;
+    margin-left: 2px;
+    line-height: 1;
+  }
+
+  .toast-code.copied .code-label {
+    color: #6ee7b7;
+  }
+
+  /* Progress bar */
+  .toast-progress {
+    height: 3px;
+    width: 100%;
+    transform-origin: left;
+    transform: scaleX(0);
+    border-radius: 0 0 14px 14px;
+    transition: none;
+  }
+
+  .pop1 .toast-progress {
+    background: #888;
+  }
+
+  .pop2 .toast-progress {
+    background: #f57642;
+  }
+
+  .spicely-toast.is-open .toast-progress {
+    transform: scaleX(1);
+    transition: transform 6s linear;
+  }
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  // ─── Qualifying Variant IDs (4 specific variants) ────────────────────────────
+  var QUALIFYING_VARIANT_IDS = new Set([
+    55623289504130,
+55623289536898,
+55627041702274,
+55627041735042,
+55627359158658,
+55631178924418,
+55635057967490,
+55649641070978,
+55649641103746,
+55655424983426,
+55655425147266,
+55655425343874,
+55655781466498,
+55655829045634,
+55660068569474,
+55660068602242,
+55660068667778,
+55660068700546,
+55660068733314,
+55661066420610,
+55675737014658,
+55675737080194,
+55675737145730,
+55675823325570,
+55675823423874,
+55675823620482,
+55675823784322,
+55675996471682,
+55675996799362,
+55680545522050,
+55559632617858,
+55529435070850,
+55529435169154,
+55529435332994,
+55570600001922,
+55570976440706,
+55574754165122,
+55575302799746,
+55575577100674,
+55575577133442,
+55576282366338,
+55579779563906,
+55580254994818,
+55580650078594,
+55580836954498,
+55583845384578,
+55583845450114,
+55584129089922,
+55584129122690,
+55586809315714,
+55593439560066,
+55593439691138,
+55593439756674,
+55593439789442,
+55593439822210,
+55593439854978,
+55596279497090,
+55596279529858,
+55596288147842,
+55596288344450,
+55597179666818,
+55597179797890,
+55597179830658,
+55597179896194,
+55597179961730,
+55599836463490,
+55599866773890,
+55599866806658,
+55599866839426,
+55599866872194,
+55599867068802,
+55606987555202,
+55623289504130,
+55623289536898,
+55627041702274,
+55627041735042,
+55627359158658,
+55631178924418,
+55635057967490,
+55649641070978,
+55649641103746,
+55655424983426,
+55655425147266,
+55655425343874,
+55655781466498,
+55655829045634,
+55660068569474,
+55660068602242,
+55660068667778,
+55660068700546,
+55660068733314,
+55661066420610,
+55675737014658,
+55675737080194,
+55675737145730,
+55675823325570,
+55675823423874,
+55675823620482,
+55675823784322,
+55675996471682,
+55675996799362,
+55680545522050,
+55766021603714,
+55766021669250,
+55766021734786,
+55766021800322,
+55766021833090,
+55766021865858,
+55766021898626,
+55766021931394,
+55766497296770,
+55766497329538,
+55767137190274,
+55767178543490,
+55767538434434,
+55767598072194,
+55782020481410,
+55782020678018,
+55782020710786,
+55785829466498,
+55785829499266,
+55794628133250,
+55795335528834,
+55795335561602,
+55795335594370,
+55795377144194,
+55806921277826,
+55806961582466,
+55806961615234,
+55806961713538,
+55806961811842,
+55806973051266,
+55807890325890,
+55807890358658,
+55807890391426,
+55807890424194,
+55807890456962,
+55808014483842,
+55808014516610,
+55808014582146,
+55808493060482,
+55808493093250,
+55812025975170,
+55812036034946,
+55822250377602,
+55822250410370,
+55822250606978,
+55822301168002,
+55822301200770,
+55827978420610,
+55827978453378,
+55832621547906,
+55847652098434,
+55847652196738,
+55847652295042,
+55847652327810,
+55847652360578,
+55847652491650,
+55847652557186,
+55855975170434,
+55855975203202,
+55855975268738,
+56069416092034,
+56071795704194,
+56072221819266,
+56077263044994,
+56077263110530,
+56077263143298,
+56086392996226,
+56086393028994,
+56086393061762,
+56086393094530,
+56086393127298,
+56086393160066,
+56086393192834,
+56093098475906,
+56093099983234,
+56093100016002,
+56093100048770,
+56093100081538,
+56093100802434,
+56093100867970,
+56093100900738,
+56093181673858,
+56093181739394,
+56094051041666,
+56096553304450,
+56097049837954,
+56101503304066,
+56101503336834,
+56101503369602,
+56101503402370,
+56146107171202,
+56182228287874,
+56182948299138,
+56183533011330,
+56183533109634,
+56183533339010,
+56183533371778,
+56183533666690,
+56199748747650,
+56258501575042,
+56258501640578,
+56270920450434,
+56270920483202,
+56280092934530,
+56280093065602,
+56280147952002,
+56280147984770,
+56286315250050,
+56299994349954,
+56299994382722,
+56304510534018,
+56304510566786,
+56318075601282,
+56318075634050,
+56318107844994,
+56330812031362,
+56330812064130,
+56330812129666,
+56330812293506,
+56330812326274,
+56335495364994,
+56335495397762,
+56374180348290,
+56374186705282,
+56384746684802,
+56384756449666,
+56384756482434,
+56384756547970,
+56385896481154,
+56392093335938,
+44546639986938,
+44546640052474,
+44546640085242,
+42709459599610
+  ]);
+
+  var DISCOUNT_CODE = "B2P10";
+
+  // ─── Elements ────────────────────────────────────────────────────────────────
+  var pop1 = document.getElementById("spicely-pop1");
+  var pop2 = document.getElementById("spicely-pop2");
+  var timers = { pop1: null, pop2: null };
+  var previousCount = 0;
+
+  // ─── Toast open/close ────────────────────────────────────────────────────────
+  function openToast(popup, key) {
+    var otherPopup = key === 'pop1' ? pop2 : pop1;
+    var otherKey   = key === 'pop1' ? 'pop2' : 'pop1';
+    closeToast(otherPopup, otherKey);
+
+    popup.classList.add("is-open");
+    clearTimeout(timers[key]);
+    timers[key] = setTimeout(function () {
+      closeToast(popup, key);
+    }, 6000);
+  }
+
+  function closeToast(popup, key) {
+    popup.classList.remove("is-open");
+    clearTimeout(timers[key]);
+  }
+
+  // Close buttons
+  pop1.querySelector(".toast-close").addEventListener("click", function () { closeToast(pop1, 'pop1'); });
+  pop2.querySelector(".toast-close").addEventListener("click", function () { closeToast(pop2, 'pop2'); });
+
+  // ─── Copy code ───────────────────────────────────────────────────────────────
+  var copyBtn   = document.getElementById("spicely-copy-btn");
+  var copyIcon  = document.getElementById("spicely-copy-icon");
+  var codeLabel = copyBtn.querySelector(".code-label");
+  var copyResetTimer = null;
+
+  copyBtn.addEventListener("click", function () {
+    navigator.clipboard.writeText(DISCOUNT_CODE)
+      .then(showCopied)
+      .catch(function () {
+        var el = document.createElement("textarea");
+        el.value = DISCOUNT_CODE;
+        el.style.cssText = "position:fixed;opacity:0;";
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand("copy");
+        document.body.removeChild(el);
+        showCopied();
+      });
+  });
+
+  function showCopied() {
+    copyBtn.classList.add("copied");
+    copyIcon.textContent = "✅";
+    codeLabel.textContent = "Copied!";
+    clearTimeout(copyResetTimer);
+    copyResetTimer = setTimeout(function () {
+      copyBtn.classList.remove("copied");
+      copyIcon.textContent = "📋";
+      codeLabel.textContent = "Use Code";
+    }, 2000);
+  }
+
+  // ─── Cart check ──────────────────────────────────────────────────────────────
+  function checkCartAndShowPopup() {
+    fetch('/cart.js')
+      .then(function (res) { return res.json(); })
+      .then(function (cart) {
+
+        // Count qualifying items by variant ID
+        var qualifyingTotal = 0;
+        cart.items.forEach(function (item) {
+          if (QUALIFYING_VARIANT_IDS.has(Number(item.variant_id))) {
+            qualifyingTotal += item.quantity;
+          }
+        });
+
+        // Transition: 0 → 1  → show Pop 1
+        if (qualifyingTotal === 1 && previousCount === 0) {
+          openToast(pop1, 'pop1');
+        }
+        // Transition: <2 → 2+  → show Pop 2
+        else if (qualifyingTotal >= 2 && previousCount < 2) {
+          openToast(pop2, 'pop2');
+        }
+
+        previousCount = qualifyingTotal;
+      })
+      .catch(function (err) {
+        console.error("Spicely toast: failed to fetch cart:", err);
+      });
+  }
+
+  // ─── Event listeners ─────────────────────────────────────────────────────────
+
+  // Add to cart button (product page)
+  document.body.addEventListener("click", function (e) {
+    if (e.target.closest('[name="add"]') || e.target.closest('[data-add-to-cart]')) {
+      setTimeout(checkCartAndShowPopup, 1200);
+    }
+  });
+
+  // Quantity input changes (cart drawer / cart page)
+  document.body.addEventListener("change", function (e) {
+    if (
+      e.target.matches('[name="updates[]"]') ||
+      e.target.matches('.cart-item__quantity') ||
+      e.target.matches('input[type="number"][name*="quantity"]')
+    ) {
+      setTimeout(checkCartAndShowPopup, 800);
+    }
+  });
+
+  // +/- quantity buttons (cart drawer)
+  document.body.addEventListener("click", function (e) {
+    if (
+      e.target.closest('.cart-item__quantity-button') ||
+      e.target.closest('[data-quantity-button]') ||
+      e.target.closest('.quantity__button')
+    ) {
+      setTimeout(checkCartAndShowPopup, 800);
+    }
+  });
+
+});
+</script>

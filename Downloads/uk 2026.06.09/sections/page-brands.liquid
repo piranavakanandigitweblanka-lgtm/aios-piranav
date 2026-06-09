@@ -1,0 +1,78 @@
+<script src="{{ 'halo-aztable.js' | asset_url }}" defer></script>
+
+{%- liquid
+    assign st = section.settings
+    assign container = st.container
+  -%}
+
+<section class="bls__section bls__brands-page mt-lg-30">
+    <page-brands>
+        <div class="{{ container }}">
+            {% assign array = "A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|#" | split: "|" %}
+            <div class="wrapper-brands">
+                <ul id="brandsCode" class="brands-list-code list-unstyled d-flex flex-wrap uppercase">
+                    <li data-code="all" class="all-brands brand-filter is-active">
+                        <a href="#" role="button">{{ 'brands.all' | t }}</a>
+                    </li>
+                    {%- for item in array -%}
+                        <li data-code="{{ item | downcase }}" class="brand-filter" data-href="{{ item | downcase }}">
+                            <a href="#brands-hex-{{ item | downcase }}" data-href="{{ item | downcase }}" role="button">{{ item | downcase }}</a>
+                        </li>
+                    {%- endfor -%}
+                </ul>
+            </div>
+            <div id="brandsWrap" class="active-all">
+                {%- for item in array -%}
+                    <div class="brands-group d-none" data-code="{{ item | downcase }}" id="brands-code-{{ item | downcase }}">
+                        <h3 class="brands-group-title text-left">{{ item | downcase }}</h3>
+                        <ul class="brands-group-list list-unstyled" role="list"></ul>
+                    </div>
+                {%- endfor -%}
+            </div>
+        </div>
+        <script type="application/json" class="brandsVendor">
+            [
+            {%- for vendor in shop.vendors -%}
+              {%- liquid
+                assign text_reduce = vendor | strip_html | downcase | truncate: 1, ''
+              assign title = '"title":' | append: '"' | append: vendor | append: '"'
+              assign letter = '"letter":' | append: '"' | append: text_reduce | append: '"'
+          -%}
+              { {{ title }}, {{ letter }} }
+              {%- unless forloop.last -%},{%- endunless forloop.last -%}
+            {%- endfor -%}
+            ]
+          </script>
+    </page-brands>
+</section>
+{% schema %}
+	{
+		"name": "Brands page",
+        "settings": [
+            {
+            "type": "header",
+            "content": "General"
+            },
+            {
+            "type": "select",
+            "id": "container",
+            "label": "Layout",
+            "default": "container",
+            "options": [
+                {
+                "value": "container",
+                "label": "Default"
+                },
+                {
+                "value": "container-fluid",
+                "label": "Fluid container"
+                },
+                {
+                "value": "full-width",
+                "label": "Full width"
+                }
+            ]
+            }
+        ]
+	}
+{% endschema %}

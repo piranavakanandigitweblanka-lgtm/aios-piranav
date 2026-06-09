@@ -1,0 +1,518 @@
+{{ 'product.css' | asset_url | stylesheet_tag }}
+{{ 'collection.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign th_st = settings
+  assign product_style = th_st.product_style
+  assign st = section.settings
+  assign products_column = st.products_column
+  assign products_limit = st.products_limit
+
+  assign f1_parts = st.filter_1_metafield | split: '.'
+  assign f1_ns = f1_parts[0] | strip
+  assign f1_key = f1_parts[1] | strip
+  
+  assign f2_parts = st.filter_2_metafield | split: '.'
+  assign f2_ns = f2_parts[0] | strip
+  assign f2_key = f2_parts[1] | strip
+-%}
+
+<style>
+  .custom-collection-filters {
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    border: 1px solid #eee;
+  }
+  .filter-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    align-items: flex-start;
+  }
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+  }
+  .filter-group label {
+    font-weight: 700;
+    font-size: 15px;
+    text-transform: uppercase;
+    color: #111;
+    letter-spacing: 0.5px;
+  }
+  .size-buttons, .type-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .size-btn, .type-btn {
+    padding: 8px 22px;
+    border: 1px solid #ddd;
+    background: #fff;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    color: #444;
+  }
+  .size-btn:hover, .type-btn:hover {
+    border-color: #111;
+    color: #111;
+    background: #f0f0f0;
+  }
+  .size-btn.active, .type-btn.active {
+    background: #111;
+    color: #fff;
+    border-color: #111;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  }
+  .btn-clear-filters {
+    padding: 12px 25px;
+    background: #fff;
+    color: #111;
+    border: 1px solid #111;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .btn-clear-filters:hover {
+    background: #111;
+    color: #fff;
+  }
+  .product-card-wrapper.hidden {
+    display: none;
+  }
+  .no-results {
+    text-align: center;
+    padding: 60px 20px;
+    background: #fff;
+    border: 1px dashed #ccc;
+    border-radius: 12px;
+    width: 100%;
+    grid-column: 1 / -1;
+  }
+
+  .variant-title-suffix {
+    display: none;
+  }
+  .filters-active .variant-title-suffix {
+    display: inline;
+  }
+  .filters-active div.variant-title-suffix {
+    display: block;
+  }
+
+  @media (max-width: 767px) {
+    .filter-controls {
+      gap: 20px;
+    }
+  }
+</style>
+
+<div class="section-{{ section.id }} section-collection-product" data-section-id="{{ section.id }}">
+  <div class="{{ st.layout }}">
+    <div class="custom-collection-filters">
+      <div class="filter-controls">
+        {% comment %} Size Filter {% endcomment %}
+        <div class="filter-group size-filter-group">
+          <label>1. {{ st.filter_1_label }}:</label>
+          <div class="size-buttons">
+            <button class="size-btn size-btn-all active" data-f1="">All {{ st.filter_1_label | split: ' ' | last }}</button>
+            {%- liquid
+              assign sizes_str = ""
+              for product in collection.products limit: 1000
+                if product.available
+                  assign f1_meta = product.metafields[f1_ns][f1_key]
+                  assign val = f1_meta.value
+                  if val != blank
+                    if f1_meta.type contains "list"
+                      for s in val
+                        assign s_clean = s | strip
+                        assign s_check = "|" | append: s_clean | append: "|"
+                        assign wrapped_sizes = "|" | append: sizes_str | append: "|"
+                        unless wrapped_sizes contains s_check
+                          if sizes_str == ""
+                            assign sizes_str = s_clean
+                          else
+                            assign sizes_str = sizes_str | append: "|" | append: s_clean
+                          endif
+                        endunless
+                      endfor
+                    else
+                      assign s_clean = val | strip
+                      assign s_check = "|" | append: s_clean | append: "|"
+                      assign wrapped_sizes = "|" | append: sizes_str | append: "|"
+                      unless wrapped_sizes contains s_check
+                        if sizes_str == ""
+                          assign sizes_str = s_clean
+                        else
+                          assign sizes_str = sizes_str | append: "|" | append: s_clean
+                        endif
+                      endunless
+                    endif
+                  endif
+                endif
+              endfor
+              assign sizes_array = sizes_str | split: "|" | sort
+            -%}
+            {% for size in sizes_array %}
+              {% if size != blank %}
+                <button class="size-btn" data-f1="{{ size }}">{{ size }}</button>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+
+        {% comment %} Type Filter {% endcomment %}
+        <div class="filter-group type-filter-group">
+          <label>2. {{ st.filter_2_label }}:</label>
+          <div class="type-buttons">
+            <button class="type-btn type-btn-all active" data-f2="">All {{ st.filter_2_label | split: ' ' | last }}</button>
+            {%- liquid
+              assign types_str = ""
+              for product in collection.products limit: 1000
+                if product.available
+                  assign f2_meta = product.metafields[f2_ns][f2_key]
+                  assign val = f2_meta.value
+                  if val != blank
+                    if f2_meta.type contains "list"
+                      for t in val
+                        assign t_clean = t | strip
+                        assign t_check = "|" | append: t_clean | append: "|"
+                        assign wrapped_types = "|" | append: types_str | append: "|"
+                        unless wrapped_types contains t_check
+                          if types_str == ""
+                            assign types_str = t_clean
+                          else
+                            assign types_str = types_str | append: "|" | append: t_clean
+                          endif
+                        endunless
+                      endfor
+                    else
+                      assign t_clean = val | strip
+                      assign t_check = "|" | append: t_clean | append: "|"
+                      assign wrapped_types = "|" | append: types_str | append: "|"
+                      unless wrapped_types contains t_check
+                        if types_str == ""
+                          assign types_str = t_clean
+                        else
+                          assign types_str = types_str | append: "|" | append: t_clean
+                        endif
+                      endunless
+                    endif
+                  endif
+                endif
+              endfor
+              assign types_array = types_str | split: "|" | sort
+            -%}
+            {% for type in types_array %}
+              {% if type != blank %}
+                <button class="type-btn" data-f2="{{ type }}">{{ type }}</button>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+
+        {% comment %} Clear Button {% endcomment %}
+        <button id="clear-filters" class="btn-clear-filters">Reset All Filters</button>
+      </div>
+    </div>
+
+    <div id="productgridcontainer" class="flex-1">
+      <div class="product-grid-container">
+        <div id="bls__product-grid" 
+             class="grid product-grid {{ product_style }} container-products-switch bls__grid row row-cols-2 row-cols-lg-{{ products_column }}"
+             data-view-mode="{{ products_column }}">
+          
+          {%- for product in collection.products limit: products_limit -%}
+            {%- liquid
+              assign f1_obj = product.metafields[f1_ns][f1_key]
+              assign card_f1 = f1_obj.value
+              if f1_obj.type contains "list"
+                assign card_f1 = card_f1 | join: ','
+              endif
+              
+              assign f2_obj = product.metafields[f2_ns][f2_key]
+              assign card_f2 = f2_obj.value
+              if f2_obj.type contains "list"
+                assign card_f2 = card_f2 | join: ','
+              endif
+            -%}
+            
+            <div class="bls__grid__item product-card-wrapper is-default-product" 
+                 data-f1="{{ card_f1 | downcase | strip }}"
+                 data-f2="{{ card_f2 | downcase | strip }}"
+                 data-available="{{ product.available }}">
+              {%- render 'product-item', product: product -%}
+            </div>
+
+            {%- for variant in product.variants -%}
+              <div class="bls__grid__item product-card-wrapper is-variant-card hidden" 
+                   data-f1="{{ card_f1 | downcase | strip }}"
+                   data-f2="{{ card_f2 | downcase | strip }}"
+                   data-available="{{ variant.available }}">
+                {%- render 'product-item', product: product, variant: variant -%}
+              </div>
+            {%- endfor -%}
+          {%- endfor -%}
+
+          <div class="no-results" id="no-results" style="display: none;">
+            <p>No products found matching the selected filters.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const sizeButtons = document.querySelectorAll('.size-btn');
+    const typeButtons = document.querySelectorAll('.type-btn');
+    const clearBtn = document.getElementById('clear-filters');
+    const noResults = document.getElementById('no-results');
+
+    let selectedSize = '';
+    let selectedType = '';
+
+    function filterProducts() {
+      const productCards = document.querySelectorAll('.product-card-wrapper');
+      let visibleCount = 0;
+
+      const availableF1 = new Set();
+      const availableF2 = new Set();
+
+      const isFilterActive = selectedSize !== '' || selectedType !== '';
+      const grid = document.getElementById('bls__product-grid');
+
+      if (isFilterActive) {
+        grid.classList.add('filters-active');
+      } else {
+        grid.classList.remove('filters-active');
+      }
+
+      productCards.forEach(card => {
+        const f1Attr = (card.dataset.f1 || '').toLowerCase();
+        const f2Attr = (card.dataset.f2 || '').toLowerCase();
+        
+        const cardF1s = f1Attr.split(',').map(s => s.trim()).filter(s => s !== '');
+        const cardF2s = f2Attr.split(',').map(t => t.trim()).filter(t => t !== '');
+
+        let isVisible = true;
+
+        if (isFilterActive) {
+          if (card.classList.contains('is-default-product')) {
+            isVisible = false;
+          } else {
+            // If filters are active, check if this card matches
+            
+            // Hide out of stock variants when filtering
+            if (card.dataset.available === 'false') {
+              isVisible = false;
+            }
+  
+            if (isVisible && selectedSize) {
+              if (!cardF1s.includes(selectedSize.toLowerCase())) {
+                isVisible = false;
+              }
+            }
+            if (isVisible && selectedType) {
+              if (!cardF2s.includes(selectedType.toLowerCase())) {
+                isVisible = false;
+              }
+            }
+          }
+        } else {
+          // If no filters, only show default product
+          if (card.classList.contains('is-variant-card')) {
+            isVisible = false;
+          }
+        }
+
+        if (isVisible) {
+          card.classList.remove('hidden');
+          visibleCount++;
+        } else {
+          card.classList.add('hidden');
+        }
+
+        // Logic for dynamic facets (always based on all cards that match the OTHER filter)
+        // Only consider AVAILABLE variants for filter options
+        if (card.classList.contains('is-variant-card')) {
+          let matchesType = true;
+          if (selectedType && !cardF2s.includes(selectedType.toLowerCase())) {
+            matchesType = false;
+          }
+          if (matchesType && card.dataset.available !== 'false') {
+            cardF1s.forEach(s => availableF1.add(s));
+          }
+  
+          let matchesSize = true;
+          if (selectedSize && !cardF1s.includes(selectedSize.toLowerCase())) {
+            matchesSize = false;
+          }
+          if (matchesSize && card.dataset.available !== 'false') {
+            cardF2s.forEach(t => availableF2.add(t));
+          }
+        }
+      });
+
+      // Update F1 Buttons visibility
+      sizeButtons.forEach(btn => {
+        const btnVal = (btn.dataset.f1 || '').toLowerCase();
+        if (btnVal === "" || availableF1.has(btnVal)) {
+          btn.style.display = '';
+        } else {
+          btn.style.display = 'none';
+        }
+      });
+
+      // Update F2 Buttons visibility
+      typeButtons.forEach(btn => {
+        const btnVal = (btn.dataset.f2 || '').toLowerCase();
+        if (btnVal === "" || availableF2.has(btnVal)) {
+          btn.style.display = '';
+        } else {
+          btn.style.display = 'none';
+        }
+      });
+
+      if (visibleCount === 0) {
+        noResults.style.display = 'block';
+      } else {
+        noResults.style.display = 'none';
+      }
+    }
+
+    function updateSizeButtons(activeSize) {
+      sizeButtons.forEach(btn => {
+        if (btn.dataset.f1 === activeSize) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+    }
+
+    function updateTypeButtons(activeType) {
+      typeButtons.forEach(btn => {
+        if (btn.dataset.f2 === activeType) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+    }
+
+    sizeButtons.forEach(btn => {
+      btn.addEventListener('click', function() {
+        selectedSize = this.dataset.f1;
+        updateSizeButtons(selectedSize);
+        filterProducts();
+      });
+    });
+
+    typeButtons.forEach(btn => {
+      btn.addEventListener('click', function() {
+        selectedType = this.dataset.f2;
+        updateTypeButtons(selectedType);
+        filterProducts();
+      });
+    });
+    
+    clearBtn.addEventListener('click', function() {
+      selectedSize = '';
+      selectedType = '';
+      updateSizeButtons('');
+      updateTypeButtons('');
+      filterProducts();
+    });
+
+    // Initial filter run to hide secondary variants
+    filterProducts();
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Collection with Filters",
+  "settings": [
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "default": "container",
+      "options": [
+        { "value": "container", "label": "Default" },
+        { "value": "container-fluid", "label": "Fluid container" },
+        { "value": "full-width", "label": "Full width" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "products_column",
+      "label": "Items per row",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "products_limit",
+      "min": 4,
+      "max": 100,
+      "step": 1,
+      "label": "Max Products to Show",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Filter 1 Settings"
+    },
+    {
+      "type": "text",
+      "id": "filter_1_label",
+      "label": "Filter 1 Label",
+      "default": "Select Diameter"
+    },
+    {
+      "type": "text",
+      "id": "filter_1_metafield",
+      "label": "Filter 1 Metafield (namespace.key)",
+      "default": "custom.size"
+    },
+    {
+      "type": "header",
+      "content": "Filter 2 Settings"
+    },
+    {
+      "type": "text",
+      "id": "filter_2_label",
+      "label": "Filter 2 Label",
+      "default": "Select Type"
+    },
+    {
+      "type": "text",
+      "id": "filter_2_metafield",
+      "label": "Filter 2 Metafield (namespace.key)",
+      "default": "custom.core"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection with Filters"
+    }
+  ]
+}
+{% endschema %}

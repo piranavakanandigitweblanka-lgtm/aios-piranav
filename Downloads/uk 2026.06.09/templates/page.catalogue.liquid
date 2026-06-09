@@ -1,0 +1,1270 @@
+<!-- /templates/page.liquid -->
+
+
+<style>
+.mr-0{
+    margin-right:0! important;
+} 
+  
+.ml-0{
+    margin-left:0! important;
+}
+  
+.bg-dark {
+    background-color: #343a40!important;
+}
+  
+.p-1 {
+    padding: .25rem!important;
+}
+  
+.card {
+    position: relative;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    border: 1px solid rgba(0,0,0,.125);
+    border-radius: .25rem;
+}
+  
+.col-3 {
+    -ms-flex: 0 0 25%;
+    flex: 0 0 25%;
+    max-width: 25%;
+}
+  
+.col-4 {
+    -webkit-box-flex: 0;
+    -ms-flex: 0 0 33.333333%;
+    flex: 0 0 33.333333%;
+    max-width: 33.333333%;
+}
+  
+.col-6 {
+    -webkit-box-flex: 0;
+    -ms-flex: 0 0 50%;
+    flex: 0 0 50%;
+    max-width: 50%;
+}
+  
+.col, .col-1, .col-10, .col-11, .col-12, .col-2, .col-3, .col-4, .col-5, .col-6, .col-7, .col-8, .col-9, .col-auto, .col-lg, .col-lg-1, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-auto, .col-md, .col-md-1, .col-md-10, .col-md-11, .col-md-12, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-auto, .col-sm, .col-sm-1, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-auto, .col-xl, .col-xl-1, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-auto {
+    position: relative;
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+}
+  
+.justify-content-center {
+    -ms-flex-pack: center!important;
+    justify-content: center!important;
+}
+  
+.d-flex {
+    display: -ms-flexbox!important;
+    display: flex!important;
+}
+  
+img {
+    vertical-align: middle;
+    border-style: none;
+}
+  
+.text-center {
+    text-align: center!important;
+}
+  
+.pt-1, .py-1 {
+    padding-top: .25rem!important;
+}
+  
+.p-0 {
+    padding: 0!important;
+}
+  
+.card-body {
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+    padding: 1.25rem;
+}
+  
+a {
+    color: #000;
+    text-decoration: none;
+    background-color: transparent;
+}
+  
+a:focus, a:hover {
+    opacity: 1 !important;
+}
+  
+.card-text:last-child {
+    margin-bottom: 0;
+}
+  
+.small, small {
+    font-size: 80%;
+    font-weight: 400;
+}
+  
+.m-1 {
+    margin: .25rem!important;
+}
+  
+.row {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    margin-right: -15px;
+    margin-left: -15px;
+}
+  
+.text-white{
+	color:white! important;
+}
+  
+  .productTitle{
+	/* background-color:#40fb8766; */
+/*     background-color:#f17d13; */
+    color: #00203FFF;
+    /*latest added*/
+    height: 45px;
+  }
+  
+  .price_tag{
+    /* 
+  	background-color:yellow;
+    border:1px solid black;
+    border-radius:50px;
+    */
+    
+     background-color: #f97701; 
+/*     background-color: #3bb000; */
+    border-radius: 50px;
+    color: #ffffff !important;
+  }
+  
+  .ml-auto{
+  	margin-left:auto;
+  }
+  
+  .border-0{
+  	border:none !important;
+  }
+  
+  .border-radius-0{
+  	border-radius: 0 !important;
+  }
+  
+  .box-shadow-20{
+  	box-shadow: 0 4px 6px -2px rgb(0 0 0 / 20%);
+  }
+  
+  .col-4.card.m-0.p-0:hover {
+    border-radius: 0.25rem;
+    border: 1px solid rgba(0,0,0,1);
+  }
+  
+  .m-point-05{
+  	margin: 0.05rem !important
+  }
+  
+  .p-point-15{
+  	padding: 0.15rem !important
+  }
+  
+  .m-0{
+  	margin:0 !important;
+  }
+  
+  .p-point-2{
+  	padding: 0.2rem !important;
+  }
+
+  /*removed styles in basic.css*/
+  .page_number{
+      float:right;
+      padding:1%;
+  }
+
+  .text-decoration-line-through{
+    text-decoration-line: line-through;
+    text-decoration-color: red;
+    text-decoration-thickness: 2px;
+  }
+  
+  .productImg{
+      /*width: 59px; 
+      height: 59px; */
+      /*width: 100px; 
+      height: 100px; */
+  }
+  /*removed styles in basic.css*/
+  
+  .productImg{
+      /*width: 59px; 
+      height: 59px; */
+      /*width: 100px; 
+      height: 100px; */
+      width: 70%; 
+      height: auto !important;
+      object-fit:cover;
+      -webkit-object-fit:cover;
+      -moz-object-fit:cover;
+      -ms-object-fit:cover;
+      -o-object-fit:cover;
+  }
+  
+  .cut-text {
+    position: relative;
+  }
+  
+  .cut-text:before {
+    position: absolute;
+    content: "";
+    left: 0;
+    top: 50%;
+    right: 0;
+    border-top: 2px solid;
+    border-color: red;
+
+    -webkit-transform:rotate(-5deg);
+    -moz-transform:rotate(-5deg);
+    -ms-transform:rotate(-5deg);
+    -o-transform:rotate(-5deg);
+    transform:rotate(-5deg);
+  }
+  
+  .middle-content{
+    display: flex;
+    flex-wrap: wrap;
+    align-content:center;
+    height: 90%;
+  }
+  
+  .footer, .header{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    height: 5%;
+  }
+  
+  .bg-footer, .bg-header {
+     background-color: #f78209!important;
+    box-shadow: inset 4px -1px 20px 0px #0c0c0c54;
+  }
+  
+  .header{
+  	/* background-image: url(https://cdn.shopify.com/s/files/1/0105/7135/0112/files/testing.jpg?v=1621869022) !important; */ 
+    /* background-image: url(https://cdn.shopify.com/s/files/1/0105/7135/0112/files/testing2.jpg?v=1621869022) !important; */
+    background: no-repeat;
+    background-size: 100%;
+    background-position: center;
+  }
+  
+  .w-100{
+  	width:100%;
+  }
+  
+  .smallT a {
+      color: #fff;
+  }
+  
+  small, .smallT{
+      font-size: 11px;
+      font-weight: 700 ;
+  }
+  
+  
+/* Create two equal columns that floats next to each other */
+.column_a {
+  float: left;
+ width:50%;
+   position: absolute;
+  /* Should be removed. Only for demonstration */
+}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+ 
+}
+  /*============================================================================================*/
+  /*GOBI_ADDED*/
+  * {
+  box-sizing: border-box;
+}
+
+/* Create two equal columns that floats next to each other */
+.column-ar {
+  margin-top:15%;
+  float: left;
+  width: 50%;
+  padding: 10px;
+    height:300px;
+ vertical-align: text-bottom;
+
+  display: table-cell;
+  
+}
+
+/* Clear floats after the columns */
+.row-ar:after {
+  content: "";
+  display: table;
+  clear: both;
+  
+  
+}
+  .arrows{
+  margin:10%;
+    font-size:20px;
+    
+  }
+  .next-icon{
+  	padding: 5px 5px 5px 9px;
+    background-color: gray;
+    border-radius: 50%;
+    height: 30px;
+    width: 30px;
+    text-align: left;
+  }
+  .previus-icon{
+  	padding: 5px 5px 5px 14px;
+/*     background-image: linear-gradient(to bottom black,gray,gray,gray); */
+  background-color:gray; 
+    border-radius: 50%;
+    height: 30px;
+    width: 30px;
+    text-align: left;
+  }
+  .page_2{
+       
+  } 
+   .page_3{
+  }
+   .column_block {
+  float: left;
+  height:auto;
+}
+
+/* Clear floats after the columns */
+.row_block:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+.list{
+      /*    list-style-image:url("https://cdn.shopify.com/s/files/1/0250/4094/5248/files/list_2d7d449e-ee28-4231-ac1c-7097291f130c.png?v=1658489349");
+  */ list-style-type: disclosure-closed;
+    line-height:1.7;
+  font-size:10px;
+  }
+  
+</style>
+
+
+
+
+
+ 
+
+<div id="canvas" style="display:none;">
+	<div class="flipbook-viewport">
+		<div class="container"> 
+         
+
+
+          
+			<div id="catalog_flipbook" class="flipbook">
+              
+              	{%  assign real_page_number = 1 %}
+              
+              	{% assign pageUrl = content_for_header | split:'"pageurl":"' | last | split:'"' | first | split:'.myshopify.com' | last | replace:'\/','/' | replace:'%20',' ' |  replace:'\u0026','&' %}
+              	{% if pageUrl contains "type" %}
+                            {% assign pageQuerystring = pageUrl | split:'?' | last %} 
+                            {% assign params = pageQuerystring | split:'&' %}
+
+                            {% for param in params %}
+                                {% assign keyAndValue = param | split:'=' %}
+                                {% if keyAndValue[0] == "type" %}
+                                    {% assign prodType = keyAndValue[1] %}
+                                    {% assign getTurnBool = true %}
+                                {% endif %}
+                            {% endfor %}
+              	{% endif %}
+              
+                {%  assign banner_count = 1 %}
+              
+        <div>
+<!--                               	<div class="header row bg-header m-0 p-point-2 w-100">
+                                   <small class="smallT text-white">{{ product_type | upcase | replace: '_', ' ' }}</small>
+                                  	<small class="smallT text-white ml-auto">Page - {{ real_page_number }}</small> 
+                                </div> -->
+          
+        
+          
+                              	<div class="">
+                                  <div class="page-wrap w-100">
+                                  
+                                      <div class="row m-1">
+                                       
+                                                  <div class="col-{{col_div}} card m-1 p-0 box-shadow-0 border-radius-0" style="max-width:{{max_width}}%;">
+<!--                                                     <a href="{{ link | within: products }}" target="blank"> -->
+                                                      <div>
+<!--                                                           <div class="card-body p-1 productTitle">
+                                                              <small class="smallT card-text">{{	title	}}</small>
+                                                          </div> -->
+                                                          <div class="card-body p-0 m-1">
+                                                              <div class="row ml-0 mr-0">
+                                                                 <img src="https://cdn.shopify.com/s/files/1/0250/4094/5248/files/final-cover-page_c29c2043-cb5e-41ba-89a4-c7e2f88f457a.png?v=1662984355">
+                                                              </div>
+                                                          </div>
+                                                          <div class="d-flex justify-content-center">
+                                                            <img class="productImg" src="{{ image | img_url: 'grande' }}" class="card-img-top" alt="..."/>
+                                                          </div>
+                                                      </div>
+<!--                                                     </a> -->
+                                                  </div>
+                                        
+                                      </div>
+                                 
+                                  </div>
+                            	</div>
+                              
+                            
+                              
+
+                              </div> 
+              
+              <!--2nd paage-->
+              
+          
+                             <!--//----page=2------//-->
+                            	<div class="">
+                                  <div class="page-wrap w-100">
+                                  
+                                      <div class="row m-1">
+                                       
+                                            <div class="col-{{col_div}} card m-1 p-0 " style="max-width:{{max_width}}%;">
+                                                <a href="{{ link | within: products }}" target="blank"> 
+<!--                                                     <div>
+														<div class="card-body p-1 productTitle">
+														 <small class="smallT card-text">{{	title	}}</small>
+														</div> 
+													<div class="card-body p-0 m-1">
+														<div class="row ml-0 mr-0 ">
+																 
+																	
+															<div class="row m-1 page_2" style="background-color:#57679eb5 ; font-family;times new roman;">
+																<div class="col-6 m-1 p-0 " style="max-width:58%;">
+																		<a href="/products/vintage-retro-industrial-flush-mount-farmhouse-ceiling-light-shade-chandelier-uk" target="blank">
+																		  <div>
+																		  <p style="color:black; font-weight:800; font-size:20px; font-family:times new roman;padding-top:4%; padding-left:14%!important;">TRANSFORMERS</p>
+																			 <ul style="color:white;">
+																			   <li class="list">DC 5V transformers</li>
+																			   <li class="list">DC 12V transformers</li>
+																			   <li class="list">DC 24V transformers</li>
+																			   <li class="list">Waterproof </li>
+																			   <li class="list">Slim transformers</li>
+																			   <li class="list">Constant Current</li>
+																			   <li class="list">Constant Voltage</li>
+																			 </ul>
+																		  </div>
+																		</a>
+																</div>
+								 
+																<div class="col-6 m-1 p-0" style="max-width:40%;">
+																	<a href="/products/modern-industrial-ceiling-light-fitting-flush-mount-light-metal-bowl-shape-shade-indoor-light-fitting-for-conservatory-dining-room-foyer-garage" target="blank">
+																	  <div>
+																		  <img src="https://cdn.shopify.com/s/files/1/0250/4094/5248/files/trans-2.png?v=1658740242">
+																	  </div>
+																	</a>
+																</div>
+													
+													  
+															</div>
+										 
+															<div class="row m-1 page_3" style="background-color:#0000005c; font-family;times new roman;">
+														   
+																   <div class="col-6 m-1 p-0" style="max-width:48%;">
+																<a href="/products/modern-industrial-ceiling-light-fitting-flush-mount-light-metal-bowl-shape-shade-indoor-light-fitting-for-conservatory-dining-room-foyer-garage" target="blank">
+																  <div>
+																	  <img src="https://cdn.shopify.com/s/files/1/0250/4094/5248/files/lamp2.png?v=1658750143">
+																  </div>
+																</a>
+															  </div>
+												
+																<div class="col-6 m-1 p-0 " style="max-width:48%;">
+																	<a href="/products/vintage-retro-industrial-flush-mount-farmhouse-ceiling-light-shade-chandelier-uk" target="blank">
+																	  <div>
+																	  <p style="color:orange; font-size:20px; font-family:times new roman;">TRANSFORMERS</p>
+																		 <ul style="color:white;">
+																		   <li>DC 5V transformers</li>
+																		   <li>DC 12V transformers</li>
+																		   <li>DC 24V transformers</li>
+																		   <li>Waterproof transformers</li>
+																		   <li>Slim transformers</li>
+																		   <li>Constant Current</li>
+																		   <li>Constant Voltage</li>
+																		 </ul>
+																	  </div>
+																	</a>
+																</div>
+													  
+															</div>
+																   
+																	
+														</div>
+													</div>
+								
+                                                   </div> -->
+                                                </a>
+                                            </div>
+                                        
+                                      </div>
+                                 
+                                  </div>
+                            	</div> 
+           
+              <!--Page=2 _End--//-->
+              
+              <!--3rd page-->
+  <div>
+<!--<div class="header row bg-header m-0 p-point-2 w-100">
+	<small class="smallT text-white">{{ product_type | upcase | replace: '_', ' ' }}</small>
+    <small class="smallT text-white ml-auto">Page - {{ real_page_number }}</small> 
+    </div> -->
+        <div class="">
+            <div class="page-wrap w-100">                  
+                <div class="row m-1">
+                    <div class="col-{{col_div}} card m-1 p-0 box-shadow-0 border-radius-0" style="max-width:{{max_width}}%;">
+						<!--<a href="{{ link | within: products }}" target="blank"> -->
+                        
+						<div>
+						<!--<div class="card-body p-1 productTitle">
+								<small class="smallT card-text">{{	title	}}</small>
+                            </div> -->
+                          
+                          <!-- 1st -->
+							<div class="card-body p-0 m-1">
+                                <h5 style="text-align:center!important;"><u>Table Of Content</u></h5>
+                                    <a href="https://ledsone.co.uk/pages/catalog?type=Easy_Fit_Lamp_Shades">  
+                                        <div class="row ml-0 mr-0" style="background-color:#D8D8D8;border:1px solid white;">
+										
+                                            <div class="card-body p-0 m-2">
+                                              <div class="circle">
+                                              	<img src="https://cdn.shopify.com/s/files/1/0250/4094/5248/files/SHADE.png?v=1653308285">
+                                              </div>
+                                            </div>
+                                                                
+                                            <div class="card-body p-1 m-2"  style="text-align:left!important;">
+                                                <p>Easy Fit Lamp shades</p>
+                                            </div>
+                                                              
+                                            <div class="card-body p-1 m-2"  style="text-align:right!important;margin-right: 15px;;"> 
+<!--                                                 <p>24</p> -->
+                                            </div>
+                                        </div>
+                                    </a>
+                              
+                              		<!-- 2nd -->
+                              		 <a href="https://ledsone.co.uk/pages/catalog?type=Hemp_Rope_Lamp_Lighting">  
+                                        <div class="row ml-0 mr-0" style="background-color:#D9CEE7;border:1px solid white;">
+										
+                                            <div class="card-body p-0 m-2">
+                                              <div class="circle">
+                                              	<img src="https://cdn.shopify.com/s/files/1/0250/4094/5248/files/pendantlamp2.png?v=1653308285">
+                                              </div>
+                                            </div>
+                                                                
+                                            <div class="card-body p-1 m-2"  style="text-align:left!important;">
+                                                <p>Pendant Lights</p>
+                                            </div>
+                                                              
+                                            <div class="card-body p-1 m-2"  style="text-align:right!important;margin-right: 15px;"> 
+<!--                                                 <p>3</p> -->
+                                            </div>
+                                        </div>
+                                    </a>
+                                       
+                              		<!-- 3rd -->
+                                    <a href="https://ledsone.co.uk/pages/catalog?type=Wall_Lamp_Shades_Lighting">  
+                                        <div class="row ml-0 mr-0" style="background-color:#def1fb;border:1px solid white;">
+                                            <div class="card-body p-0 m-2">
+                                                <div class="circle">
+                                              		<img src="https://cdn.shopify.com/s/files/1/0250/4094/5248/files/wall-light.png?v=1653308285">
+                                              	</div>
+                                            </div>
+                                                                
+                                            <div class="card-body p-0 m-1"  style="text-align:left!important;">
+                                                <p>Wall Lights</p>
+                                            </div>
+                                                              
+                                            <div class="card-body p-0 m-2"  style="text-align:right!important;margin-right: 15px;"> 
+<!--                                                 <p>3</p> -->
+                                            </div>
+                                                                
+                                        </div>
+                                    </a>
+                              
+                              		<!-- 4th -->                              
+                                    <a href="https://ledsone.co.uk/pages/catalog?type=Ceiling_Lamp_Lighting">  
+                                        <div class="row ml-0 mr-0" style="background-color:#B9DCC8;border:1px solid white;">
+											<div class="card-body p-0 m-2">
+                                                <div class="circle">
+                                              	<img src="https://cdn.shopify.com/s/files/1/0250/4094/5248/files/ceiling-light_6ac45765-5dba-4f82-94d6-25d68433915a.png?v=1653387498">
+                                              </div>
+                                            </div>
+                                                                
+                                            <div class="card-body p-0 m-1"  style="text-align:left!important;">
+                                                <p>Ceiling lights</p>
+                                            </div>
+                                                              
+                                            <div class="card-body p-0 m-2"  style="text-align:right!important;margin-right: 15px;"> 
+<!--                                                 <p>3</p> -->
+                                            </div>
+                                                                
+                                        </div>
+                                    </a>
+                                    
+                              		<!-- 5th -->
+                                    <a href="https://ledsone.co.uk/pages/catalog?type=Plugin_Pendant">  
+                                       <div class="row ml-0 mr-0" style="background-color:#CCE4C7;border:1px solid white;">
+                                            <div class="card-body p-0 m-2">
+												 <div class="circle">
+                                              	<img src="https://cdn.shopify.com/s/files/1/0250/4094/5248/files/plug-inpendant.png?v=1653387498">
+                                              </div>
+                                            </div>
+                                                                
+                                            <div class="card-body p-0 m-1"  style="text-align:left!important;">
+                                                <p>Plug in Lamps</p>
+                                            </div>
+                                                              
+                                            <div class="card-body p-0 m-2"  style="text-align:right!important;margin-right: 15px;"> 
+<!--                                                 <p>3</p> -->
+                                            </div>
+                                                                
+                                        </div>
+                                    </a>
+                              		
+                                    <!-- 6th -->                        
+                                    <a href="https://ledsone.co.uk/pages/catalog?type=Pipe_Lamp_Lighting">  
+                                        <div class="row ml-0 mr-0" style="background-color:#D1E4BB;border:1px solid white;">
+                                            <div class="card-body p-0 m-2">
+                                                <div class="circle">
+                                              	<img src="https://cdn.shopify.com/s/files/1/0250/4094/5248/files/pipe-light_fdfd5b6a-9a11-4ced-9eac-858839ed9fbc.png?v=1653387498">
+                                              </div>
+                                            </div>
+                                                                
+                                            <div class="card-body p-0 m-1"  style="text-align:left!important;">
+                                                <p>Pipe Lights</p>
+                                            </div>
+                                                              
+											<div class="card-body p-0 m-2"  style="text-align:right!important;margin-right: 15px;"> 
+<!--                                                 <p>3</p> -->
+                                            </div>
+                                        </div>
+                                    </a>
+                                      
+                              		<!-- 7th -->
+                                    <a href="https://ledsone.co.uk/pages/catalog?type=#page/52">  
+										 <div class="row ml-0 mr-0" style="background-color:#F8F4BC;border:1px solid white;">
+                                            <div class="card-body p-0 m-2">
+                                                 <div class="circle">
+                                              	<img src="https://cdn.shopify.com/s/files/1/0250/4094/5248/files/lamp-holders.png?v=1653387498">
+                                              </div>
+                                            </div>
+                                                                
+                                            <div class="card-body p-0 m-1"  style="text-align:left!important;">
+                                                <p>Lamp Holders</p>
+                                            </div>
+                                                              
+                                            <div class="card-body p-0 m-2"  style="text-align:right!important;margin-right: 15px;"> 
+<!--                                                 <p>52</p> -->
+											</div>
+                                                                
+                                        </div>
+                                    </a>
+                                            
+                              		<!-- 8th -->
+                                    <a href="https://ledsone.co.uk/pages/catalog?type=Vintage_Cables">  
+                                         <div class="row ml-0 mr-0" style="background-color:#F9EBB4;border:1px solid white;">
+                                            <div class="card-body p-0 m-2">
+                                                 <div class="circle">
+                                              	<img src="https://cdn.shopify.com/s/files/1/0250/4094/5248/files/cables.png?v=1653387498">
+                                              </div>
+                                            </div>
+                                                                
+                                            <div class="card-body p-0 m-1"  style="text-align:left!important;">
+                                                <p>Vintage cables</p>
+                                            </div>
+                                                              
+											<div class="card-body p-0 m-2"  style="text-align:right!important;margin-right: 15px;"> 
+<!--                                                 <p>176</p> -->
+                                            </div>
+                                                                
+										</div>
+                                    </a>
+                                     
+                              		<!-- 9th -->
+                                    <a href="https://ledsone.co.uk/pages/catalog?type=Bulb_E27_Base">  
+										 <div class="row ml-0 mr-0" style="background-color:#F7E1B5;border:1px solid white;">
+                                            <div class="card-body p-0 m-2">
+                                                 <div class="circle">
+                                              	<img src="https://cdn.shopify.com/s/files/1/0250/4094/5248/files/bulbs_22552540-6a06-4178-be78-681e633683a4.png?v=1653387498">
+                                              </div>
+                                            </div>
+                                                                
+                                            <div class="card-body p-0 m-1"  style="text-align:left!important;">
+                                                <p>Vintage Bulbs</p>
+                                            </div>
+                                                              
+                                            <div class="card-body p-0 m-2"  style="text-align:right!important;margin-right: 15px;"> 
+<!--                                                 <p>01</p> -->
+											</div>
+                                                                
+                                        </div>
+                                    </a>
+                                              
+                              		<!-- 10th -->
+                                    <a href="https://ledsone.co.uk/pages/catalog?type=Constant_Current_Transformer#page/4">  
+                                         <div class="row ml-0 mr-0" style="background-color:#F9D7BD;border:1px solid white;">
+											<div class="card-body p-0 m-2">
+                                                 <div class="circle">
+                                              	<img src="https://cdn.shopify.com/s/files/1/0250/4094/5248/files/transformer.png?v=1653460576">
+                                              </div>
+                                            </div>
+                                                                
+											<div class="card-body p-0 m-1"  style="text-align:left!important;">
+												<p>LED Transformers</p>
+											</div>
+                                                              
+											<div class="card-body p-0 m-2"  style="text-align:right!important;margin-right: 15px;"> 
+<!-- 												<p>3</p> -->
+											</div>              
+										</div>
+									</a>
+                                             
+                              		<!-- 11th -->
+                                    <a href="https://ledsone.co.uk/pages/catalog?type=LED_Lights">  
+                                         <div class="row ml-0 mr-0" style="background-color:#F9C8B7;border:1px solid white;">
+                                            <div class="card-body p-0 m-2">
+                                                 <div class="circle">
+                                              	<img src="https://cdn.shopify.com/s/files/1/0250/4094/5248/files/pannel-light.png?v=1653460576">
+                                              </div>
+                                            </div>
+                                                                
+                                            <div class="card-body p-0 m-1"  style="text-align:left!important;">
+                                                <p>LED Lighting</p>
+                                                                    
+                                            </div>
+                                                              
+                                            <div class="card-body p-0 m-2"  style="text-align:right!important;margin-right: 15px;"> 
+<!--                                                 <p>3</p> -->
+                                            </div>          
+                                        </div>
+                                    </a>
+                                        
+                              		<!-- 12th -->
+                                    <a href="https://ledsone.co.uk/pages/catalog?type=Switches_And_Sockets">  
+                                         <div class="row ml-0 mr-0" style="background-color:#F8C3BE;border:1px solid white;">
+                                            <div class="card-body p-0 m-2">
+                                                 <div class="circle">
+                                              	<img src="https://cdn.shopify.com/s/files/1/0250/4094/5248/files/switches.png?v=1653460576">
+                                              </div>
+                                            </div>
+                                                                
+                                            <div class="card-body p-0 m-1"  style="text-align:left!important;">
+                                                <p>Switches & Sockets</p>
+                                            </div>
+                                                              
+                                            <div class="card-body p-0 m-2"  style="text-align:right!important;margin-right: 15px;"> 
+<!--                                                 <p>170</p> -->
+                                            </div>            
+                                        </div>
+                                    </a>
+                                                 
+                              		<!-- 13th -->
+                                    <a href="https://ledsone.co.uk/pages/catalog?type=Handles">  
+                                         <div class="row ml-0 mr-0" style="background-color:#E9C3DD;border:1px solid white;">
+                                            <div class="card-body p-0 m-2">
+                                                 <div class="circle">
+                                              	<img src="https://cdn.shopify.com/s/files/1/0250/4094/5248/files/handle.png?v=1653460576">
+                                              </div>
+                                            </div>
+                                                                
+                                            <div class="card-body p-0 m-1"  style="text-align:left!important;">
+                                                <p>Handles</p>
+                                            </div>
+                                                              
+                                            <div class="card-body p-0 m-2"  style="text-align:right!important;margin-right: 15px;"> 
+<!-- 												<p>46</p> -->
+                                            </div>
+                                                                
+                                        </div>
+                                    </a>
+                            </div>
+							
+                            <div class="d-flex justify-content-center">
+                                <img class="productImg" src="{{ image | img_url: 'grande' }}" class="card-img-top" alt="..."/>
+                            </div>
+                        </div>
+<!--</a> -->
+                    </div>
+                                        
+                </div>
+                                 
+            </div>
+		</div>    
+</div> 
+              
+              <style>
+                .circle{
+                    width: 40px;
+                    height: 40px;
+                    /* border-radius: 50%; */
+/*                     background-color: green; */
+                    margin-left: 5%;
+                  
+                            }
+              </style>
+              
+              	{% assign collection___urls_lamp = ",banner1,https://ledsone.co.uk/pages/vintage-cables,https://ledsone.co.uk/collections/diy-tools,https://ledsone.co.uk/collections/b22-base-bulb,https://ledsone.co.uk/collections/3core-round,https://ledsone.co.uk/pages/lamp-spares,https://ledsone.co.uk/pages/lamp-holders,https://ledsone.co.uk/collections/3core-twisted" | split: ',' %}
+              	{% assign collection___urls_transf = ",banner1,https://ledsone.co.uk/collections/2core-twisted,https://ledsone.co.uk/collections/e27-base-bulb,https://ledsone.co.uk/collections/2core-round,https://ledsone.co.uk/collections/b22-base-bulb" | split: ',' %}
+              	{% assign collection___urls_others = ",orange,https://ledsone.co.uk/collections/pendant-lights,https://ledsone.co.uk/collections/easy-fit-shades/products/vintage-metro-metal-retro-bedroom-kitchen-modern-light-pendant-shade-style-home,https://ledsone.co.uk/collections/ceiling-lighting,https://ledsone.co.uk/collections/pendant-lights,https://ledsone.co.uk/collections/dc-12v-transformer,https://ledsone.co.uk/collections/wall-lighting,https://ledsone.co.uk/collections/spider-light,https://ledsone.co.uk/collections/pendant-lights,https://ledsone.co.uk/collections/dc-24v-transformer,https://ledsone.co.uk/pages/led-transformers,https://ledsone.co.uk/pages/vintage-bulbs,https://ledsone.co.uk/pages/vintage-cables,https://ledsone.co.uk/pages/lamp-spares,https://ledsone.co.uk/collections/2core-round,https://ledsone.co.uk/collections/b22-base-bulb,https://ledsone.co.uk/collections/3core-twisted,https://ledsone.co.uk/collections/2core-round,https://ledsone.co.uk/pages/lamp-spares,https://ledsone.co.uk/pages/lamp-holders,https://ledsone.co.uk/collections/3core-twisted," | split: ',' %}
+				
+            	{% for product_type in shop.types %}
+                	{% unless product_type == "" %}
+                    	{%  assign row_of_page = 2 %}
+                       	{%  assign products_in_row = 2 %}
+                     	{%  assign product_index = 0 %}
+                      	{%  assign col_div = 12 | divided_by: products_in_row %}
+              
+              			{%  assign max_width = 100 | divided_by: products_in_row | minus:2 %}
+
+              			{% if prodType contains '_Lamp_' %}
+              				{%	paginate collections['catalog_lampshades'].products by 1000 %}
+                                {% assign same_type_available_products_array = collections['catalog_lampshades'].products | where: "type", product_type%}
+                            {%	endpaginate %}
+              			{% elsif prodType contains 'Transformer' %}
+              				{%	paginate collections['catalog_transformers'].products by 1000 %}
+                                {% assign same_type_available_products_array = collections['catalog_transformers'].products | where: "type", product_type%}
+                            {%	endpaginate %}
+              			{% else %}
+              				{%	paginate collections['catalog_others'].products by 1000 %}
+                                {% assign same_type_available_products_array = collections['catalog_others'].products | where: "type", product_type%}
+                            {%	endpaginate %}
+              			{% endif %}
+              
+              			{%	assign same_type_products_count = same_type_available_products_array.size %}
+              
+                        {%  assign products_in_page = row_of_page | times: products_in_row %}
+                        {%  assign bookpages = same_type_products_count | divided_by: products_in_page %}
+
+                        {%  assign reel_products_in_page = bookpages | times: products_in_page %}
+                        {%	if(reel_products_in_page < same_type_products_count) %}
+              				{%  assign bookpages = bookpages | plus: 1 %}
+                        {%	endif %}
+
+                        {%	for pageNum in (1..bookpages) %}
+                            <div>
+                              	<div class="header row bg-header m-0 p-point-2 w-100">
+                                    <small class="smallT text-white">{{ product_type | upcase | replace: '_', ' ' }}</small>
+                                  	<small class="smallT text-white ml-auto">Page - {{ real_page_number }}</small>
+                                </div>
+                              	<div class="middle-content">
+                                  <div class="page-wrap w-100">
+                                    {%	for row in (1..row_of_page) %}
+                                      <div class="row m-1">
+                                          {%	if(product_index < same_type_products_count) %}
+                                              {%	for prod in (1..products_in_row) %}
+                                        		{%	if(product_index < same_type_products_count) %}
+                                                  {% if prodType contains '_Lamp_' %}
+                                                      {%	paginate collections['catalog_lampshades'].products by 1000 %}
+                                                          {%	assign image = same_type_available_products_array[product_index].featured_image	%}
+                                                          {%	assign link = same_type_available_products_array[product_index].url	%}
+                                                          {%	assign title = same_type_available_products_array[product_index].title | truncate: 50 %}
+                                                          {%	assign compare_at_price_max = same_type_available_products_array[product_index].compare_at_price_max	%}
+                                                          {%	assign price = same_type_available_products_array[product_index].price	%}
+                                                          {%	assign compare_at_price = same_type_available_products_array[product_index].compare_at_price	%}
+                                                      {%	endpaginate %}
+                                                  {% elsif prodType contains 'Transformer' %}
+                                                      {%	paginate collections['catalog_transformers'].products by 1000 %}
+                                                          {%	assign image = same_type_available_products_array[product_index].featured_image	%}
+                                                          {%	assign link = same_type_available_products_array[product_index].url	%}
+                                                          {%	assign title = same_type_available_products_array[product_index].title | truncate: 50 %}
+                                                          {%	assign compare_at_price_max = same_type_available_products_array[product_index].compare_at_price_max	%}
+                                                          {%	assign price = same_type_available_products_array[product_index].price	%}
+                                                          {%	assign compare_at_price = same_type_available_products_array[product_index].compare_at_price	%}
+                                                      {%	endpaginate %}
+                                                  {% else %}
+                                                      {%	paginate collections['catalog_others'].products by 1000 %}
+                                                          {%	assign image = same_type_available_products_array[product_index].featured_image	%}
+                                                          {%	assign link = same_type_available_products_array[product_index].url	%}
+                                                          {%	assign title = same_type_available_products_array[product_index].title | truncate: 50 %}
+                                                          {%	assign compare_at_price_max = same_type_available_products_array[product_index].compare_at_price_max	%}
+                                                          {%	assign price = same_type_available_products_array[product_index].price	%}
+                                                          {%	assign compare_at_price = same_type_available_products_array[product_index].compare_at_price	%}
+                                                      {%	endpaginate %}
+                                                  {% endif %}
+
+                                                  {% if prodType == product_type %}
+                                                      {% if getTurnBool == true %} 
+                                        				{% assign turnPageNumber = real_page_number | plus: 4 %}
+                                                         
+                                                          {% assign getTurnBool = false %}
+                                                      {% endif %}
+                                                  {% endif %}
+
+                                                  <div class="col-{{col_div}} card m-1 p-0 box-shadow-20 border-radius-0" style="max-width:{{max_width}}%;">
+                                                    <a href="{{ link | within: products }}" target="blank">
+                                                      <div>
+                                                          <div class="card-body p-1 productTitle">
+                                                              <small class="smallT card-text">{{	title	}}</small>
+                                                          </div>
+                                                          <div class="card-body p-0 m-1">
+                                                              <div class="row ml-0 mr-0">
+                                                                  {% if compare_at_price_max < price %}
+                                                                      <small class="smallT card-text price_tag p-1 ml-auto">{{ price | money }}</small>
+                                                                  {% elsif compare_at_price_max > price %}
+                                                                      <small class="smallT card-text cut-text p-1">{{ compare_at_price | money }}</small>
+                                                                      <small class="smallT card-text price_tag p-1 ml-auto">{{ price | money }}</small>
+                                                                  {% endif %}
+                                                              </div>
+                                                          </div>
+                                                          <div class="d-flex justify-content-center">
+                                                              <img class="productImg" src="{{ image | img_url: 'grande' }}" class="card-img-top" alt="..."/>
+                                                          </div>
+                                                      </div>
+                                                    </a>
+                                                  </div>
+                                                  {%  assign product_index = product_index | plus: 1 %}
+                                        		{% endif %}
+                                        	  {% endfor %}
+                                          {% else %}
+                                       		
+                                        		<div class="m-1">
+                                                  {%  assign banner_count = banner_count | plus: 1 %}
+                                                    {% if prodType contains '_Lamp_' %}
+                                                  <a href="{{ collection___urls_lamp[banner_count] }}"><img class="box-shadow-20" src="https://cdn.shopify.com/s/files/1/0250/4094/5248/files/banner-lamp{{banner_count}}.jpg"/></a>
+                                                        
+                                            {% elsif prodType contains 'Transformer' %}
+                                                  <a href="{{ collection___urls_transf[banner_count] }}"><img class="box-shadow-20" src="https://cdn.shopify.com/s/files/1/0250/4094/5248/files/banner-trans{{banner_count}}.jpg"/></a>
+                                                       
+                                            {% else %}
+                                                  <a href="{{ collection___urls_others[banner_count] }}"><img class="box-shadow-20" src="https://cdn.shopify.com/s/files/1/0250/4094/5248/files/banner-other{{banner_count}}.jpg"/></a>
+                                                   
+                                            {% endif %}
+                                                  
+                                                </div>
+                                        	
+                                          {% endif %}
+                                      </div>
+                                    {% endfor %}
+                                  </div>
+                            	</div>
+                              
+                              <!--Gobi ADDED-->
+<!--                               <div class="row m-1">
+                                <div class="col-6 card m-1 p-0 box-shadow-20 border-radius-0" style="max-width:48%;">
+                                  <h1>catalog_lampshades</h1>
+                                </div>
+								 <div class="col-6 card m-1 p-0 box-shadow-20 border-radius-0" style="max-width:48%;">
+                                
+                                </div>
+                              </div> -->
+                              
+                               <div class="footer row bg-footer p-point-3 m-0 w-100" style="padding:1%;">
+                                  {% assign checkPageOddEven = real_page_number | modulo: 2 %}
+                                  {% if checkPageOddEven == 1 %}
+                                    {% if prodType contains '_Lamp_' %}
+                                      <small class="smallT text-white"><a href="https://www.ledsone.co.uk/pages/catalog?type=Transformer">Transformer Catalog</a></small>
+                                    {% elsif prodType contains 'Transformer' %}
+                                      <small class="smallT text-white"><a href="https://www.ledsone.co.uk/pages/catalog?type=_Lamp_">Lampshades Catalog</a></small>
+                                    {% else %}
+                                      <small class="smallT text-white"><a href="https://www.ledsone.co.uk/pages/catalog?type=_Lamp_">Lampshades Catalog</a></small>
+                                    {% endif %}
+                                  
+                                     <small class="ml-auto turn_1_page"><a href="https://ledsone.co.uk/pages/catalog">FRONT PAGE</a></small>
+                                
+                                    <small class="smallT text-white ml-auto">Ledsone UK</small>
+                                   
+                                  {% elsif checkPageOddEven == 0 %}
+                                  	<small class="smallT text-white">Ledsone UK</small>
+                                 
+                                   <small class="ml-auto turn_1_page"><a href="https://ledsone.co.uk/pages/catalog">FRONT PAGE</a></small>
+                                
+                                    {% if prodType contains '_Lamp_' %}
+                                      <small class="smallT text-white ml-auto"><a href="https://www.ledsone.co.uk/pages/catalog?type=Others">Other Catalog</a></small>
+                                    {% elsif prodType contains 'Transformer' %}
+                                      <small class="smallT text-white ml-auto"><a href="https://www.ledsone.co.uk/pages/catalog?type=Others">Other Catalog</a></small>
+                                    {% else %}
+                                      <small class="smallT text-white ml-auto"><a href="https://www.ledsone.co.uk/pages/catalog?type=Transformer">Transformer Catalog</a></small>
+                                    {% endif %}
+                                  {% endif %}
+                                </div>
+                                                  
+                              </div>
+              				{%  assign real_page_number = real_page_number | plus: 1 %}
+                    	{% endfor %}
+                	{% endunless %}
+            	{% endfor %}
+        	</div>
+		</div>
+	</div>
+</div>
+
+
+<script type="text/javascript">
+
+	function loadApp() {
+
+		$('#canvas').fadeIn(1000);
+
+		var flipbook = $('.flipbook');
+
+		// Check if the CSS was already loaded
+		
+		if (flipbook.width()==0 || flipbook.height()==0) {
+			setTimeout(loadApp, 10);
+			return;
+		}
+
+		// Create the flipbook
+      
+      	console.log($( window ).width());
+      	console.log($( window ).height());
+
+		$('.flipbook').turn({
+				// Width 922
+
+				width:1920,
+				
+				// Height 600
+
+				height:1250,
+
+				// Duration in millisecond
+
+				duration: 1000,
+
+				// Hardware acceleration
+
+				acceleration: !isChrome(),
+
+				// Enables gradients
+
+				gradients: true,
+				
+				// Auto center this flipbook
+
+				autoCenter: true,
+
+				// Elevation from the edge of the flipbook when turning a page
+
+				elevation: 50,
+
+				// Events
+
+				when: {
+					turning: function(event, page, view) {
+						
+						var book = $(this),
+						currentPage = book.turn('page'),
+						pages = book.turn('pages');
+				
+						// Update the current URI
+
+						Hash.go('page/' + page).update();
+					}
+				}
+
+        }){% unless turnPageNumber == "" %}.turn('page', {{turnPageNumber}}){% endunless %};
+		//type is available turn page number
+
+		// Using arrow keys to turn the page
+
+		$(document).keydown(function(e){
+
+			var previous = 37, next = 39, esc = 27;
+
+			switch (e.keyCode) {
+				case previous:
+
+					// left arrow
+					$('.flipbook').turn('previous');
+					e.preventDefault();
+
+				break;
+				case next:
+
+					//right arrow
+					$('.flipbook').turn('next');
+					e.preventDefault();
+                	console.log("puvii pressed next");
+
+				break;
+				case esc:
+					
+					$('.flipbook-viewport').zoom('zoomOut');	
+					e.preventDefault();
+
+				break;
+			}
+		});
+
+		// URIs - Format #/page/1 
+
+		Hash.on('^page\/([0-9]*)$', {
+			yep: function(path, parts) {
+				var page = parts[1];
+
+				if (page!==undefined) {
+					if ($('.flipbook').turn('is'))
+						$('.flipbook').turn('page', page);
+				}
+
+			},
+			nop: function(path) {
+
+				if ($('.flipbook').turn('is'))
+					$('.flipbook').turn('page', 1);
+			}
+		});
+
+		// Zoom.js
+
+		$('.flipbook-viewport').zoom({
+			flipbook: $('.flipbook'),
+
+			max: function() { 
+				
+				return largeMagazineWidth()/$('.flipbook').width();
+
+			}, 
+
+			when: {
+
+				swipeLeft: function() {
+
+					$(this).zoom('flipbook').turn('next');
+
+				},
+
+				swipeRight: function() {
+					
+					$(this).zoom('flipbook').turn('previous');
+
+				},
+
+				resize: function(event, scale, page, pageElement) {
+
+					if (scale==1){
+						/* $('.smallT').attr('style', 'font-size:10px;');
+						$('body').attr('style', 'line-height: 1 !important;');
+						$('.productImg').attr('style', 'width:59px; height:59px;'); */
+                      	$('.smallT').attr('style', 'font-size:9.8px;');
+						$('body').attr('style', 'line-height: 1 !important;');
+						$('.productImg').attr('style', 'width:100px; height:100px;');
+					}
+					else{
+						/* $('.smallT').attr('style', 'font-size:25px;');
+						$('body').attr('style', 'line-height: 1.8 !important;');
+						$('.productImg').attr('style', 'width:80px; height:80px;'); */
+                      	$('.smallT').attr('style', 'font-size:20px;');
+						$('body').attr('style', 'line-height: 1.5 !important;');
+						$('.productImg').attr('style', 'width:200px; height:200px;');
+					}
+
+				},
+
+				zoomIn: function () {
+					
+					if (!window.escTip && !$.isTouch) {
+						escTip = true;
+
+						$('<div />', {'class': 'exit-message'}).
+							html('<div>Press ESC to exit</div>').
+								appendTo($('body')).
+								delay(2000).
+								animate({opacity:0}, 500, function() {
+									$(this).remove();
+								});
+					}
+				},
+
+				zoomOut: function () {
+
+					setTimeout(function(){
+						$('.flipbook').addClass('animated').removeClass('zoom-in');
+						resizeViewport();
+					}, 0);
+
+				}
+			}
+		});
+
+		// Zoom event
+
+		if ($.isTouch){
+			$('.flipbook-viewport').bind('zoom.doubleTap', zoomTo);
+		}
+		else{
+          	//uncomment first comment to duble tap zoom
+			//$('.flipbook-viewport').bind('zoom.doubleTap', zoomTo);
+			//$('.flipbook-viewport').bind('zoom.tap', zoomTo);
+		}
+
+		$(window).resize(function() {
+			resizeViewport();
+		}).bind('orientationchange', function() {
+			resizeViewport();
+		});
+      
+      	// Events for the next button
+
+
+        // Events for the next button
+
+        $('.previous-button').bind($.mouseEvents.over, function() {
+
+            $(this).addClass('previous-button-hover');
+
+        }).click(function() {
+
+            $('.magazine').turn('previous');
+
+        });
+
+		resizeViewport();
+
+		$('.magazine').addClass('animated');
+	}
+  
+  
+        $('#next-btn').click(function() {
+          console.log("button-click");
+
+            $('.flipbook').turn('next');
+
+        });
+  
+	$('#canvas').hide();
+
+	// Load the HTML4 version if there's not CSS transform
+
+	yepnope({
+		test : Modernizr.csstransforms,
+		yep: ['{{ 'turn.js' | asset_url }}'],
+		nope: ['{{ 'turn.html4.min.js' | asset_url }}'],
+		both: ['{{ 'zoom.min.js' | asset_url }}', '{{ 'basic.js' | asset_url }}', '{{ 'basic.css' | asset_url }}'],
+		complete: loadApp
+	});
+
+</script>

@@ -1,0 +1,115 @@
+{%- layout none -%}
+{%- assign gbp_to_pln_rate = 5.05 -%}
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">
+  <channel>
+    <title>{{ shop.name | escape }}</title>
+    <link>{{ shop.url }}</link>
+    <description>{{ shop.name | escape }} - Google Shopping Feed</description>
+
+    {% assign target_collection = collections['all_products'] %}
+    {% paginate target_collection.products by 5000 %}
+    {% for product in target_collection.products %}
+
+      {% if product.variants.size > 1 %}
+
+        {% for variant in product.variants %}
+        <item>
+          <g:id>{{ variant.id }}</g:id>
+          <g:item_group_id>{{ product.id }}</g:item_group_id>
+          <title>{{ product.title | escape }} - {{ variant.title | escape }}</title>
+          <description>{{ product.description | strip_html | truncatewords: 500 | escape }}</description>
+          <link>{{ shop.url }}{{ variant.url }}</link>
+          <g:image_link>https:{{ variant.featured_image | product_img_url: 'large' }}</g:image_link>
+          <g:condition>new</g:condition>
+          <g:availability>{% if variant.available %}in_stock{%- else -%}out_of_stock{%- endif %}</g:availability>
+
+          <g:price>{{ variant.price | money_without_currency }} {{ shop.currency }}</g:price>
+
+          {%- assign variant_pln_price = variant.price | times: gbp_to_pln_rate | divided_by: 100.0 | round: 2 -%}
+          <g:price>{{ variant_pln_price }} PLN</g:price>
+
+          <g:brand>{{ product.vendor | escape }}</g:brand>
+          <g:google_product_category>{{ product.type | escape }}</g:google_product_category>
+          <g:product_type>{{ product.type | escape }}</g:product_type>
+
+          {% if variant.barcode != blank %}
+          <g:gtin>{{ variant.barcode }}</g:gtin>
+          {% endif %}
+
+          {% if variant.sku != blank %}
+          <g:mpn>{{ variant.sku }}</g:mpn>
+          {% endif %}
+
+          {% for option in product.options %}
+            {% if option == 'Color' or option == 'Colour' %}
+              <g:color>{{ variant.option1 }}</g:color>
+            {% endif %}
+            {% if option == 'Size' %}
+              <g:size>{{ variant.option2 }}</g:size>
+            {% endif %}
+          {% endfor %}
+
+          <g:shipping>
+            <g:country>GB</g:country>
+            <g:service>Standard</g:service>
+            <g:price>0.00 GBP</g:price>
+          </g:shipping>
+          <g:shipping>
+            <g:country>PL</g:country>
+            <g:service>Standard (7-11 working days)</g:service>
+            <g:price>74.00 PLN</g:price>
+          </g:shipping>
+
+        </item>
+        {% endfor %}
+
+      {% else %}
+
+        <item>
+          <g:id>{{ product.id }}</g:id>
+          <title>{{ product.title | escape }}</title>
+          <description>{{ product.description | strip_html | truncatewords: 500 | escape }}</description>
+          <link>{{ shop.url }}{{ product.url }}</link>
+          <g:image_link>https:{{ product.featured_image | product_img_url: 'large' }}</g:image_link>
+          <g:condition>new</g:condition>
+          <g:availability>{% if product.available %}in_stock{%- else -%}out_of_stock{%- endif %}</g:availability>
+
+          <g:price>{{ product.price | money_without_currency }} {{ shop.currency }}</g:price>
+
+          {%- assign pln_price = product.price | times: gbp_to_pln_rate | divided_by: 100.0 | round: 2 -%}
+          <g:price>{{ pln_price }} PLN</g:price>
+
+          <g:brand>{{ product.vendor | escape }}</g:brand>
+          <g:google_product_category>{{ product.type | escape }}</g:google_product_category>
+          <g:product_type>{{ product.type | escape }}</g:product_type>
+
+          {%- assign current_variant = product.selected_or_first_available_variant -%}
+          {% if current_variant.barcode != blank %}
+          <g:gtin>{{ current_variant.barcode }}</g:gtin>
+          {% endif %}
+
+          {% if current_variant.sku != blank %}
+          <g:mpn>{{ current_variant.sku }}</g:mpn>
+          {% endif %}
+
+          <g:shipping>
+            <g:country>GB</g:country>
+            <g:service>Standard</g:service>
+            <g:price>2.69 GBP</g:price>
+          </g:shipping>
+          <g:shipping>
+            <g:country>PL</g:country>
+            <g:service>Standard (7-11 working days)</g:service>
+            <g:price>74.00 PLN</g:price>
+          </g:shipping>
+
+        </item>
+
+      {% endif %}
+
+    {% endfor %}
+    {% endpaginate %}
+
+  </channel>
+</rss>

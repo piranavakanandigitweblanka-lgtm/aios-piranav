@@ -1,0 +1,298 @@
+{% assign target_collection = collections[collection_handle] %}
+
+{% if target_collection and target_collection.products.size > 0 %}
+<div class="single-product-section">
+  <table class="single-product-table">
+    <thead>
+      <tr>
+        <th>Products</th>
+        <th>Price</th>
+        <th>Quantity</th>
+        <th>Add</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for product in target_collection.products %}
+        {% assign first_variant = product.variants.first %}
+        <tr data-product-id="{{ product.id }}" data-variant-id="{{ first_variant.id }}">
+          <td class="product-cell">
+            <div class="product-content">
+              {% if product.featured_image %}
+                <img
+                  src="{{ product.featured_image | img_url: '' }}"
+                  width="40" height="40"
+                  data-full="{{ product.featured_image | img_url: '' }}"
+                  alt="{{ product.title | escape }}"
+                  class="product-img"
+                  onclick="showImageModal(this)">
+              {% endif %}
+              <a href="{{ product.url }}" class="table-product-title" title="{{ product.title }}">
+                {{ product.title }}
+              </a>
+            </div>
+          </td>
+          <td>
+            <span
+              class="price"
+              id="price-{{ first_variant.id }}"
+              data-unit-price="{{ first_variant.price | divided_by: 100.0 }}"
+              data-currency-symbol="£">
+              {{ first_variant.price | money }}
+            </span>
+          </td>
+          <td class="quantity-cell">
+            <div class="qty-wrapper">
+              <button type="button" class="qty-btn" onclick="changeQty({{ first_variant.id }}, -1)">−</button>
+              <input type="number" name="quantity" min="1" value="1" id="quantity-{{ first_variant.id }}">
+              <button type="button" class="qty-btn" onclick="changeQty({{ first_variant.id }}, 1)">+</button>
+            </div>
+          </td>
+          <td>
+            {% if first_variant.available %}
+              <button
+                type="button"
+                class="add-to-cart-btn"
+                onclick="addToCart({{ first_variant.id }}, document.getElementById('quantity-{{ first_variant.id }}').value, this)">
+                Add to cart
+              </button>
+            {% else %}
+              <button type="button" class="add-to-cart-btn disabled" disabled title="Sold Out">
+                Sold Out
+              </button>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div id="imageModal" class="image-modal">
+    <span class="image-modal-close" onclick="closeImageModal()">&times;</span>
+    <img class="image-modal-content" id="modalImage" src="" alt="" width="" height="">
+  </div>
+</div>
+
+<script>
+function formatMoney(amount, symbol) {
+  return symbol + parseFloat(amount).toFixed(2);
+}
+function changeQty(variantId, delta) {
+  const qtyInput = document.getElementById('quantity-' + variantId);
+  let qty = parseInt(qtyInput.value) + delta;
+  if (qty < 1) qty = 1;
+  qtyInput.value = qty;
+  updatePrice(variantId, qty);
+}
+function updatePrice(variantId, qty) {
+  const priceSpan = document.getElementById('price-' + variantId);
+  const unitPrice = parseFloat(priceSpan.getAttribute('data-unit-price'));
+  const symbol = priceSpan.getAttribute('data-currency-symbol');
+  const totalPrice = unitPrice * qty;
+  if (!priceSpan.style.minWidth) {
+    priceSpan.style.minWidth = priceSpan.offsetWidth + 'px';
+    priceSpan.style.display = 'inline-block';
+  }
+  priceSpan.textContent = formatMoney(totalPrice, symbol);
+}
+function addToCart(variantId, qty, btnEl) {
+  fetch('/cart/add.js', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id: variantId, quantity: parseInt(qty) })
+  })
+    .then(res => res.json())
+    .then(data => showSuccessRow(btnEl))
+    .catch(err => console.error(err));
+}
+function showSuccessRow(btnEl) {
+  const tr = btnEl.closest('tr');
+  if (tr.nextElementSibling && tr.nextElementSibling.classList.contains('success-row')) {
+    tr.nextElementSibling.remove();
+  }
+  const colCount = tr.children.length;
+  const successTr = document.createElement('tr');
+  successTr.classList.add('success-row');
+  const td = document.createElement('td');
+  td.colSpan = colCount;
+  td.innerHTML = `
+    <div class="success-message">
+      <strong>Added successfully!</strong>
+      <a href="/cart" class="view-cart-link">View Cart</a>
+      <button class="dismiss-btn" onclick="this.closest('tr').remove()">Dismiss</button>
+    </div>`;
+  successTr.appendChild(td);
+  tr.insertAdjacentElement('afterend', successTr);
+}
+function showImageModal(imgEl) {
+  const modal = document.getElementById('imageModal');
+  const modalImg = document.getElementById('modalImage');
+  modal.style.display = 'flex';
+  modalImg.src = imgEl.getAttribute('data-full');
+}
+function closeImageModal() {
+  document.getElementById('imageModal').style.display = 'none';
+}
+document.getElementById('imageModal').addEventListener('click', function (e) {
+  if (e.target === this) closeImageModal();
+});
+document.querySelectorAll('.qty-wrapper input[name="quantity"]').forEach(input => {
+  input.addEventListener('blur', function() {
+    const variantId = this.id.replace('quantity-', '');
+    let qty = parseInt(this.value);
+    if (isNaN(qty) || qty < 1) qty = 1;
+    this.value = qty;
+    updatePrice(variantId, qty);
+  });
+});
+</script>
+
+<style>
+.single-product-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.single-product-table th,
+.single-product-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+  vertical-align: middle;
+  font-weight: 500;
+}
+.single-product-table th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+.single-product-table th:nth-child(1),
+.single-product-table td:nth-child(1) {
+  width: 35%;
+}
+.single-product-table th:nth-child(3),
+.single-product-table td:nth-child(3) {
+  width: 15%;
+}
+.product-content {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+}
+.product-img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 4px;
+  cursor: zoom-in;
+  flex-shrink: 0;
+}
+.table-product-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* only 2 lines */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
+  color: #001A72;
+  text-decoration: none;
+}
+.table-product-title:hover {
+  text-decoration: underline;
+}
+.qty-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.qty-btn {
+  background-color: #eee;
+  border: 1px solid #ccc;
+  padding: 3px 6px;
+  cursor: pointer;
+}
+.qty-btn:hover {
+  background-color: #ddd;
+}
+.qty-wrapper input {
+  width: 40px;
+  height: 24px;
+  text-align: center;
+  margin: 0 2px;
+  border: 1px solid #ccc;
+  border-radius: 0;
+  padding: 0 2px;
+}
+.add-to-cart-btn {
+  background-color: #001A72;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  cursor: pointer;
+  border-radius: 4px;
+  display: inline-block;
+  font-size: 12px;
+}
+.add-to-cart-btn:hover {
+  background-color: #0030b0;
+}
+.add-to-cart-btn.disabled {
+  background-color: #999 !important;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+.image-modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  justify-content: center;
+  align-items: center;
+}
+.image-modal-content {
+  max-width: 90%;
+  max-height: 90%;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
+}
+.image-modal-close {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  color: #fff;
+  font-size: 30px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 10000;
+}
+.success-row td {
+  background-color: #f0f8ff;
+  text-align: center;
+  padding: 12px;
+}
+.success-message {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+  text-align: center;
+}
+.success-message .view-cart-link {
+  color: #001A72;
+  text-decoration: underline;
+}
+.success-message .dismiss-btn {
+  background: #ccc;
+  border: none;
+  padding: 4px 8px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.success-message .dismiss-btn:hover {
+  background: #aaa;
+}
+</style>
+{% endif %}

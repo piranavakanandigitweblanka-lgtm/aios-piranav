@@ -1,0 +1,8 @@
+<review-scroll class="bls__pro-reviews mr-20 pointer">
+    {% if review_star %}
+        <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+    {% endif %}
+    {% if review_widget %}
+        <div id="shopify-product-reviews" data-id="{{ product.id }}">{{ product.metafields.spr.reviews }}</div>
+    {% endif %}
+</review-scroll>

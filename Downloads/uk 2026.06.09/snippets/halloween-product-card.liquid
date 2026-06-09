@@ -1,0 +1,158 @@
+<div class="halloween-product-card" data-product-handle="{{ product.handle }}">
+  <div class="halloween-product-card__image-wrapper">
+    <a href="{{ product.url | within: collection }}" class="halloween-product-card__link">
+      {% if product.featured_image %}
+        <img
+          class="halloween-product-card__image"
+          src="{{ product.featured_image | img_url: '400x400' }}"
+          alt="{{ product.featured_image.alt | escape }}"
+          loading="lazy"
+          width="400"
+          height="400"
+        >
+      {% else %}
+        <div class="halloween-product-card__placeholder">
+          {{ 'product-1' | placeholder_svg_tag: 'halloween-product-card__placeholder-svg' }}
+        </div>
+      {% endif %}
+    </a>
+
+   {%- liquid
+    assign target = product.selected_or_first_available_variant
+    assign compare_at_price = target.compare_at_price
+    assign price = target.price | default: 1999
+  -%}
+  {%- if compare_at_price > price and compare_at_price != blank -%}
+    <div class="halloween-product-card__badge halloween-product-card__badge--sale">
+      {%- assign p = compare_at_price | minus: price -%}
+      {%- if p > 0 -%}
+        {%- assign p = p | times: 100.0 | divided_by: compare_at_price | round -%}
+      {%- endif -%}
+      -{{ p }}%
+    </div>
+  {%- endif -%}
+
+  {% unless product.available %}
+    <div class="halloween-product-card__badge halloween-product-card__badge--sold-out">
+      Sold Out
+    </div>
+  {% endunless %}
+</div>
+
+  <div class="halloween-product-card__content">
+    <h3 class="halloween-product-card__title">
+      <a href="{{ product.url | within: collection }}" class="halloween-product-card__title-link">
+        {{ product.title }}
+      </a>
+    </h3>
+
+    <!-- Start of Judge.me code -->
+    <div style='{{ jm_style }}' class='jdgm-widget jdgm-preview-badge' data-id='{{ product.id }}' data-auto-install='false'>
+      {{ product.metafields.judgeme.badge }}
+    </div>
+    <!-- End of Judge.me code -->
+
+    <div class="halloween-product-card__price">
+      {% if product.compare_at_price > product.price %}
+        <span class="halloween-product-card__price--compare">
+          {{ product.compare_at_price | money }}
+        </span>
+        <span class="halloween-product-card__price--current halloween-product-card__price--sale">
+          {{ product.price | money }}
+        </span>
+      {% else %}
+        <span class="halloween-product-card__price--current">
+          {{ product.price | money }}
+        </span>
+      {% endif %}
+    </div>
+
+    <!-- 🎃 BUTTON SECTION -->
+    <div class="halloween-product-card__buttons">
+      <!-- Description button -->
+      <button 
+        type="button" 
+        class="halloween-product-card__button halloween-product-card__button--description" 
+        data-product-handle="{{ product.handle }}"
+        data-halloween-description-popup-trigger
+      >
+        Description
+      </button>
+
+      <!-- Quick Add button logic -->
+      {% if product.available %}
+        {% if product.variants.size > 1 %}
+          <a href="{{ product.url | within: collection }}" class="halloween-product-card__button halloween-product-card__button--options">
+            Select
+          </a>
+        {% else %}
+          <form method="post" action="/cart/add" class="halloween-product-card__form" data-type="add-to-cart-form">
+            <input type="hidden" name="id" value="{{ product.variants.first.id }}">
+
+            <div class="halloween-product-card__add-to-cart-row">
+              <div class="halloween-product-card__quantity-wrapper">
+                <label class="visually-hidden" for="Quantity-{{ product.id }}">Quantity</label>
+                <quantity-input class="quantity btn-radius border px-8 bg-grey flex align-items-center text-center mr-20 min-height-50">
+                  <button class="btn-reset flex justify-content-center align-items-center quantity__button no-js-hidden width-35" name="minus" type="button" aria-label="Decrease quantity">
+                    <svg width="11" height="12" viewBox="0 0 11 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M11 0.5V1.5H0V0.5H11Z" fill="#111111"/>
+                    </svg>
+                  </button>
+
+                  <input 
+                    class="quantity__input bg-unset border-none text-center width-50 appearance-none p-0-important"
+                    type="number"
+                    name="quantity"
+                    id="Quantity-{{ product.id }}"
+                    min="1"
+                    value="1">
+
+                  <button class="btn-reset flex justify-content-center align-items-center quantity__button no-js-hidden width-35" name="plus" type="button" aria-label="Increase quantity">
+                    <svg width="11" height="12" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" clip-rule="evenodd" d="M5 11.5H6V6.5H11V5.5H6V0.5H5V5.5H0V6.5H5V11.5Z" fill="#111111"/>
+                    </svg>
+                  </button>
+                </quantity-input>
+              </div>
+
+              <button type="submit" class="halloween-product-card__button halloween-product-card__button--add" data-add-to-cart>
+                Quick Add
+              </button>
+            </div>
+          </form>
+        {% endif %}
+      {% else %}
+        <button class="halloween-product-card__button halloween-product-card__button--disabled" disabled>
+          Out of Stock
+        </button>
+      {% endif %}
+    </div>
+    <!-- 🎃 END BUTTON SECTION -->
+  </div>
+</div>
+
+<!-- Halloween Description Popup Modal -->
+<div class="halloween-description-popup" id="halloween-description-popup-{{ product.handle }}" data-halloween-description-popup>
+  <div class="halloween-description-popup__overlay" data-halloween-description-popup-close></div>
+  <div class="halloween-description-popup__content">
+    <button class="halloween-description-popup__close" data-halloween-description-popup-close aria-label="Close description">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M1 1L15 15M15 1L1 15" stroke="currentColor" stroke-width="2"/>
+      </svg>
+    </button>
+    
+    <div class="halloween-description-popup__header">
+      <h3 class="halloween-description-popup__title">{{ product.title }}</h3>
+    </div>
+    
+    <div class="halloween-description-popup__body">
+      <div id="halloween-dynamic-variant-description">
+        {% if product.selected_or_first_available_variant.metafields.custom.variant_description %}
+          {{ product.selected_or_first_available_variant.metafields.custom.variant_description | metafield_tag }}
+        {% else %}
+          {{ product.description }}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>

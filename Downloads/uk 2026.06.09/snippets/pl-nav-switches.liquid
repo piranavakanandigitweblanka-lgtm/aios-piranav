@@ -1,0 +1,14 @@
+<nav class="pl-nav" aria-label="Lighting categories">
+  <a href="{{ pages['switches-and-sockets'].url }}"
+     {% if current_page == 'switches-and-sockets' %}class="active"{% endif %}>
+    Switches & Sockets
+  </a>
+  <a href="{{ pages['ledsone-switches'].url }}"
+     {% if current_page == 'ledsone-switches' %}class="active"{% endif %}>
+    Switches and accessories
+  </a>
+  <a href="{{ pages['switches-and-combo'].url }}"
+     {% if current_page == 'switches-and-combo' %}class="active"{% endif %}>
+    Switches and Combo
+  </a>
+</nav>

@@ -1,0 +1,223 @@
+{% doc %}
+  @prompt
+    Create a custom CSS code block for a product page that makes the quantity selector and "Add to Cart" button display inline (side-by-side) on desktop screens, while stacking vertically on mobile devices for better usability. The layout should:
+    
+    1. On desktop (768px and above): Display quantity selector and add to cart button in the same row with proper spacing
+    2. On mobile: Stack the elements vertically for easy touch interaction
+    3. Maintain proper alignment and spacing between elements
+    4. Ensure buttons remain medium-sized and fully clickable
+    5. Keep the design clean and user-friendly
+    
+    The CSS should target the product form elements (quantity selector and add to cart button) and apply responsive flexbox layout rules.
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-product-form-layout-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+  }
+
+  .ai-product-form-layout-{{ ai_gen_id }} .product-form__input {
+    display: flex;
+    flex-direction: column;
+    gap: {{ block.settings.mobile_spacing }}px;
+    width: 100%;
+  }
+
+  @media screen and (min-width: 768px) {
+    .ai-product-form-layout-{{ ai_gen_id }} .product-form__input {
+      flex-direction: row;
+      align-items: {{ block.settings.desktop_alignment }};
+      gap: {{ block.settings.desktop_spacing }}px;
+    }
+
+    .ai-product-form-layout-{{ ai_gen_id }} .product-form__input .quantity {
+      flex: 0 0 auto;
+      width: auto;
+      min-width: {{ block.settings.quantity_width }}px;
+    }
+
+    .ai-product-form-layout-{{ ai_gen_id }} .product-form__input .product-form__submit {
+      flex: {{ block.settings.button_flex_grow }};
+      width: auto;
+    }
+  }
+
+  @media screen and (max-width: 767px) {
+    .ai-product-form-layout-{{ ai_gen_id }} .product-form__input .quantity,
+    .ai-product-form-layout-{{ ai_gen_id }} .product-form__input .product-form__submit {
+      width: 100%;
+    }
+
+    .ai-product-form-layout-{{ ai_gen_id }} .product-form__input .product-form__submit {
+      min-height: {{ block.settings.mobile_button_height }}px;
+    }
+  }
+
+  .ai-product-form-layout-{{ ai_gen_id }} .product-form__input .quantity {
+    margin: 0;
+  }
+
+  .ai-product-form-layout-{{ ai_gen_id }} .product-form__input .product-form__submit {
+    margin: 0;
+  }
+
+  .ai-product-form-layout-{{ ai_gen_id }} .product-form__input .quantity__input {
+    text-align: center;
+  }
+
+  {% if block.settings.equal_height %}
+    @media screen and (min-width: 768px) {
+      .ai-product-form-layout-{{ ai_gen_id }} .product-form__input .quantity,
+      .ai-product-form-layout-{{ ai_gen_id }} .product-form__input .product-form__submit {
+        height: {{ block.settings.desktop_element_height }}px;
+      }
+
+      .ai-product-form-layout-{{ ai_gen_id }} .product-form__input .quantity__button,
+      .ai-product-form-layout-{{ ai_gen_id }} .product-form__input .quantity__input {
+        height: 100%;
+      }
+    }
+  {% endif %}
+{% endstyle %}
+
+<div class="ai-product-form-layout-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <style>
+    {{ block.settings.custom_css }}
+  </style>
+</div>
+
+{% schema %}
+{
+  "name": "Product form layout CSS",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Desktop layout"
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "Desktop width",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "desktop_spacing",
+      "label": "Spacing between elements",
+      "min": 5,
+      "max": 30,
+      "step": 5,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "select",
+      "id": "desktop_alignment",
+      "label": "Vertical alignment",
+      "options": [
+        {
+          "value": "flex-start",
+          "label": "Top"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "flex-end",
+          "label": "Bottom"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "quantity_width",
+      "label": "Quantity selector width",
+      "min": 80,
+      "max": 200,
+      "step": 10,
+      "unit": "px",
+      "default": 120
+    },
+    {
+      "type": "select",
+      "id": "button_flex_grow",
+      "label": "Button width behavior",
+      "options": [
+        {
+          "value": "0 0 auto",
+          "label": "Fixed width"
+        },
+        {
+          "value": "1",
+          "label": "Fill remaining space"
+        }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "checkbox",
+      "id": "equal_height",
+      "label": "Equal height elements",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "desktop_element_height",
+      "label": "Element height",
+      "min": 40,
+      "max": 70,
+      "step": 5,
+      "unit": "px",
+      "default": 50
+    },
+    {
+      "type": "header",
+      "content": "Mobile layout"
+    },
+    {
+      "type": "range",
+      "id": "mobile_spacing",
+      "label": "Spacing between elements",
+      "min": 5,
+      "max": 25,
+      "step": 5,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "mobile_button_height",
+      "label": "Button minimum height",
+      "min": 44,
+      "max": 70,
+      "step": 2,
+      "unit": "px",
+      "default": 50
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS",
+      "placeholder": ".product-form__submit {\n  /* Your custom styles */\n}"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product form layout CSS"
+    }
+  ],
+  "tag": null
+}
+{% endschema %}

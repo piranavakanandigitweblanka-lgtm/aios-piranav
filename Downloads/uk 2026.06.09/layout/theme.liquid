@@ -1,0 +1,367 @@
+{% liquid
+  assign enable_rtl = settings.rtl
+  assign iso_code = request.locale.iso_code
+  assign lis_language_rtl = settings.language_rtl
+  if lis_language_rtl != blank
+    if lis_language_rtl contains iso_code
+      assign enable_rtl = true
+    else
+      assign enable_rtl = false
+    endif
+  endif
+%}
+
+<!doctype html>
+<html class="no-js{% if enable_rtl %} body-rtl{% endif %}" lang="{{ iso_code }}">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="">
+
+    <!-- Preconnect to third-party origins to speed up discovery -->
+    <link rel="preconnect" href="https://connect.facebook.net" crossorigin>
+    <link rel="preconnect" href="https://www.facebook.com" crossorigin>
+    <link rel="preconnect" href="https://www.clarity.ms" crossorigin>
+    <link rel="preconnect" href="https://static.klaviyo.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- puvii added 21st Jan, 2025 for redirection -->
+    <script>
+      (function redirectIfNeeded() {
+        var oldBaseUrl = 'https://ledsone.co.uk/de/';
+        var newBaseUrl = 'https://ledsone.co.uk/';
+
+        // Get the current URL
+        var currentUrl = window.location.href;
+
+        // Check if the current URL starts with the old base URL
+        if (currentUrl.indexOf(oldBaseUrl) === 0) {
+          // Replace the old base URL with the new base URL
+          var updatedUrl = currentUrl.replace(oldBaseUrl, newBaseUrl);
+
+          // Redirect to the updated URL
+          window.location.href = updatedUrl;
+        }
+      })();
+    </script>
+    <!-- puvii added 21st Jan, 2025 for redirection -->
+ <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta name="google-site-verification" content="yrZJ5nkQV6kiYsEC0nn-tz7Iy0gaaEDKeZbimb3FN6I">
+
+    <link rel="canonical" href="{{ canonical_url }}">
+    <link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
+    {%- if settings.favicon != blank -%}
+      <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
+    {%- endif -%}
+    <title>
+      {{ page_title }}
+      {%- if current_tags %} &ndash; tagged "{{ current_tags | join: ', ' }}"{% endif -%}
+      {%- if current_page != 1 %} &ndash; Page {{ current_page }}{% endif -%}
+      {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
+    </title>
+    <meta name="description" content="{{ page_description | default: shop.description | default: shop.name | escape }}">
+    {% render 'meta-tags' %}
+
+    {%- render 'head-assets' -%}
+    {{ 'cart.css' | asset_url | stylesheet_tag: preload: true }}
+
+    <script>
+      document.documentElement.className = document.documentElement.className.replace('no-js', 'js');
+      if (Shopify.designMode) {
+        document.documentElement.classList.add('shopify-design-mode');
+      }
+    </script>
+
+    {{ content_for_header }}
+
+    <meta name="p:domain_verify" content="9b0645b57f690155160cac12806badb4">
+    <meta name="facebook-domain-verification" content="fstoak96x3qug4u4pl2ym0sm0k5100">
+
+    {% render 'gsf-conversion-pixels' %}
+
+
+    <!-- add for catalog -start -->
+    {% if page.handle == 'catalogue' %}
+      {% comment %} <meta name="viewport" content="width = 1050, user-scalable = no"> {% endcomment %}
+      <script type="text/javascript" async src="{{ 'jquery.min.1.7.js' | asset_url }}"></script>
+      <script type="text/javascript" async src="{{	'modernizrcatalog.2.5.3.min.js' | asset_url	}}"></script>
+      <script type="text/javascript" async src="{{	'hash.js' | asset_url	}}"></script>
+
+      <style>
+        header#page-header,
+        div#shopify-section-footer-2 {
+          display: none;
+        }
+
+        .shopify-section.slider-section,
+        .site-wrapper,
+        .wrapper.main-content {
+          margin: 0 auto;
+          padding: 0;
+          width: 100%;
+        }
+
+        .main-content {
+          width: 100%;
+          margin-top: 0;
+        }
+
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+            sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+          font-size: 1rem;
+          font-weight: 400;
+        }
+
+        .ly-languages-switcher {
+          display: none !important;
+        }
+      </style>
+    {% endif %}
+    {% if page.handle == "led-sone-products-configurator" or template.suffix == 'config-pk' %}
+        <style>
+            #MainContent, .content-for-layout, .container, .bls__container, .page-width {
+                max-width: 100% !important;
+                width: 100% !important;
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+            }
+            .bls-wrapper {
+                max-width: 100% !important;
+            }
+        </style>
+    {% endif %}
+    <!-- add for catalog -end -->
+
+
+    <!-- Sitelinks Searchbox & Organization Structured Data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org/",
+        "@type": "WebSite",
+        "name": {{ shop.name | json }},
+        "url": "{{ shop.secure_url }}",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "{{ shop.secure_url }}/search?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      }
+    </script>
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "LEDSone UK Ltd",
+        "url": "{{ shop.url }}",
+        "logo": "{{ settings.logo_image_desktop | image_url }}",
+        "image": "{{ settings.logo_image_desktop | image_url }}",
+        "description": {{ shop.description | json }},
+        "telephone": "02477220687",
+        "priceRange": "£",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Unit 3, Green Industrial Estate, Marshbrook Cl, Lythalls Ln",
+          "addressLocality": "Coventry",
+          "postalCode": "CV2 2NW",
+          "addressCountry": "GB"
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": 52.4411116,
+          "longitude": -1.4883333
+        },
+        "openingHoursSpecification": [
+          {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": [
+              "Monday",
+              "Tuesday",
+              "Wednesday",
+              "Thursday",
+              "Friday"
+            ],
+            "opens": "08:00",
+            "closes": "16:00"
+          }
+        ],
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "telephone": "02477220687",
+          "contactType": "customer service",
+          "areaServed": "GB",
+          "availableLanguage": "English"
+        },
+        "sameAs": [
+          {{ settings.social_twitter_link | json }},
+          {{ settings.social_facebook_link | json }},
+          {{ settings.social_pinterest_link | json }},
+          {{ settings.social_instagram_link | json }},
+          {{ settings.social_tiktok_link | json }},
+          {{ settings.social_tumblr_link | json }},
+          {{ settings.social_snapchat_link | json }},
+          {{ settings.social_youtube_link | json }},
+          {{ settings.social_vimeo_link | json }}
+        ]
+      }
+    </script>
+
+     {% render 'seo-noindex' %}
+
+    <link rel="preload" href="{{ 'blueskytechco.woff' | asset_url }}" as="font" type="font/woff" crossorigin>
+  </head>
+  <body class="{% if page.handle == 'led-sone-products-configurator' or template.suffix == 'config-pk' %}full-width-layout{% endif %} {% if template.name == 'collection' %}template-collection{% endif %}{% if template.name == 'product' %}template-product {% endif %}{% if template.name == 'index' %}template-index{% endif %} {%- if settings.general_layout == 'boxed' -%}box-layout{% elsif settings.general_layout == 'full_width' %}full-width-layout{% else %}{%- endif -%} {% if settings.content_center %}item-center{% endif %} product-images-style-{{ settings.product_images_style }} {% if template.suffix contains 'layout-2' %}product-layout-2{% endif %}">
+    {% render 'scroll-progress' %}
+    <div class="bls-wrapper">
+      {%- render 'umino-home' -%}
+      <div class="bls__overlay d-none-overlay"></div>
+      {% section 'announcement' %}
+      {%- render 'header' -%}
+      <main
+        id="MainContent"
+        class="content-for-layout focus-none{% if template == 'product' or template == 'page.wishlist' or template == "page.recently-viewed-products" %} skeleton-product-detail{% endif %}"
+        role="main"
+        tabindex="-1"
+      >
+        {{ content_for_layout }}
+      </main>
+      {% unless page.handle == 'catalogue' or page.handle == 'led-sone-products-configurator' or template.suffix == 'config-pk' %}
+        {% section 'order-tracking' %}
+      {% endunless %}
+      {% unless page.handle == 'led-sone-products-configurator' or template.suffix == 'config-pk' %}
+        {%- render 'footer-layout' -%}
+      {% endunless %}
+
+      {%- section 'mobile-stickybar' -%}
+      {%- section 'custom-colors' -%}
+    </div>
+    {%- render 'fake-order' -%}
+    {%- render 'content-bottom' -%}
+    {%- render 'before-you-leave' -%}
+    {%- render 'scripts-tag' -%}
+    <script src="{{ 'third-party-scripts.js' | asset_url }}?v=1.1" defer="defer"></script>
+    {%- if shop.domain == 'umino-demo.myshopify.com'
+      or shop.domain == 'demo-umino.myshopify.com'
+      or shop.domain == 'umino-demo-v2.myshopify.com'
+    -%}
+      <feature-button class="d-none extent-button-right-bar"></feature-button>
+    {%- endif -%}
+
+    <!-- Buy now button bug fixing -->
+    {% if template.name == 'product' %}
+      <script>
+        document.addEventListener('DOMContentLoaded', function () {
+          function initializeShopifyPaymentButton() {
+            if (typeof Shopify !== 'undefined' && Shopify.PaymentButton) {
+              const paymentButtonSkeleton = document.querySelector('.shopify-payment-button__skeleton');
+              const paymentButtonContainer = document.querySelector('.shopify-payment-button');
+
+              if (
+                paymentButtonSkeleton ||
+                (paymentButtonContainer && !paymentButtonContainer.querySelector('.shopify-payment-button__button'))
+              ) {
+                Shopify.PaymentButton.init();
+              } else {
+                console.error('Shopify.PaymentButton is already initialized.');
+              }
+            } else {
+              console.error('Shopify.PaymentButton is not defined or not loaded.');
+            }
+          }
+
+          // Call the function to initialize immediately
+          console.log("puvii added in theme.liquid for 'Buy Now' button");
+          initializeShopifyPaymentButton();
+        });
+      </script>
+    {%- endif -%}
+    <!-- Buy now button bug fixing -->
+
+    {% render 'offerpop' %}
+    {% comment %} {% render 'pendantoffpop' %}   {% endcomment %}
+
+{% comment %} piranav add homepage-tracker.js 2026.05.04
+ {% if template == 'index' %}
+  <script src="{{ 'homepage-tracker.js' | asset_url }}" defer="defer"></script>
+{% endif %} {% endcomment %}
+
+ {% comment %} {% if template == 'index' %}
+  <script src="{{ 'homepage-tracker-pk.js' | asset_url }}" defer="defer"></script>
+{% endif %} {% endcomment %}
+
+    {% comment %} <script>
+      (function() {
+        var scriptsLoaded = false;
+        function loadThirdPartyScripts() {
+          if (scriptsLoaded) return;
+          scriptsLoaded = true;
+          
+          console.log('Loading third-party scripts on interaction...');
+
+          // TikTok Pixel Code
+          !(function (w, d, t) {
+            w.TiktokAnalyticsObject = t;
+            var ttq = (w[t] = w[t] || []);
+            (ttq.methods = [
+              'page', 'track', 'identify', 'instances', 'debug', 'on', 'off', 'once', 'ready', 'alias', 'group', 'enableCookie', 'disableCookie', 'holdConsent', 'revokeConsent', 'grantConsent',
+            ]),
+              (ttq.setAndDefer = function (t, e) {
+                t[e] = function () {
+                  t.push([e].concat(Array.prototype.slice.call(arguments, 0)));
+                };
+              });
+            for (var i = 0; i < ttq.methods.length; i++) ttq.setAndDefer(ttq, ttq.methods[i]);
+            (ttq.instance = function (t) {
+              for (var e = ttq._i[t] || [], n = 0; n < ttq.methods.length; n++) ttq.setAndDefer(e, ttq.methods[n]);
+              return e;
+            }),
+              (ttq.load = function (e, n) {
+                var r = 'https://analytics.tiktok.com/i18n/pixel/events.js',
+                  o = n && n.partner;
+                (ttq._i = ttq._i || {}),
+                  (ttq._i[e] = []),
+                  (ttq._i[e]._u = r),
+                  (ttq._t = ttq._t || {}),
+                  (ttq._t[e] = +new Date()),
+                  (ttq._o = ttq._o || {}),
+                  (ttq._o[e] = n || {});
+                n = document.createElement('script');
+                (n.type = 'text/javascript'), (n.async = !0), (n.src = r + '?sdkid=' + e + '&lib=' + t);
+                e = document.getElementsByTagName('script')[0];
+                e.parentNode.insertBefore(n, e);
+              });
+
+            ttq.load('CQOSBMRC77U65T3JCO2G');
+            ttq.page();
+          })(window, document, 'ttq');
+
+          // Microsoft Clarity Code
+          (function (c, l, a, r, i, t, y) {
+            c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments); };
+            t = l.createElement(r);
+            t.async = 1;
+            t.src = 'https://www.clarity.ms/tag/' + i;
+            y = l.getElementsByTagName(r)[0];
+            y.parentNode.insertBefore(t, y);
+          })(window, document, 'clarity', 'script', 'ld9y8d60j4');
+        }
+
+        // Trigger on interaction
+        ['mouseover', 'keydown', 'touchstart', 'scroll'].forEach(function(event) {
+          window.addEventListener(event, loadThirdPartyScripts, { once: true, passive: true });
+        });
+
+        // Fallback delay
+        setTimeout(loadThirdPartyScripts, 5000);
+      })();
+    </script> {% endcomment %}
+
+
+ 
+  </body>
+</html>

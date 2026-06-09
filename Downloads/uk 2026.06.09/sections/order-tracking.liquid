@@ -1,0 +1,383 @@
+<section class="order-tracking-section">
+  <div class="order-tracking-container">
+<div class="tracking-header">
+    <h2>{{ section.settings.heading }}</h2>
+    <p>{{ section.settings.subtext }}</p>
+</div>
+    <div class="tracking-row">
+   <!-- LEFT COLUMN -->
+<div class="delivery-col">
+  <span class="delivery-label">Order now to receive by</span>
+
+  <div class="date-range">
+    <strong id="deliveryDateMin">--</strong>
+    <span class="date-separator">-</span>
+    <strong id="deliveryDateMax">--</strong>
+  </div>
+
+  <span class="delivery-badge">Within 3-5 days</span>
+
+  <div class="express-delivery-note">
+    Need it faster? <strong>Express Delivery</strong> available — order now for <strong>next day delivery</strong>.
+  </div>
+
+  <a href="https://ledsone.co.uk/pages/delivery-information" class="delivery-info-link" target="_blank">
+    View delivery info
+  </a>
+</div>
+
+      <!-- RIGHT COLUMN -->
+      <div class="track-col">
+        <input
+          type="text"
+          id="trackingNumber"
+          placeholder="Enter your tracking number"
+        />
+        <button onclick="trackOrder()">Track Order</button>
+        <p class="tracking-note">Tracking opens in a new tab</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<style>
+.order-tracking-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+  padding-top: 10px;
+   padding-bottom: 30px;
+}
+.tracking-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.tracking-header h2 {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.tracking-header p {
+  font-size: 14px;
+  color: #555;
+  margin: 0 auto;
+  max-width: 500px; /* Optional: prevents it from stretching too wide */
+}
+
+
+.tracking-wrapper {
+  max-width: 420px;
+  margin: auto;
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+  text-align: center;
+}
+
+.tracking-wrapper h2 {
+  font-size: 22px;
+  margin-bottom: 8px;
+}
+
+.tracking-wrapper p {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 16px;
+}
+
+.tracking-wrapper input {
+  width: 100%;
+  padding: 14px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  margin-bottom: 12px;
+}
+
+.tracking-wrapper button {
+  width: 100%;
+  padding: 14px;
+  font-size: 16px;
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.tracking-wrapper button:hover {
+  opacity: 0.9;
+}
+
+.tracking-note {
+  font-size: 12px;
+  margin-top: 10px;
+  color: #0c0303;
+}
+
+/* Mobile optimization */
+@media (max-width: 480px) {
+  .tracking-wrapper {
+    padding: 20px;
+  }
+}
+
+.delivery-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #eef7f1;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  gap: 10px;
+}
+
+.delivery-col.left {
+  text-align: left;
+  font-size: 14px;
+  color:rgb(5, 70, 131);
+}
+
+.delivery-col.left .label {
+  display: block;
+  font-size: 12px;
+  color: #555;
+}
+
+.delivery-col.right {
+  text-align: right;
+}
+
+.delivery-col.right .badge {
+  background:rgb(26, 73, 127);
+  color: #fff;
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+/* Mobile row-wise stack */
+@media (max-width: 480px) {
+  .delivery-row {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .delivery-col.left,
+  .delivery-col.right {
+    text-align: center;
+  }
+}
+
+.tracking-row {
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+  margin-top: 16px;
+}
+
+/* LEFT */
+.delivery-col {
+  flex: 0 0 38%;
+  background: #eef7f1;
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.delivery-label {
+  font-size: 13px;
+  color: #555;
+  display: block;
+}
+
+.date-range {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 6px 0;
+}
+
+.date-range strong {
+  font-size: 20px;
+  color: #1a1a1a;
+}
+
+.date-separator {
+  font-size: 20px;
+  color: #1a1a1a;
+  font-weight: normal;
+}
+
+.delivery-badge {
+  display: inline-block;
+  background:rgb(4, 64, 141);
+  color: #fff;
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 20px;
+  margin-top: 4px;
+}
+
+/* RIGHT */
+.track-col {
+  flex: 1;
+}
+
+.track-col input {
+  width: 100%;
+  padding: 14px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+}
+
+.track-col button {
+  width: 100%;
+  padding: 14px;
+  font-size: 16px;
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.track-col button:hover {
+  opacity: 0.9;
+}
+
+/* MOBILE STACK */
+@media (max-width: 768px) {
+  .tracking-row {
+    flex-direction: column;
+  }
+
+  .delivery-col {
+    text-align: center;
+  }
+  
+  .date-range {
+    gap: 4px;
+  }
+}
+
+</style>
+
+<script>
+function trackOrder() {
+  var trackingNo = document.getElementById("trackingNumber").value.trim();
+
+  if (!trackingNo) {
+    alert("Please enter a tracking number");
+    return;
+  }
+
+  var url = "";
+{% comment %} 
+  // Evri (Hermes)
+  if (/^[HTG]\w+/.test(trackingNo)) {
+    url = "https://www.evri.com/track/parcel/" + trackingNo;
+  }
+  // DPD (UK – supports most formats)
+  else if (
+    /^\d{12,14}$/.test(trackingNo) ||     // 12–14 digit numbers
+    trackingNo.startsWith("1550") ||      // Common DPD refs
+    /^[A-Z0-9]{8,20}$/i.test(trackingNo)  // Alphanumeric refs
+  ) {
+    url = "https://www.dpd.co.uk/service/tracking?parcel=" + trackingNo;
+  }
+  // Royal Mail
+  else if (trackingNo.endsWith("GB")) {
+    url = "https://www.royalmail.com/track-your-item#/tracking-results/" + trackingNo;
+  } {% endcomment %}
+  // Royal Mail: ends with GB OR long alphanumeric > 18 chars
+  if (trackingNo.endsWith("GB") || /^[A-Z0-9]{18,30}$/i.test(trackingNo)) {
+    url = "https://www.royalmail.com/track-your-item#/tracking-results/" + trackingNo;
+  }
+// Evri
+else if (/^[HTG]\w+/.test(trackingNo)) {
+  url = "https://www.evri.com/track/parcel/" + trackingNo;
+}
+  // SmartTrack
+  else if (/^UK\d{10}$/.test(trackingNo)) {   // e.g., UK3812088390
+    url = "https://www.smarttrack.co/tracking.php?tracking_number=" + trackingNo;
+  }
+// DPD
+else if (
+  /^\d{12,14}$/.test(trackingNo) ||     // 12–14 digit numbers
+  trackingNo.startsWith("1550") ||      // Common DPD refs
+  /^[A-Z0-9]{8,20}$/i.test(trackingNo)  // Alphanumeric refs
+) {
+  url = "https://www.dpd.co.uk/service/tracking?parcel=" + trackingNo;
+}
+  else {
+    alert("Carrier not recognised. Please check your tracking number.");
+    return;
+  }
+
+  window.open(url, "_blank");
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  var minDays = 3;
+  var maxDays = 5;
+  var today = new Date();
+  
+  // Calculate min date (3 days from now)
+  var minDate = new Date(today);
+  minDate.setDate(today.getDate() + minDays);
+  
+  // Calculate max date (5 days from now)
+  var maxDate = new Date(today);
+  maxDate.setDate(today.getDate() + maxDays);
+
+  // Format options
+  var options = { day: 'numeric', month: 'long' };
+  
+  // Format the dates
+  var formattedMinDate = minDate.toLocaleDateString('en-GB', options);
+  var formattedMaxDate = maxDate.toLocaleDateString('en-GB', options);
+
+  // Update the DOM
+  document.getElementById("deliveryDateMin").innerText = formattedMinDate;
+  document.getElementById("deliveryDateMax").innerText = formattedMaxDate;
+});
+</script>
+
+{% schema %}
+{
+  "name": "Order Tracking",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Track Your Order"
+    },
+    {
+      "type": "text",
+      "id": "subtext",
+      "label": "Sub text",
+      "default": "Enter your tracking number to see delivery updates"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Order Tracking"
+    }
+  ]
+}
+{% endschema %}

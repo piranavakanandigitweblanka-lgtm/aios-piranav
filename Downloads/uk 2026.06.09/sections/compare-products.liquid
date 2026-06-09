@@ -1,0 +1,897 @@
+{% comment %}
+Premium Product Comparison Section
+Uses metafield: custom.compare_products (list.product_reference)
+{% endcomment %}
+
+{% assign compare_products = product.metafields.custom.compare_products.value %}
+
+{% if compare_products != blank %}
+<section class="pcp-section" id="compare-{{ section.id }}">
+  <div class="pcp-wrap">
+
+    <div class="pcp-head">
+      <p class="pcp-eyebrow">Side-by-Side</p>
+      <h2 class="pcp-title">{{ section.settings.title }}</h2>
+      {% if section.settings.description != blank %}
+        <div class="pcp-desc rte">{{ section.settings.description }}</div>
+      {% endif %}
+    </div>
+
+    <!-- ─── DESKTOP TABLE (hidden on mobile) ─────────────────── -->
+    <div class="pcp-scroll pcp-desktop-only">
+      <table class="pcp-table">
+        <thead>
+          <tr>
+            <th class="pcp-sticky pcp-feat-col">
+              <span class="pcp-feat-label">Features</span>
+            </th>
+
+            <!-- Current Product -->
+            <th class="pcp-col pcp-col--current">
+              <div class="pcp-card-top bls__product-item" data-product-handle="{{ product.handle }}">
+                <span class="pcp-badge pcp-badge--current">★ Current</span>
+                {% if product.featured_image %}
+                  <div class="pcp-img-wrap">
+                    <img
+                      src="{{ product.featured_image | image_url: width: 280 }}"
+                      alt="{{ product.title }}"
+                      loading="lazy"
+                      width="140"
+                      height="140">
+                  </div>
+                {% endif %}
+                <button type="button" class="pcp-name pcp-popup-trigger bls__product-quickview">{{ product.title }}</button>
+                <div class="pcp-price">{{ product.price | money }}</div>
+                {% if product.compare_at_price > product.price %}
+                  <div class="pcp-was">Was {{ product.compare_at_price | money }}</div>
+                {% endif %}
+              </div>
+            </th>
+
+            {% for item in compare_products %}
+              <th class="pcp-col">
+                <div class="pcp-card-top bls__product-item" data-product-handle="{{ item.handle }}">
+                  <span class="pcp-badge pcp-badge--alt">Compare</span>
+                  {% if item.featured_image %}
+                    <div class="pcp-img-wrap">
+                      <img
+                        src="{{ item.featured_image | image_url: width: 280 }}"
+                        alt="{{ item.title }}"
+                        loading="lazy"
+                        width="140"
+                        height="140">
+                    </div>
+                  {% endif %}
+                  <button type="button" class="pcp-name pcp-popup-trigger bls__product-quickview">{{ item.title }}</button>
+                  <div class="pcp-price">{{ item.price | money }}</div>
+                  {% if item.compare_at_price > item.price %}
+                    <div class="pcp-was">Was {{ item.compare_at_price | money }}</div>
+                  {% endif %}
+                </div>
+              </th>
+            {% endfor %}
+          </tr>
+        </thead>
+
+        <tbody>
+          <!-- Availability -->
+          <tr class="pcp-row">
+            <td class="pcp-sticky pcp-row-label">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Availability
+            </td>
+            <td class="pcp-col--current">
+              {% if product.available %}
+                <span class="pcp-tag pcp-tag--yes">✔ In Stock</span>
+              {% else %}
+                <span class="pcp-tag pcp-tag--no">✖ Sold Out</span>
+              {% endif %}
+            </td>
+            {% for item in compare_products %}
+              <td>
+                {% if item.available %}
+                  <span class="pcp-tag pcp-tag--yes">✔ In Stock</span>
+                {% else %}
+                  <span class="pcp-tag pcp-tag--no">✖ Sold Out</span>
+                {% endif %}
+              </td>
+            {% endfor %}
+          </tr>
+
+          <!-- Vendor -->
+          <tr class="pcp-row pcp-row--alt">
+            <td class="pcp-sticky pcp-row-label">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+              Brand
+            </td>
+            <td class="pcp-col--current pcp-val">{{ product.vendor }}</td>
+            {% for item in compare_products %}
+              <td class="pcp-val">{{ item.vendor }}</td>
+            {% endfor %}
+          </tr>
+
+          <!-- Type -->
+          <tr class="pcp-row">
+            <td class="pcp-sticky pcp-row-label">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-4 0v2"/></svg>
+              Category
+            </td>
+            <td class="pcp-col--current pcp-val">{{ product.type }}</td>
+            {% for item in compare_products %}
+              <td class="pcp-val">{{ item.type }}</td>
+            {% endfor %}
+          </tr>
+
+          <!-- Add to Cart Row -->
+          <tr class="pcp-row pcp-row--action">
+            <td class="pcp-sticky pcp-row-label"></td>
+            <td class="pcp-col--current">
+              {% if product.available %}
+                {% assign current_variant = product.selected_or_first_available_variant %}
+                <form method="post" action="/cart/add" class="pcp-form">
+                  <input type="hidden" name="id" value="{{ current_variant.id }}">
+                  <input type="hidden" name="quantity" value="1">
+                  <button type="submit" class="pcp-atc pcp-atc--primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                    Add to Cart
+                  </button>
+                </form>
+              {% else %}
+                <button class="pcp-atc pcp-atc--disabled" disabled>Sold Out</button>
+              {% endif %}
+            </td>
+            {% for item in compare_products %}
+              <td>
+                {% if item.available %}
+                  {% assign compare_variant = item.selected_or_first_available_variant %}
+                  <form method="post" action="/cart/add" class="pcp-form">
+                    <input type="hidden" name="id" value="{{ compare_variant.id }}">
+                    <input type="hidden" name="quantity" value="1">
+                    <button type="submit" class="pcp-atc pcp-atc--secondary">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                      Add to Cart
+                    </button>
+                  </form>
+                {% else %}
+                  <button class="pcp-atc pcp-atc--disabled" disabled>Sold Out</button>
+                {% endif %}
+              </td>
+            {% endfor %}
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ─── MOBILE CARD LAYOUT (hidden on desktop) ────────────── -->
+    <div class="pcp-mobile-only">
+
+      <!-- Scroll hint indicator -->
+      <p class="pcp-scroll-hint">← Swipe to compare →</p>
+
+      <div class="pcp-cards-scroll">
+        <div class="pcp-cards-track">
+
+          <!-- Feature label column (always visible, not scrolled) -->
+          <!-- Labels are embedded inside each card row instead -->
+
+          <!-- Current Product Card -->
+          <div class="pcp-card pcp-card--current">
+            <div class="pcp-card-header bls__product-item" data-product-handle="{{ product.handle }}">
+              <span class="pcp-badge pcp-badge--current">★ Current</span>
+              {% if product.featured_image %}
+                <div class="pcp-img-wrap">
+                  <img
+                    src="{{ product.featured_image | image_url: width: 280 }}"
+                    alt="{{ product.title }}"
+                    loading="lazy"
+                    width="120"
+                    height="120">
+                </div>
+              {% endif %}
+              <button type="button" class="pcp-name pcp-popup-trigger bls__product-quickview">{{ product.title }}</button>
+              <div class="pcp-price">{{ product.price | money }}</div>
+              {% if product.compare_at_price > product.price %}
+                <div class="pcp-was">Was {{ product.compare_at_price | money }}</div>
+              {% endif %}
+            </div>
+
+            <div class="pcp-card-rows">
+              <div class="pcp-card-row">
+                <span class="pcp-card-label">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  Availability
+                </span>
+                <span class="pcp-card-val">
+                  {% if product.available %}
+                    <span class="pcp-tag pcp-tag--yes">✔ In Stock</span>
+                  {% else %}
+                    <span class="pcp-tag pcp-tag--no">✖ Sold Out</span>
+                  {% endif %}
+                </span>
+              </div>
+
+              <div class="pcp-card-row pcp-card-row--alt">
+                <span class="pcp-card-label">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                  Brand
+                </span>
+                <span class="pcp-card-val pcp-val">{{ product.vendor }}</span>
+              </div>
+
+              <div class="pcp-card-row">
+                <span class="pcp-card-label">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-4 0v2"/></svg>
+                  Category
+                </span>
+                <span class="pcp-card-val pcp-val">{{ product.type }}</span>
+              </div>
+            </div>
+
+            <div class="pcp-card-footer">
+              {% if product.available %}
+                {% assign current_variant = product.selected_or_first_available_variant %}
+                <form method="post" action="/cart/add" class="pcp-form">
+                  <input type="hidden" name="id" value="{{ current_variant.id }}">
+                  <input type="hidden" name="quantity" value="1">
+                  <button type="submit" class="pcp-atc pcp-atc--primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                    Add to Cart
+                  </button>
+                </form>
+              {% else %}
+                <button class="pcp-atc pcp-atc--disabled" disabled>Sold Out</button>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Compare Product Cards -->
+          {% for item in compare_products %}
+            <div class="pcp-card">
+              <div class="pcp-card-header bls__product-item" data-product-handle="{{ item.handle }}">
+                <span class="pcp-badge pcp-badge--alt">Compare</span>
+                {% if item.featured_image %}
+                  <div class="pcp-img-wrap">
+                    <img
+                      src="{{ item.featured_image | image_url: width: 280 }}"
+                      alt="{{ item.title }}"
+                      loading="lazy"
+                      width="120"
+                      height="120">
+                  </div>
+                {% endif %}
+                <button type="button" class="pcp-name pcp-popup-trigger bls__product-quickview">{{ item.title }}</button>
+                <div class="pcp-price">{{ item.price | money }}</div>
+                {% if item.compare_at_price > item.price %}
+                  <div class="pcp-was">Was {{ item.compare_at_price | money }}</div>
+                {% endif %}
+              </div>
+
+              <div class="pcp-card-rows">
+                <div class="pcp-card-row">
+                  <span class="pcp-card-label">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    Availability
+                  </span>
+                  <span class="pcp-card-val">
+                    {% if item.available %}
+                      <span class="pcp-tag pcp-tag--yes">✔ In Stock</span>
+                    {% else %}
+                      <span class="pcp-tag pcp-tag--no">✖ Sold Out</span>
+                    {% endif %}
+                  </span>
+                </div>
+
+                <div class="pcp-card-row pcp-card-row--alt">
+                  <span class="pcp-card-label">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                    Brand
+                  </span>
+                  <span class="pcp-card-val pcp-val">{{ item.vendor }}</span>
+                </div>
+
+                <div class="pcp-card-row">
+                  <span class="pcp-card-label">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-4 0v2"/></svg>
+                    Category
+                  </span>
+                  <span class="pcp-card-val pcp-val">{{ item.type }}</span>
+                </div>
+              </div>
+
+              <div class="pcp-card-footer">
+                {% if item.available %}
+                  {% assign compare_variant = item.selected_or_first_available_variant %}
+                  <form method="post" action="/cart/add" class="pcp-form">
+                    <input type="hidden" name="id" value="{{ compare_variant.id }}">
+                    <input type="hidden" name="quantity" value="1">
+                    <button type="submit" class="pcp-atc pcp-atc--secondary">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                      Add to Cart
+                    </button>
+                  </form>
+                {% else %}
+                  <button class="pcp-atc pcp-atc--disabled" disabled>Sold Out</button>
+                {% endif %}
+              </div>
+            </div>
+          {% endfor %}
+
+        </div>
+      </div>
+    </div>
+    <!-- end mobile layout -->
+
+  </div>
+</section>
+{% endif %}
+
+<style>
+/* ─── Reset & Base ─────────────────────────────── */
+.pcp-section *,
+.pcp-section *::before,
+.pcp-section *::after {
+  box-sizing: border-box;
+}
+
+/* ─── Section wrapper ──────────────────────────── */
+.pcp-section {
+  padding: 80px 20px;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.pcp-wrap {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ─── Header ───────────────────────────────────── */
+.pcp-head {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.pcp-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #888;
+  margin: 0 0 12px;
+}
+
+.pcp-title {
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #111;
+  margin: 0 0 14px;
+  line-height: 1.1;
+}
+
+.pcp-desc {
+  max-width: 580px;
+  margin: 0 auto;
+  color: #666;
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+/* ─── Visibility helpers ───────────────────────── */
+.pcp-desktop-only { display: block; }
+.pcp-mobile-only  { display: none; }
+
+/* ─── Scroll container ─────────────────────────── */
+.pcp-scroll {
+  overflow-x: auto;
+  border-radius: 20px;
+  box-shadow:
+    0 2px 4px rgba(0,0,0,.04),
+    0 12px 40px rgba(0,0,0,.08);
+  background: #fff;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ─── Table ────────────────────────────────────── */
+.pcp-table {
+  width: 100%;
+  min-width: 820px;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.pcp-table th,
+.pcp-table td {
+  padding: 20px 22px;
+  border-bottom: 1px solid #f0f0ee;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 14px;
+  color: #333;
+}
+
+.pcp-table thead th {
+  border-bottom: 2px solid #f0f0ee;
+  padding-top: 28px;
+  padding-bottom: 28px;
+}
+
+.pcp-table tr:last-child td {
+  border-bottom: 0;
+}
+
+/* ─── Sticky feature column ────────────────────── */
+.pcp-sticky {
+  position: sticky;
+  left: 0;
+  background: #fff;
+  z-index: 3;
+  text-align: left !important;
+  min-width: 160px;
+  max-width: 180px;
+}
+
+thead .pcp-sticky {
+  background: #fff;
+  z-index: 4;
+}
+
+.pcp-feat-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #aaa;
+}
+
+/* ─── Row label ────────────────────────────────── */
+.pcp-row-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+  white-space: nowrap;
+}
+
+.pcp-row-label svg {
+  color: #aaa;
+  flex-shrink: 0;
+}
+
+/* ─── Alternating rows ─────────────────────────── */
+.pcp-row--alt td,
+.pcp-row--alt .pcp-sticky {
+  background: #fafaf9;
+}
+
+/* ─── Current product column ───────────────────── */
+.pcp-col--current {
+  background: #f0f7ff !important;
+  position: relative;
+}
+
+thead .pcp-col--current {
+  background: #f0f7ff !important;
+}
+
+/* ─── Card tops (header cells) ─────────────────── */
+.pcp-card-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.pcp-img-wrap {
+  width: 120px;
+  height: 120px;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.pcp-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.35s ease;
+}
+
+.pcp-img-wrap:hover img {
+  transform: scale(1.05);
+}
+
+.pcp-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.pcp-popup-trigger {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  text-align: center;
+}
+
+.pcp-price {
+  font-size: 17px;
+  font-weight: 800;
+  color: #111;
+  letter-spacing: -0.02em;
+}
+
+.pcp-was {
+  font-size: 12px;
+  color: #aaa;
+  text-decoration: line-through;
+}
+
+/* ─── Badges ───────────────────────────────────── */
+.pcp-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 100px;
+  margin-bottom: 4px;
+}
+
+.pcp-badge--current {
+  background: #111;
+  color: #fff;
+}
+
+.pcp-badge--alt {
+  background: #eee;
+  color: #666;
+}
+
+/* ─── Stock tags ───────────────────────────────── */
+.pcp-tag {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 100px;
+}
+
+.pcp-tag--yes {
+  background: #e8f7ef;
+  color: #1a7a45;
+}
+
+.pcp-tag--no {
+  background: #fdecea;
+  color: #b91c1c;
+}
+
+/* ─── Cell values ──────────────────────────────── */
+.pcp-val {
+  font-size: 14px;
+  color: #444;
+  font-weight: 500;
+}
+
+/* ─── Action row ───────────────────────────────── */
+.pcp-row--action td {
+  padding-top: 24px;
+  padding-bottom: 28px;
+}
+
+.pcp-form {
+  margin: 0;
+  padding: 0;
+}
+
+/* ─── Add to Cart buttons ──────────────────────── */
+.pcp-atc {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  border: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+  white-space: nowrap;
+  width: 100%;
+  max-width: 180px;
+}
+
+.pcp-atc--primary {
+  background: #111;
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+}
+
+.pcp-atc--primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(0,0,0,0.22);
+}
+
+.pcp-atc--primary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.pcp-atc--secondary {
+  background: #fff;
+  color: #111;
+  border: 2px solid #ddd;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.pcp-atc--secondary:hover {
+  border-color: #111;
+  background: #111;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(0,0,0,0.15);
+}
+
+.pcp-atc--secondary:active {
+  transform: translateY(0);
+}
+
+.pcp-atc--disabled {
+  background: #f0f0f0;
+  color: #bbb;
+  cursor: not-allowed;
+  border: none;
+  width: 100%;
+  max-width: 180px;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ═══════════════════════════════════════════════════
+   MOBILE — Card-based layout replaces table
+   ═══════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+
+  .pcp-desktop-only { display: none !important; }
+  .pcp-mobile-only  { display: block; }
+
+  .pcp-section {
+    padding: 40px 16px;
+  }
+
+  .pcp-head {
+    margin-bottom: 24px;
+  }
+
+  .pcp-title {
+    font-size: 26px;
+  }
+
+  .pcp-desc {
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  /* Scroll hint */
+  .pcp-scroll-hint {
+    text-align: center;
+    font-size: 12px;
+    color: #aaa;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    margin: 0 0 14px;
+  }
+
+  /* Horizontal scroll track */
+  .pcp-cards-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 12px;
+    /* hide scrollbar on mobile but keep functionality */
+    scrollbar-width: none;
+  }
+  .pcp-cards-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  .pcp-cards-track {
+    display: flex;
+    gap: 12px;
+    /* each card is slightly less than viewport so peeking is visible */
+    padding: 4px 4px 4px 4px;
+    width: max-content;
+  }
+
+  /* Individual product card */
+  .pcp-card {
+    width: 240px;
+    flex-shrink: 0;
+    background: #fff;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow:
+      0 2px 4px rgba(0,0,0,0.04),
+      0 8px 28px rgba(0,0,0,0.09);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .pcp-card--current {
+    background: #f0f7ff;
+    box-shadow:
+      0 2px 4px rgba(0,0,0,0.06),
+      0 10px 34px rgba(17,120,255,0.12);
+  }
+
+  /* Card header */
+  .pcp-card-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 20px 16px 16px;
+    text-align: center;
+    border-bottom: 2px solid rgba(0,0,0,0.06);
+  }
+
+  .pcp-card--current .pcp-card-header {
+    border-bottom-color: rgba(17,120,255,0.12);
+  }
+
+  .pcp-card-header .pcp-img-wrap {
+    width: 90px;
+    height: 90px;
+    border-radius: 12px;
+    margin: 4px 0;
+  }
+
+  .pcp-card-header .pcp-name {
+    font-size: 13px;
+    line-height: 1.35;
+  }
+
+  .pcp-card-header .pcp-price {
+    font-size: 16px;
+  }
+
+  /* Feature rows inside each card */
+  .pcp-card-rows {
+    flex: 1;
+  }
+
+  .pcp-card-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 11px 16px;
+    border-bottom: 1px solid #f0f0ee;
+  }
+
+  .pcp-card-row:last-child {
+    border-bottom: none;
+  }
+
+  .pcp-card-row--alt {
+    background: rgba(0,0,0,0.018);
+  }
+
+  .pcp-card-label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #777;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .pcp-card-label svg {
+    color: #bbb;
+    flex-shrink: 0;
+  }
+
+  .pcp-card-val {
+    font-size: 12px;
+    font-weight: 600;
+    color: #333;
+    text-align: right;
+  }
+
+  .pcp-card-val .pcp-tag {
+    font-size: 10px;
+    padding: 3px 8px;
+  }
+
+  /* Card footer with ATC button */
+  .pcp-card-footer {
+    padding: 14px 16px 18px;
+    border-top: 1px solid rgba(0,0,0,0.06);
+  }
+
+  .pcp-card-footer .pcp-form,
+  .pcp-card-footer .pcp-atc,
+  .pcp-card-footer .pcp-atc--disabled {
+    width: 100%;
+    max-width: 100%;
+    font-size: 12px;
+    padding: 11px 14px;
+    border-radius: 10px;
+    gap: 6px;
+  }
+
+  .pcp-card-footer .pcp-atc svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 380px) {
+  .pcp-card {
+    width: 210px;
+  }
+
+  .pcp-title {
+    font-size: 22px;
+  }
+}
+.pcp-popup-trigger:hover,
+.pcp-popup-trigger:focus,
+.pcp-popup-trigger:focus-visible,
+.pcp-popup-trigger.bls__product-quickview:hover,
+.pcp-popup-trigger.bls__product-quickview:focus,
+.pcp-popup-trigger.bls__product-quickview:focus-visible {
+  background: transparent !important;
+  color: inherit !important;
+  box-shadow: none !important;
+  text-decoration: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+  filter: none !important;
+  outline: none;
+}
+</style>
+
+{% schema %}
+{
+  "name": "Premium Compare Products",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Compare Products"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "default": "<p>Compare this product with similar options.</p>"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Premium Compare Products"
+    }
+  ]
+}
+{% endschema %}

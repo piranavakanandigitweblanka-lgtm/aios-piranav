@@ -1,0 +1,219 @@
+{%- liquid 
+    assign is_unlisted = false 
+    if item.product.tags contains 'unlisted'
+        assign is_unlisted = true 
+    endif 
+    assign is_specific_id = false
+        assign item_product_id_str = item.product_id | append: ''
+    if item_product_id_str == '15310681342338' or item_product_id_str == '15333124407682' or item_product_id_str == '15334501941634'
+        assign is_specific_id = true 
+    endif 
+
+    assign hide_link = false
+    if is_unlisted or is_specific_id
+        assign hide_link = true
+    endif
+
+    assign cart_has_service_product = false
+    for check_item in cart.items
+        assign check_id_str = check_item.product_id | append: ''
+        if check_id_str == '15310681342338' or check_id_str == '15333124407682' or check_id_str == '15334501941634'
+            assign cart_has_service_product = true
+            break
+        endif
+    endfor
+
+    assign has_special_tag = false
+    if item.product.tags contains 'SP' or item.product.tags contains 'WL' or item.product.tags contains 'TL'
+        assign has_special_tag = true
+    endif
+
+    assign hide_remove = false
+    if is_specific_id
+        assign hide_remove = true
+    elsif cart_has_service_product
+        if is_unlisted or has_special_tag
+            assign hide_remove = true
+        endif
+    endif
+    assign lock_quantity = false
+    if is_specific_id
+        assign lock_quantity = true
+    endif
+
+    assign preview_image = nil
+    if is_specific_id
+        for property in item.properties
+            if property.first == 'Lighting preview'
+                assign preview_image = property.last
+                break
+            endif
+        endfor
+    endif
+-%}
+<div id="bls-minicart-product-{{ item.key }}" class="cart-item d-flex mb-20 pb-20"
+  data-is-unlisted="{{ is_unlisted }}"
+  data-is-service="{{ is_specific_id }}"
+  data-index="{{ item.index | plus: 1 }}"
+  data-key="{{ item.id }}"
+>
+  <div class="bls-minicart-product__image global-media-settings mr-15">
+    {% if hide_link %}
+      <div class="bls-minicart-product__image-container">
+    {% else %}
+      <a href="{{- item.url -}}">
+    {% endif %}
+      {%- if preview_image != blank -%}
+        <div class="bls__responsive-image" style="--aspect-ratio: 1/1;">
+          <img src="{{ preview_image }}" alt="{{ item.title | escape }}" class="motion-reduce" loading="lazy" width="70" height="70" style="object-fit: contain; width: 100%; height: 100%;">
+        </div>
+      {%- elsif item.image != blank -%}
+        {%- render 'responsive-image' | image: item.image | type: 'product' | cls: 'bls__product-grid bls__product-img-sw' -%}
+      {%- else -%}
+        {%- render 'responsive-image' | type: 'product' | cls: 'bls__product-grid-plh' -%}
+      {%- endif -%}
+    {% if hide_link %}</div>{% else %}</a>{% endif %}
+  </div>
+  <div class="bls-minicart-product-info flex-1 relative">
+    <h4 class="bls-minicart-product-name">
+      {% if hide_link %}
+        <span>{{ item.product.title | escape }}</span>
+      {% else %}
+        <a href="{{- item.url -}}">{{ item.product.title | escape }}</a>
+      {% endif %}
+    </h4>
+    <div class="bls-minicart-item-variant">
+      {%- unless item.product.has_only_default_variant -%}
+        {%- for option in item.options_with_values -%}
+          <div class="product-option">
+            <span class="label">{{ option.name }}: </span>
+            <span>
+                {%- if option.name == 'Lighting preview' or option.value contains 'http' -%}
+                    <a href="{{ option.value }}" target="_blank" class="btn btn-secondary btn-sm mt-5" style="padding: 5px 10px; font-size: 11px; display: inline-block;">
+                        View your custom product
+                    </a>
+                {%- else -%}
+                    {{ option.value }}
+                {%- endif -%}
+            </span>
+          </div>
+        {%- endfor -%}
+      {%- endunless -%}
+      {%- if item.properties.size != 0 -%}<div class="product-option-property">{%- endif -%}
+      {%- for property in item.properties -%}
+        {%- assign property_first_char = property.first | slice: 0 -%}
+        {%- if property.last != blank and property_first_char != '_' -%}
+          <div class="product-option">
+            <span>{{ property.first }}: </span>
+            <span>
+              {%- if property.last contains '/uploads/' or property.first == 'Lighting preview' or property.last contains 'http' -%}
+                <a href="{{ property.last }}" class="btn btn-secondary btn-sm mt-5" target="_blank" style="padding: 5px 10px; font-size: 11px; display: inline-block;">
+                  View your custom product
+                </a>
+              {%- else -%}
+                {{ property.last }}
+              {%- endif -%}
+            </span>
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+      {%- if item.properties.size != 0 -%}</div>{%- endif -%}
+    </div>
+
+    <div class="bls-minicart-item-prices">
+      {%- if item.original_price != item.final_price -%}
+        <div class="bls-minicart-discounted-prices">
+          <span class="bls-minicart-item-original-price">
+            {% if settings.currency_code_enabled %}
+              {{ item.original_price | money_with_currency }}
+            {% else %}
+              {{ item.original_price | money }}
+            {% endif %}
+          </span>
+          <span class="bls-minicart-item-price bls-minicart-item-regular-price text-color-regular-price">
+            {% if settings.currency_code_enabled %}
+              {{ item.final_price | money_with_currency }}
+            {% else %}
+              {{ item.final_price | money }}
+            {% endif %}
+          </span>
+        </div>
+      {%- else -%}
+        <span class="bls-minicart-item-original-price text-color-original-price">
+          {% if settings.currency_code_enabled %}
+            {{ item.original_price | money_with_currency }}
+          {% else %}
+            {{ item.original_price | money }}
+          {% endif %}
+        </span>
+      {%- endif -%}
+      <div class="bls-minicart-actions mt-5">
+        {%- if lock_quantity -%}
+          <div
+            class="quantity-locked py-10 px-15 text-center"
+            style="min-width: 100px;"
+          ></div>
+        {%- else -%}
+          <quantity-input class="quantity rounded-5 border d-inline-flex align-items-center text-center">
+            <button
+              class="quantity__button btn-reset width-35 flex justify-content-center align-items-center no-js-hidden"
+              name="minus"
+              type="button"
+              data-id="{{- item.key -}}"
+            >
+              <svg width="11" height="12" viewBox="0 0 11 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M11 0.5L11 1.5L-4.37114e-08 1.5L0 0.5L11 0.5Z" fill="#111111"></path>
+              </svg>
+            </button>
+            <input
+              class="bls-quantity-input bg-unset border-none text-center width-50 appearance-none p-0-important"
+              type="number"
+              name="updates[]"
+              data-id="{{- item.key -}}"
+              value="{{- item.quantity -}}"
+              data-value="{{- item.quantity -}}"
+              min="0"
+            >
+            <button
+              class="quantity__button  btn-reset width-35 flex justify-content-center align-items-center no-js-hidden"
+              name="plus"
+              type="button"
+              data-id="{{- item.key -}}"
+            >
+              <svg width="11" height="12" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M5 11.5H6L6 6.5H11V5.5H6L6 0.5H5L5 5.5H0V6.5H5L5 11.5Z" fill="#111111"></path>
+              </svg>
+            </button>
+          </quantity-input>
+        {%- endif -%}
+      </div>
+    </div>
+    <div class="bls-minicart-bottom">
+      {% assign item_url = item.url %}
+      {%- unless item.product.has_only_default_variant -%}
+        <a
+          href="{{ item_url }}"
+          class="bls-minicart-item-edit"
+          data-id="{{ item.id }}"
+          data-key="{{ item.key }}"
+          data-quantity="{{ item.quantity }}"
+        >
+          {{- 'general.cart.edit' | t -}}
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7.73512 2.10012L2.94595 7.16928C2.76512 7.36178 2.59012 7.74095 2.55512 8.00345L2.33928 9.89345C2.26345 10.5759 2.75345 11.0426 3.43012 10.9259L5.30845 10.6051C5.57095 10.5584 5.93845 10.3659 6.11928 10.1676L10.9085 5.09845C11.7368 4.22345 12.1101 3.22595 10.8209 2.00678C9.53762 0.799283 8.56345 1.22512 7.73512 2.10012Z" stroke="#999999" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M6.93604 2.94571C7.18687 4.55571 8.49354 5.78654 10.1152 5.94988" stroke="#999999" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M1.75 12.8333H12.25" stroke="#999999" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      {%- endunless -%}
+      {%- unless hide_remove -%}
+        <mini-cart-remove-button class="bls-minicart-item-remove" data-index="{{- item.key -}}">
+          <a href="{{ item.url_to_remove }}" class="cart-remove button--tertiary">
+            {{- 'general.cart.remove' | t -}}
+            <span class="icon-trash-2"></span>
+          </a>
+        </mini-cart-remove-button>
+      {%- endunless -%}
+    </div>
+  </div>
+</div>

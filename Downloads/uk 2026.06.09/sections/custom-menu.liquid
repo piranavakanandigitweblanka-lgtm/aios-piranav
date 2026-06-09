@@ -1,0 +1,228 @@
+{% schema %}
+{
+  "name": "Custom Menu",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Menu Heading",
+      "default": "Quick Links"
+    },
+    {
+      "type": "link_list",
+      "id": "menu", 
+      "label": "Select Menu"
+    },
+    {
+      "type": "select",
+      "id": "menu_direction",
+      "label": "Menu Direction",
+      "options": [
+        {
+          "value": "row",
+          "label": "Horizontal"
+        },
+        {
+          "value": "column",
+          "label": "Vertical"
+        }
+      ],
+      "default": "column"
+    },
+    {
+      "type": "range",
+      "id": "spacing",
+      "label": "Item Spacing",
+      "min": 8,
+      "max": 32,
+      "step": 4,
+      "default": 16,
+      "unit": "px"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom Menu",
+      "category": "Navigation"
+    }
+  ]
+}
+{% endschema %}
+
+<div class="custom-menu-section" data-section-type="custom-menu">
+  {%- if section.settings.heading != blank -%}
+    <h2 class="custom-menu__heading">{{ section.settings.heading }}</h2>
+  {%- endif -%}
+  
+  {%- if section.settings.menu != blank -%}
+    {%- assign menu = linklists[section.settings.menu] -%}
+    <nav class="custom-menu" aria-label="{{ section.settings.heading | default: 'Quick Links' }}">
+      <ul class="custom-menu__list custom-menu__list--{{ section.settings.menu_direction }}">
+        {%- for link in menu.links -%}
+          <li class="custom-menu__item">
+            <a 
+              href="{{ link.url }}" 
+              class="custom-menu__link {% if link.active %}custom-menu__link--active{% endif %}"
+              {% if link.current %}aria-current="page"{% endif %}
+            >
+              {{ link.title }}
+            </a>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </nav>
+  {%- else -%}
+    <p class="custom-menu__empty">Please select a menu in the section settings.</p>
+  {%- endif -%}
+</div>
+<style>
+.custom-menu-section {
+  padding: 1rem 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.custom-menu__heading {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  color: #333;
+}
+
+.custom-menu__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  gap: 5px;
+  /* Mobile-first: horizontal scroll slider */
+  overflow-x: auto;
+  flex-wrap: nowrap;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  scroll-snap-type: x mandatory; /* enables snapping */
+  scroll-behavior: smooth;
+}
+
+.custom-menu__list::-webkit-scrollbar {
+  display: none;
+}
+
+.custom-menu__item {
+  flex: 0 0 auto;
+  scroll-snap-align: start; /* where each item will snap */
+}
+
+.custom-menu__link {
+  display: block;
+  padding: 0.75rem 1rem;
+  text-decoration: none;
+  color: #555;
+  font-weight: 500;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  text-align: center;
+  border: 1px solid transparent;
+  background-color: #fff;
+  min-width: 140px;
+  
+  &:hover {
+    color: #fff;
+    background-color: #012f6d;
+    border-color: #e1e1e1;
+  }
+  
+  &.custom-menu__link--active {
+    color: #000;
+    font-weight: 600;
+    background-color: #f0f0f0;
+  }
+}
+
+/* Tablet and above */
+@media (min-width: 768px) {
+  .custom-menu-section {
+    padding: 3rem 2rem;
+  }
+
+  .custom-menu__heading {
+    font-size: 2rem;
+    text-align: left;
+  }
+
+  .custom-menu__list {
+    overflow: visible;
+    scrollbar-width: auto;
+    scroll-snap-type: none;
+    flex-wrap: wrap;
+    align-items: flex-start;
+
+    {% if section.settings.menu_direction == 'row' %}
+      flex-direction: row;
+      justify-content: flex-start;
+    {% else %}
+      flex-direction: column;
+    {% endif %}
+  }
+
+  .custom-menu__item {
+    flex: initial;
+  }
+
+  .custom-menu__link {
+    text-align: left;
+    min-width: 200px;
+  }
+}
+
+/* Desktop - Dynamic gap based on available space */
+@media (min-width: 1024px) {
+  .custom-menu__list--row {
+    justify-content: flex-start; /* Changed from space-between */
+  }
+
+  .custom-menu__link {
+    min-width: auto;
+    white-space: nowrap;
+  }
+
+  /* Dynamic gap calculation */
+  .custom-menu__list--row {
+    gap: {{ section.settings.spacing }}px;
+    justify-content: flex-start;
+  }
+  
+  /* When there are fewer items, use space-between to distribute them evenly */
+  .custom-menu__list--row:has(.custom-menu__item:nth-child(3):last-child) {
+    justify-content: space-between;
+  }
+  
+  .custom-menu__list--row:has(.custom-menu__item:nth-child(2):last-child) {
+    justify-content: space-between;
+  }
+  
+  .custom-menu__list--row:has(.custom-menu__item:only-child) {
+    justify-content: flex-start;
+  }
+}
+
+/* Alternative approach using container queries for more precise control */
+@container (min-width: 1024px) {
+  .custom-menu__list--row {
+    gap: clamp(8px, calc((100% - (200px * var(--item-count))) / (var(--item-count) - 1)), {{ section.settings.spacing }}px);
+  }
+}
+
+/* Fallback for browsers that don't support :has() */
+@media (min-width: 1024px) {
+  .custom-menu__list--row.justify-space-between {
+    justify-content: space-between;
+    gap: {{ section.settings.spacing }}px;
+  }
+}
+</style>
+
+
+
+

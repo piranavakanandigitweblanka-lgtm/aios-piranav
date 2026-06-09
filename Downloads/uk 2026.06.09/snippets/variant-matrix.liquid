@@ -1,0 +1,620 @@
+{% comment %}
+  Variant Pricing Matrix with Quantity + Smart Pack Pricing
+  Usage: {% render 'variant-matrix', product: product, section: section %}
+  Requires: product with 2 options (option1 = Size, option2 = Pack)
+{% endcomment %}
+
+{%- liquid
+  assign option1 = product.options_with_values[0]
+  assign option2 = product.options_with_values[1]
+  assign pack_values = option2.values
+-%}
+
+{%- if product.options.size >= 2 -%}
+
+<script>
+window.matrixVariants_{{ product.id }} = [
+  {%- for variant in product.variants -%}
+  {
+    id: {{ variant.id }},
+    option1: {{ variant.option1 | json }},
+    option2: {{ variant.option2 | json }},
+    price: {{ variant.price }},
+    sku: {{ variant.sku | json }},
+    available: {{ variant.available }},
+    inventory_quantity: {{ variant.inventory_quantity }}
+  }{% unless forloop.last %},{% endunless %}
+  {%- endfor -%}
+];
+window.matrixPackValues_{{ product.id }} = [
+  {%- for pv in pack_values -%}
+  {{ pv | json }}{% unless forloop.last %},{% endunless %}
+  {%- endfor -%}
+];
+</script>
+
+<div class="variant-matrix" id="variant-matrix-{{ product.id }}" data-product-id="{{ product.id }}">
+
+  <table class="variant-matrix__table">
+    <thead>
+      <tr>
+        <th class="variant-matrix__th variant-matrix__th--label">{{ option1.name }}</th>
+        {%- for pv in pack_values -%}
+          <th class="variant-matrix__th variant-matrix__th--pack">{{ pv }}</th>
+        {%- endfor -%}
+      </tr>
+    </thead>
+    <tbody>
+      {%- for size_value in option1.values -%}
+        <tr class="variant-matrix__row" data-size="{{ size_value | escape }}">
+          <td class="variant-matrix__td variant-matrix__td--label">{{ size_value }}</td>
+          {%- for pack_value in pack_values -%}
+            {%- liquid
+              assign matched = nil
+              assign unavailable = false
+              for variant in product.variants
+                if variant.option1 == size_value and variant.option2 == pack_value
+                  assign matched = variant
+                  unless variant.available
+                    assign unavailable = true
+                  endunless
+                  break
+                endif
+              endfor
+            -%}
+            <td
+              class="variant-matrix__td variant-matrix__td--price{% if unavailable %} variant-matrix__td--disabled{% endif %}{% if matched == nil %} variant-matrix__td--empty{% endif %}"
+              {% if matched %}
+                data-variant-id="{{ matched.id }}"
+                data-size="{{ size_value | escape }}"
+                data-pack="{{ pack_value | escape }}"
+                data-price="{{ matched.price }}"
+                data-available="{{ matched.available }}"
+                data-sku="{{ matched.sku | escape }}"
+              {% endif %}>
+              {%- if matched -%}
+                {%- if unavailable -%}
+                  <span class="variant-matrix__sold-out">Sold out</span>
+                {%- else -%}
+                  <span class="variant-matrix__price">{{ matched.price | money }}</span>
+                {%- endif -%}
+              {%- else -%}
+                <span class="variant-matrix__sold-out">—</span>
+              {%- endif -%}
+            </td>
+          {%- endfor -%}
+        </tr>
+      {%- endfor -%}
+    </tbody>
+  </table>
+
+  <!-- ATC bar -->
+  <div class="variant-matrix__atc-bar" id="matrix-atc-bar-{{ product.id }}" style="display:none;">
+    <div class="variant-matrix__atc-info">
+      <span class="variant-matrix__atc-label" id="matrix-atc-label-{{ product.id }}">—</span>
+      <span class="variant-matrix__atc-pack-note" id="matrix-atc-pack-note-{{ product.id }}"></span>
+    </div>
+    <div class="variant-matrix__atc-controls">
+      <div class="variant-matrix__qty-wrap">
+        <button class="variant-matrix__qty-btn" id="matrix-qty-minus-{{ product.id }}" type="button">−</button>
+        <input
+          class="variant-matrix__qty-input"
+          id="matrix-qty-input-{{ product.id }}"
+          type="number"
+          min="1"
+          value="1"
+          inputmode="numeric">
+        <button class="variant-matrix__qty-btn" id="matrix-qty-plus-{{ product.id }}" type="button">+</button>
+      </div>
+      <div class="variant-matrix__atc-price-wrap">
+        <span class="variant-matrix__atc-price-label">Total</span>
+        <span class="variant-matrix__atc-total" id="matrix-atc-total-{{ product.id }}">—</span>
+      </div>
+      <button
+        class="variant-matrix__atc-btn"
+        id="matrix-atc-btn-{{ product.id }}"
+        type="button">
+        Add to Cart
+      </button>
+    </div>
+  </div>
+
+  <!-- Feedback message -->
+  <div class="variant-matrix__msg" id="matrix-msg-{{ product.id }}" style="display:none;"></div>
+
+</div>
+
+<style>
+.variant-matrix { width: 100%; margin-bottom: 20px; }
+
+.variant-matrix__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin-bottom: 0;
+}
+.variant-matrix__th {
+  padding: 9px 14px;
+  border: 1px solid #e0e0e0;
+  background: #f7f7f7;
+  font-weight: 500;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.variant-matrix__th--label { text-align: left; min-width: 140px; }
+.variant-matrix__th--pack  { text-align: center; min-width: 80px; }
+
+.variant-matrix__row { cursor: pointer; }
+.variant-matrix__row:hover td { background: #f0f5fb; }
+.variant-matrix__row--active:hover td { background: #eaf3f8; }
+
+.variant-matrix__td {
+  padding: 8px 14px;
+  border: 1px solid #e0e0e0;
+  transition: background 0.12s;
+}
+.variant-matrix__td--label {
+  font-size: 12px;
+  color: #555;
+  text-align: left;
+  cursor: pointer;
+}
+.variant-matrix__td--price {
+  text-align: center;
+  font-weight: 500;
+  cursor: pointer;
+}
+.variant-matrix__td--disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.variant-matrix__td--empty {
+  text-align: center;
+  color: #bbb;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.variant-matrix__row--active td { background: #eaf3f8; }
+.variant-matrix__td--active { background: #b5d4f4 !important; }
+.variant-matrix__sold-out {
+  font-size: 11px;
+  color: #999;
+  font-weight: 400;
+}
+
+/* ATC bar */
+.variant-matrix__atc-bar {
+  margin-top: 12px;
+  border: 1px solid #d0e4f0;
+  border-radius: 8px;
+  background: #f5fafd;
+  padding: 14px 16px;
+}
+.variant-matrix__atc-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.variant-matrix__atc-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #111;
+}
+.variant-matrix__atc-pack-note {
+  font-size: 12px;
+  color: #1a6fa8;
+  background: #daeef9;
+  border-radius: 4px;
+  padding: 2px 8px;
+}
+.variant-matrix__atc-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.variant-matrix__qty-wrap {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #fff;
+}
+.variant-matrix__qty-btn {
+  background: #f0f0f0;
+  border: none;
+  width: 34px;
+  height: 38px;
+  font-size: 18px;
+  cursor: pointer;
+  line-height: 1;
+  color: #333;
+}
+.variant-matrix__qty-btn:hover { background: #e0e0e0; }
+.variant-matrix__qty-input {
+  width: 52px;
+  height: 38px;
+  border: none;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  -moz-appearance: textfield;
+  outline: none;
+}
+.variant-matrix__qty-input::-webkit-inner-spin-button,
+.variant-matrix__qty-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+.variant-matrix__atc-price-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.3;
+}
+.variant-matrix__atc-price-label { font-size: 11px; color: #888; }
+.variant-matrix__atc-total {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111;
+}
+.variant-matrix__atc-btn {
+  flex: 1;
+  min-width: 140px;
+  background: #111;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  height: 42px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.variant-matrix__atc-btn:hover { background: #333; }
+.variant-matrix__atc-btn:disabled { background: #aaa; cursor: not-allowed; }
+.variant-matrix__atc-btn.loading { opacity: 0.7; pointer-events: none; }
+
+.variant-matrix__msg {
+  margin-top: 10px;
+  padding: 9px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+.variant-matrix__msg.success {
+  background: #e6f4ea;
+  color: #1a6e2e;
+  border: 1px solid #a8d5b5;
+}
+.variant-matrix__msg.error {
+  background: #fdecea;
+  color: #c0392b;
+  border: 1px solid #f5c6c2;
+}
+
+/* Responsive improvements */
+.variant-matrix {
+  width: 100%;
+  margin-bottom: 20px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.variant-matrix__table {
+  width: 100%;
+  min-width: 100%;
+}
+.variant-matrix__th,
+.variant-matrix__td {
+  white-space: normal;
+}
+.variant-matrix__th--label { min-width: 120px; }
+.variant-matrix__th--pack  { min-width: 70px; }
+
+@media (max-width: 768px) {
+  .variant-matrix__th,
+  .variant-matrix__td {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+  .variant-matrix__th--label { min-width: 100px; }
+  .variant-matrix__th--pack  { min-width: 60px; }
+  .variant-matrix__atc-bar {
+    padding: 12px;
+  }
+  .variant-matrix__atc-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .variant-matrix__qty-wrap {
+    width: 100%;
+    max-width: none;
+    justify-content: center;
+  }
+  .variant-matrix__qty-input {
+    width: 100%;
+    max-width: 130px;
+  }
+  .variant-matrix__atc-price-wrap {
+    width: 100%;
+  }
+  .variant-matrix__atc-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .variant-matrix__th,
+  .variant-matrix__td {
+    padding: 10px 10px;
+  }
+  .variant-matrix__atc-info {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .variant-matrix__atc-label,
+  .variant-matrix__atc-pack-note {
+    width: 100%;
+  }
+  .variant-matrix__qty-wrap {
+    flex: 1 1 auto;
+  }
+  .variant-matrix__atc-price-wrap {
+    align-items: flex-start;
+  }
+}
+</style>
+
+<script>
+(function () {
+  var pid         = {{ product.id }};
+  var allVariants = window.matrixVariants_{{ product.id }} || [];
+  var packValues  = window.matrixPackValues_{{ product.id }} || [];
+
+  var matrix   = document.getElementById('variant-matrix-' + pid);
+  var atcBar   = document.getElementById('matrix-atc-bar-' + pid);
+  var atcLabel = document.getElementById('matrix-atc-label-' + pid);
+  var packNote = document.getElementById('matrix-atc-pack-note-' + pid);
+  var qtyInput = document.getElementById('matrix-qty-input-' + pid);
+  var qtyMinus = document.getElementById('matrix-qty-minus-' + pid);
+  var qtyPlus  = document.getElementById('matrix-qty-plus-' + pid);
+  var totalEl  = document.getElementById('matrix-atc-total-' + pid);
+  var atcBtn   = document.getElementById('matrix-atc-btn-' + pid);
+  var msgEl    = document.getElementById('matrix-msg-' + pid);
+
+  if (!matrix) return;
+
+  var selectedSize = null;
+  var quantity     = 1;
+
+  var packThresholds = packValues
+    .map(function(v) { return parseInt(v, 10); })
+    .filter(function(n) { return !isNaN(n); })
+    .sort(function(a, b) { return a - b; });
+
+  function getPackForQty(qty) {
+    var chosen = packThresholds[0] !== undefined ? packThresholds[0] : packValues[0];
+    for (var i = packThresholds.length - 1; i >= 0; i--) {
+      if (qty >= packThresholds[i]) { chosen = packThresholds[i]; break; }
+    }
+    return String(chosen);
+  }
+
+  function findVariant(size, pack) {
+    for (var i = 0; i < allVariants.length; i++) {
+      var v = allVariants[i];
+      if (v.option1 === size && v.option2 === String(pack)) return v;
+    }
+    return null;
+  }
+
+  function formatMoney(pence) { return '£' + (pence / 100).toFixed(2); }
+
+  /* Fire event so price block in the section can react */
+  function dispatchPriceUpdate(variantId, qty) {
+    document.dispatchEvent(new CustomEvent('matrix:priceUpdate', {
+      bubbles: true,
+      detail: { variantId: variantId, qty: qty }
+    }));
+  }
+
+  function highlightPackColumn(pack) {
+    matrix.querySelectorAll('.variant-matrix__td--price').forEach(function(c) {
+      c.classList.remove('variant-matrix__td--active');
+    });
+    var activeRow = matrix.querySelector('.variant-matrix__row--active');
+    if (!activeRow) return;
+    var activeCell = activeRow.querySelector('[data-pack="' + pack + '"]');
+    if (activeCell) activeCell.classList.add('variant-matrix__td--active');
+  }
+
+  function updateBar() {
+    if (!selectedSize) return;
+    var qty  = parseInt(qtyInput.value, 10) || 1;
+    var pack = getPackForQty(qty);
+    var v    = findVariant(selectedSize, pack);
+
+    packNote.textContent = 'Pack ' + pack + ' pricing';
+    highlightPackColumn(pack);
+
+    if (!v || !v.available) {
+      totalEl.textContent = '—';
+      atcBtn.disabled     = true;
+      atcBtn.textContent  = 'Sold out';
+      return;
+    }
+
+    totalEl.textContent = formatMoney(v.price * qty);
+    atcBtn.disabled     = false;
+    atcBtn.textContent  = 'Add to Cart';
+
+    /* Notify price block */
+    dispatchPriceUpdate(v.id, qty);
+
+    var inp = document.querySelector('input[name="id"]');
+    if (inp) { inp.value = v.id; inp.dispatchEvent(new Event('change', { bubbles: true })); }
+  }
+
+  function selectRow(size) {
+    selectedSize = size;
+    matrix.querySelectorAll('.variant-matrix__row').forEach(function(r) {
+      r.classList.toggle('variant-matrix__row--active', r.getAttribute('data-size') === size);
+    });
+    atcLabel.textContent  = size;
+    atcBar.style.display  = 'block';
+    msgEl.style.display   = 'none';
+    updateBar();
+  }
+
+  matrix.querySelectorAll('.variant-matrix__row').forEach(function(row) {
+    row.addEventListener('click', function(e) {
+      var td = e.target.closest('td');
+      if (td && (td.classList.contains('variant-matrix__td--disabled') || td.classList.contains('variant-matrix__td--empty'))) return;
+      var size = row.getAttribute('data-size');
+      var pack = td ? td.getAttribute('data-pack') : null;
+      if (size) selectRow(size);
+      if (pack && qtyInput) {
+        qtyInput.value = pack;
+        onQtyChange();
+      }
+    });
+  });
+
+  qtyMinus.addEventListener('click', function() {
+    var v = parseInt(qtyInput.value, 10) || 1;
+    if (v > 1) { qtyInput.value = v - 1; onQtyChange(); }
+  });
+  qtyPlus.addEventListener('click', function() {
+    qtyInput.value = (parseInt(qtyInput.value, 10) || 1) + 1;
+    onQtyChange();
+  });
+  qtyInput.addEventListener('input', onQtyChange);
+
+  function onQtyChange() {
+    var qty = parseInt(qtyInput.value, 10);
+    if (!qty || qty < 1) { qtyInput.value = 1; qty = 1; }
+    quantity = qty;
+    updateBar();
+  }
+
+  atcBtn.addEventListener('click', function() {
+    if (!selectedSize) return;
+    var qty  = parseInt(qtyInput.value, 10) || 1;
+    var pack = getPackForQty(qty);
+    var v    = findVariant(selectedSize, pack);
+    if (!v || !v.available) return;
+
+    atcBtn.classList.add('loading');
+    atcBtn.textContent  = 'Adding…';
+    msgEl.style.display = 'none';
+
+    /* Send sections param so Shopify returns re-rendered minicart HTML */
+    fetch('/cart/add.js', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+      body: JSON.stringify({
+        id: v.id,
+        quantity: qty,
+        sections: 'form-mini-cart',
+        sections_url: window.location.pathname
+      })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      atcBtn.classList.remove('loading');
+      atcBtn.textContent = 'Add to Cart';
+
+      if (data.status) {
+        showMsg(data.description || 'Could not add to cart.', 'error');
+        return;
+      }
+
+      showMsg('Added to cart!', 'success');
+
+      /* ── 1. Update cart count bubble ──────────────────────────── */
+      fetch('/cart.js')
+        .then(function(r) { return r.json(); })
+        .then(function(cart) {
+          document.querySelectorAll('.cart-count').forEach(function(el) {
+            el.innerHTML = cart.item_count;
+          });
+          /* Update header total price if present */
+          var htp = document.querySelector('header-total-price');
+          if (htp && typeof htp.updateTotal === 'function') {
+            htp.updateTotal(cart);
+          }
+        });
+
+      /* ── 2. Refresh minicart drawer HTML ─────────────────────── */
+      if (data.sections && data.sections['form-mini-cart']) {
+        var formMiniCart = document.getElementById('form-mini-cart');
+        if (formMiniCart) {
+          var parsed = new DOMParser().parseFromString(
+            data.sections['form-mini-cart'], 'text/html'
+          );
+          var newContent = parsed.querySelector('#form-mini-cart');
+          if (newContent) {
+            formMiniCart.innerHTML = newContent.innerHTML;
+          }
+          /* Update free-shipping progress bar if present */
+          var cartThreshold = document.querySelector('.bls__cart-thres-js');
+          if (cartThreshold) {
+            var parsedThreshold = parsed.querySelector('.bls__cart-thres-js');
+            if (parsedThreshold) {
+              if (parsedThreshold.classList.contains('cart_shipping_free')) {
+                cartThreshold.classList.add('cart_shipping_free');
+              } else {
+                cartThreshold.classList.remove('cart_shipping_free');
+              }
+              var tContent = parsedThreshold.querySelector('.bls__cart-thres');
+              if (tContent) {
+                cartThreshold.querySelector('.bls__cart-thres').innerHTML = tContent.innerHTML;
+              }
+              setTimeout(function() {
+                var bar = parsed.querySelector('.percent_shipping_bar');
+                var liveBar = cartThreshold.querySelector('.percent_shipping_bar');
+                if (bar && liveBar) {
+                  liveBar.setAttribute('style', bar.getAttribute('style'));
+                }
+              }, 500);
+            }
+          }
+        }
+      }
+
+      /* ── 3. Re-bind cart drawer actions & open it ─────────────── */
+      var cartNotification = document.querySelector('cart-notification');
+      if (cartNotification) {
+        if (typeof cartNotification.cartAction === 'function') {
+          cartNotification.cartAction();
+        }
+        if (typeof cartNotification.open === 'function') {
+          cartNotification.open();
+        }
+      }
+
+      /* Also fire events for any other theme listeners */
+      document.dispatchEvent(new CustomEvent('cart:updated', { bubbles: true }));
+    })
+    .catch(function() {
+      atcBtn.classList.remove('loading');
+      atcBtn.textContent = 'Add to Cart';
+      showMsg('Something went wrong. Please try again.', 'error');
+    });
+  });
+
+  function showMsg(text, type) {
+    msgEl.textContent   = text;
+    msgEl.className     = 'variant-matrix__msg ' + type;
+    msgEl.style.display = 'block';
+    setTimeout(function() { msgEl.style.display = 'none'; }, 4000);
+  }
+
+  // Auto-select first available row on load
+  var firstRow = matrix.querySelector('.variant-matrix__row');
+  if (firstRow) selectRow(firstRow.getAttribute('data-size'));
+})();
+</script>
+
+{%- endif -%}

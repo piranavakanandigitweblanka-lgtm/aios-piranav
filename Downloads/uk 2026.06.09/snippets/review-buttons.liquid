@@ -1,0 +1,72 @@
+{% comment %}
+  Snippet: Trustpilot Review Button (Mini on Mobile)
+{% endcomment %}
+
+<div class="review-section-wrapper">
+  <style>
+  .review-section-wrapper {
+    {% comment %} padding: 20px; {% endcomment %}
+    {% comment %} background-color: #f8f9fc; {% endcomment %}
+    text-align: center;
+  }
+
+  .review-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* Main Button */
+  .trustpilot-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border: 1px solid #00B67A;
+    border-radius: 6px;
+    background: #fff;
+    color: #000;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: 0.2s ease-in-out;
+    white-space: nowrap;
+  }
+
+  .trustpilot-btn:hover {
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  }
+
+  .trustpilot-star {
+    width: 18px;
+    height: 18px;
+    fill: #00B67A;
+  }
+
+  /* Hide on Mobile + iPad (Up to 1024px) */
+  @media (max-width: 1024px) {
+    .review-section-wrapper {
+      display: none !important;
+    }
+  }
+</style>
+
+
+  <div class="review-section">
+    <a href="https://uk.trustpilot.com/review/ledsone.co.uk"
+       target="_blank"
+       rel="noopener noreferrer"
+       class="trustpilot-btn">
+
+      Review us on
+
+      <svg class="trustpilot-star" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <path d="M12 .587l3.668 7.431L24 9.748l-6 5.847 1.416 8.261L12 19.896l-7.416 3.96L6 15.595 0 9.748l8.332-1.73z"/>
+      </svg>
+
+      <strong>Trustpilot</strong>
+
+    </a>
+  </div>
+</div>

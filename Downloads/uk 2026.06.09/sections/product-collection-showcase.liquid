@@ -1,0 +1,647 @@
+{% comment %} Product Collection Showcase Section {% endcomment %}
+
+<section class="pcs-section" id="product-collection-showcase">
+  <div class="pcs-grid">
+    {% for block in section.blocks %}
+      {% assign collection = collections[block.settings.collection] %}
+      <div class="pcs-card" {{ block.shopify_attributes }}>
+        {% if block.settings.promo_label != blank %}
+          <div class="pcs-promo-bar">
+            {{ block.settings.promo_label }}
+          </div>
+        {% endif %}
+
+        <div class="pcs-card-header">
+          <div class="pcs-card-titles">
+            <h2 class="pcs-card-title">
+              {% if block.settings.title != blank %}
+                {{ block.settings.title }}
+              {% elsif collection != blank %}
+                {{ collection.title }}
+              {% else %}
+                Collection
+              {% endif %}
+            </h2>
+            {% if block.settings.subtitle != blank %}
+              <p class="pcs-card-subtitle">{{ block.settings.subtitle }}</p>
+            {% endif %}
+          </div>
+          {% if collection != blank %}
+            <a href="{{ collection.url }}" class="pcs-more-link">More &rsaquo;</a>
+          {% endif %}
+        </div>
+
+        <div
+          class="pcs-products"
+          data-auto-switch="{{ section.settings.enable_auto_switch }}"
+          data-interval="{{ section.settings.switch_interval | times: 1000 }}"
+        >
+          <div class="pcs-products-track">
+            {% assign products_to_show = collection.products | default: empty %}
+            {% assign total_products = products_to_show.size | at_most: 12 %}
+            {% if total_products == 0 %}
+              {% assign total_products = 3 %}
+            {% endif %}
+
+            {% assign num_slides = total_products | plus: 2 | divided_by: 3 %}
+
+            {% for i in (1..num_slides) %}
+              {% assign offset = i | minus: 1 | times: 3 %}
+              <div class="pcs-product-slide {% if i == 1 %}active{% endif %}" data-slide-index="{{ i | minus: 1 }}">
+                <div class="pcs-product-grid">
+                  {% for j in (1..3) %}
+                    {% assign product_index = offset | plus: j | minus: 1 %}
+                    {% assign product = products_to_show[product_index] %}
+
+                    {% if product != blank %}
+                      <div class="pcs-product">
+                        <div class="pcs-product-image-wrapper">
+                          <a href="{{ product.url }}" class="pcs-product-image-link">
+                            {% if product.featured_image != blank %}
+<img
+                                src="{{ product.featured_image | image_url: width: 300 }}"
+                                srcset="{{ product.featured_image | image_url: width: 150 }} 150w,
+                                        {{ product.featured_image | image_url: width: 300 }} 300w,
+                                        {{ product.featured_image | image_url: width: 450 }} 450w"
+                                sizes="(max-width: 480px) 33vw, 300px"
+                                alt="{{ product.featured_image.alt | escape }}"
+                                class="pcs-product-img"
+                                {% if forloop.parentloop.first %}loading="eager"{% else %}loading="lazy"{% endif %}
+                                width="300"
+                                height="300"
+                              >
+                            {% else %}
+                              <div class="pcs-product-img pcs-placeholder">
+                                {{ 'product-' | append: j | placeholder_svg_tag: 'placeholder-svg' }}
+                              </div>
+                            {% endif %}
+                          </a>
+                          {% if product.compare_at_price > product.price %}
+                            {% assign discount = product.compare_at_price
+                              | minus: product.price
+                              | times: 100.0
+                              | divided_by: product.compare_at_price
+                              | round
+                            %}
+                            {% if discount > 0 %}
+                              <span class="pcs-discount-badge">-{{ discount }}%</span>
+                            {% endif %}
+                          {% endif %}
+                        </div>
+                        <div class="pcs-product-footer">
+                          <div class="pcs-product-price-box">
+                            <span class="pcs-product-price">
+                              {{ product.price | money }}
+                            </span>
+                            {% if product.compare_at_price > product.price %}
+                              <span class="pcs-product-price--original">
+                                {{ product.compare_at_price | money }}
+                              </span>
+                            {% endif %}
+                          </div>
+                          <button
+                            class="pcs-wishlist"
+                            aria-label="Add {{ product.title | escape }} to wishlist"
+                            data-product-handle="{{ product.handle }}"
+                            onclick="pcsToggleWishlist(this, '{{ product.handle }}')"
+                          >
+                            <svg
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="1.5"
+                              width="18"
+                              height="18"
+                            >
+                              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    {% else %}
+                      <div class="pcs-product pcs-product--empty">
+                        <div class="pcs-product-img pcs-placeholder">
+                          {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+                        </div>
+                        <div class="pcs-product-footer">
+                          <span class="pcs-product-price">—</span>
+                        </div>
+                      </div>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+          {% if num_slides > 1 %}
+            <div class="pcs-pagination">
+              {% for i in (1..num_slides) %}
+                <span class="pcs-dot {% if i == 1 %}active{% endif %}" data-index="{{ i | minus: 1 }}"></span>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+<style>
+  .pcs-section {
+    padding: {{ section.settings.section_padding }}px 0;
+    background: {{ section.settings.background_color }};
+  }
+
+  .pcs-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+
+  .pcs-card {
+    background: #ffffff;
+    border: 1px solid #e8e8e8;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: box-shadow 0.2s ease;
+  }
+
+  .pcs-card:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  }
+
+  .pcs-promo-bar {
+    background: {{ section.settings.promo_bar_color }};
+    color: {{ section.settings.promo_bar_text_color }};
+    font-size: 14px;
+    padding: 6px 16px;
+    text-align: center;
+    font-weight: 500;
+  }
+
+  .pcs-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 14px 16px 10px;
+    gap: 8px;
+  }
+
+  .pcs-card-titles {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .pcs-card-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0 0 2px;
+    line-height: 1.3;
+  }
+
+  .pcs-card-subtitle {
+    font-size: 11.5px;
+    color: #888;
+    margin: 0;
+    line-height: 1.4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .pcs-more-link {
+    font-size: 13px;
+    color: #555;
+    text-decoration: none;
+    white-space: nowrap;
+    padding: 2px 0;
+    border-bottom: 1px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+    flex-shrink: 0;
+  }
+
+  .pcs-more-link:hover {
+    color: #000;
+    border-bottom-color: #000;
+  }
+
+  .pcs-products {
+    position: relative;
+    overflow: hidden;
+    background: #e8e8e8;
+    border-top: 1px solid #e8e8e8;
+  }
+
+  .pcs-products-track {
+    position: relative;
+    width: 100%;
+    /* Fixed height based on grid (300px img approx + footer) */
+    min-height: 200px; 
+    overflow: hidden;
+  }
+
+  /* Since aspect-ratio 1/1 + footer, we need a way to keep track height. 
+     Using container-query or just allowing the first slide to set height */
+  .pcs-product-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.98);
+    transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.6s;
+    z-index: 1;
+  }
+
+  .pcs-product-slide.active {
+    position: relative; /* First slide/Active slide dictates height */
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+    z-index: 2;
+  }
+
+  .pcs-product-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+  }
+
+  .pcs-product {
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .pcs-product-image-wrapper {
+    position: relative;
+    display: block;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+  }
+
+  .pcs-product-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+    display: block;
+  }
+
+  .pcs-product-image-wrapper:hover .pcs-product-img {
+    transform: scale(1.05);
+  }
+
+  .pcs-placeholder {
+    background: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .pcs-placeholder .placeholder-svg {
+    width: 50%;
+    height: 50%;
+    opacity: 0.3;
+  }
+
+  .pcs-product-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+  }
+
+  .pcs-product-price-box {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .pcs-product-price {
+    font-size: 13.5px;
+    font-weight: 600;
+    color:rgb(227, 9, 9);
+    white-space: nowrap;
+  }
+
+  .pcs-product-price--original {
+    font-size: 11px;
+    font-weight: 400;
+    color: black;
+    text-decoration: line-through;
+    margin-left: 4px;
+  }
+
+  .pcs-discount-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: #012f6d;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 8px;
+    border-radius: 8px;
+    z-index: 2;
+    pointer-events: none;
+
+  }
+
+  .pcs-wishlist {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #bbb;
+    padding: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s, transform 0.15s;
+    border-radius: 50%;
+  }
+
+  .pcs-wishlist:hover {
+    color: #e05a5a;
+    transform: scale(1.15);
+  }
+
+  .pcs-wishlist.active {
+    color: #e05a5a;
+  }
+
+  .pcs-wishlist.active svg {
+    fill: #e05a5a;
+  }
+
+  .pcs-product--empty {
+    opacity: 0.35;
+    pointer-events: none;
+  }
+
+  .pcs-pagination {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 0 12px;
+    background: #fff;
+  }
+
+  .pcs-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #e0e0e0;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .pcs-dot:hover {
+    background: #bbb;
+    transform: scale(1.3);
+  }
+
+  .pcs-dot.active {
+    width: 20px;
+    border-radius: 10px;
+    background: #012f6d;
+    box-shadow: 0 2px 6px rgba(1, 47, 109, 0.2);
+  }
+
+  @media (max-width: 720px) {
+    .pcs-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .pcs-card-subtitle {
+      display: none;
+    }
+    .pcs-product-footer {
+      padding: 6px 8px;
+    }
+    .pcs-product-price {
+      font-size: 11.5px;
+    }
+  }
+</style>
+
+<script>
+  (function () {
+    var WISHLIST_KEY = 'bls__wishlist-items';
+
+    function getWishlist() {
+      try {
+        return JSON.parse(localStorage.getItem(WISHLIST_KEY) || '[]');
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveWishlist(list) {
+      localStorage.setItem(WISHLIST_KEY, JSON.stringify(list));
+      // Trigger header count update if theme has global listener
+      document.dispatchEvent(new CustomEvent('wishlist:updated'));
+    }
+
+    window.pcsToggleWishlist = function (btn, productHandle) {
+      var list = getWishlist();
+      var idx = list.indexOf(productHandle);
+      if (idx === -1) {
+        list.push(productHandle);
+        btn.classList.add('active');
+      } else {
+        list.splice(idx, 1);
+        btn.classList.remove('active');
+        // Optional: Redirect to wishlist page on removal like the theme does
+        // window.location.href = window.shopUrl + '/pages/wishlist';
+      }
+      saveWishlist(list);
+    };
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var list = getWishlist();
+      document.querySelectorAll('.pcs-wishlist').forEach(function (btn) {
+        if (list.indexOf(btn.dataset.productHandle) !== -1) {
+          btn.classList.add('active');
+        }
+      });
+
+      // Auto-switch logic
+      document.querySelectorAll('.pcs-products[data-auto-switch="true"]').forEach(function (container) {
+        var track = container.querySelector('.pcs-products-track');
+        var slides = container.querySelectorAll('.pcs-product-slide');
+        if (slides.length <= 1) return;
+
+        var interval = parseInt(container.dataset.interval) || 5000;
+        var currentIndex = 0;
+
+        function goToSlide(index) {
+          if (index === currentIndex) return;
+          
+          var dots = container.querySelectorAll('.pcs-dot');
+          slides[currentIndex].classList.remove('active');
+          if (dots[currentIndex]) dots[currentIndex].classList.remove('active');
+          
+          currentIndex = index;
+
+          slides[currentIndex].classList.add('active');
+          if (dots[currentIndex]) dots[currentIndex].classList.add('active');
+        }
+
+        // Click to switch
+        container.querySelectorAll('.pcs-dot').forEach(function(dot) {
+          dot.addEventListener('click', function() {
+            goToSlide(parseInt(this.dataset.index));
+          });
+        });
+
+        setInterval(function () {
+          goToSlide((currentIndex + 1) % slides.length);
+        }, interval);
+      });
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Collection Showcase",
+  "tag": "section",
+  "class": "product-collection-showcase",
+  "settings": [
+    {
+      "type": "range",
+      "id": "section_padding",
+      "label": "Section padding (px)",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "default": 40
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Section background",
+      "default": "#f0f4f8"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Max content width (px)",
+      "min": 800,
+      "max": 1600,
+      "step": 40,
+      "default": 1200
+    },
+    {
+      "type": "color",
+      "id": "promo_bar_color",
+      "label": "Promo bar background",
+      "default": "#fff3cd"
+    },
+    {
+      "type": "color",
+      "id": "promo_bar_text_color",
+      "label": "Promo bar text color",
+      "default": "#7a5c00"
+    },
+    {
+      "type": "header",
+      "content": "Auto-Switch Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_auto_switch",
+      "label": "Enable auto-switching products",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "switch_interval",
+      "label": "Switch interval (seconds)",
+      "min": 2,
+      "max": 30,
+      "step": 1,
+      "default": 5
+    }
+  ],
+  "blocks": [
+    {
+      "type": "collection_card",
+      "name": "Collection Card",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Override title",
+          "info": "Leave blank to use the collection name"
+        },
+        {
+          "type": "text",
+          "id": "subtitle",
+          "label": "Subtitle / tagline",
+          "placeholder": "Factory Price, 30-day Guarantee"
+        },
+        {
+          "type": "text",
+          "id": "promo_label",
+          "label": "Promo bar text (optional)",
+          "placeholder": "Order 120+ pieces → Get up to 30% OFF"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Collection Showcase",
+      "blocks": [
+        {
+          "type": "collection_card",
+          "settings": {
+            "title": "Featured Picks",
+            "subtitle": "Factory Price, Your Store Essentials, 30-day Price Guarantee"
+          }
+        },
+        {
+          "type": "collection_card",
+          "settings": {
+            "title": "Bag Charms & Keychains",
+            "subtitle": "Trending New — Cherry, Plush, Acrylic & More"
+          }
+        },
+        {
+          "type": "collection_card",
+          "settings": {
+            "title": "Ship by Sea Recommends",
+            "subtitle": "USA Only — Orders $200+ save 100% shipping",
+            "promo_label": "Free Shipping on orders over $200"
+          }
+        },
+        {
+          "type": "collection_card",
+          "settings": {
+            "title": "Bulk Discount",
+            "subtitle": "Order 120+ Pieces / SKU to unlock savings",
+            "promo_label": "Order 120+ pieces per SKU → Get up to 30% OFF"
+          }
+        }
+      ]
+    }
+  ],
+  "max_blocks": 6
+}
+{% endschema %}

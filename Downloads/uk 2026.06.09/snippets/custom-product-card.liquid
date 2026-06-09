@@ -1,0 +1,320 @@
+<div class="custom-product-card" data-product-handle="{{ product.handle }}">
+  <div class="custom-product-card__image-wrapper">
+    <a href="{{ product.url | within: collection }}" class="custom-product-card__link">
+      {% if product.featured_image %}
+        {{ product.featured_image | image_url: width: 500 | image_tag:
+          class: 'custom-product-card__image',
+          loading: 'lazy',
+          widths: '250, 500',
+          sizes: '(min-width: 768px) 500px, 100vw'
+        }}
+      {% else %}
+        <div class="custom-product-card__placeholder">
+          {{ 'product-1' | placeholder_svg_tag: 'custom-product-card__placeholder-svg' }}
+        </div>
+      {% endif %}
+    </a>
+
+    {% if product.compare_at_price > product.price %}
+      {% assign discount = product.compare_at_price | minus: product.price %}
+      {% assign discount_percent = discount | times: 100 | divided_by: product.compare_at_price %}
+      <div class="custom-product-card__badge custom-product-card__badge--sale">
+        -{{ discount_percent | round }}%
+      </div>
+    {% endif %}
+
+    {% unless product.available %}
+      <div class="custom-product-card__badge custom-product-card__badge--sold-out">
+        Sold Out
+      </div>
+    {% endunless %}
+  </div>
+
+  <div class="custom-product-card__content">
+    <h3 class="custom-product-card__title">
+      <a href="{{ product.url | within: collection }}" class="custom-product-card__title-link">
+        {{ product.title }}
+      </a>
+    </h3>
+
+    <!-- Judge.me ratings -->
+    <div style='{{ jm_style }}' class='jdgm-widget jdgm-preview-badge' data-id='{{ product.id }}' data-auto-install='false'>
+      {{ product.metafields.judgeme.badge }}
+    </div>
+
+    <div class="custom-product-card__price">
+      {% if product.compare_at_price > product.price %}
+        <span class="custom-product-card__price--compare">
+          {{ product.compare_at_price | money }}
+        </span>
+        <span class="custom-product-card__price--current custom-product-card__price--sale">
+          {{ product.price | money }}
+        </span>
+      {% else %}
+        <span class="custom-product-card__price--current">
+          {{ product.price | money }}
+        </span>
+      {% endif %}
+    </div>
+
+    <!-- BUTTON SECTION -->
+    <div class="custom-product-card__buttons">
+      <!-- Description button -->
+      <button
+        type="button"
+        class="custom-product-card__button custom-product-card__button--description"
+        data-product-handle="{{ product.handle }}"
+        data-description-popup-trigger
+      >
+        Description
+      </button>
+
+      <!-- Quick Add / Select Options -->
+      {% if product.available %}
+        {% if product.variants.size > 1 %}
+          <!-- Multi-variant: open variant popup -->
+          <button
+            type="button"
+            class="custom-product-card__button custom-product-card__button--options"
+            data-product-handle="{{ product.handle }}"
+            data-variant-popup-trigger
+          >
+            Select Options
+          </button>
+        {% else %}
+          <form method="post" action="/cart/add" class="custom-product-card__form" data-type="add-to-cart-form">
+            <input type="hidden" name="id" value="{{ product.variants.first.id }}">
+            <div class="custom-product-card__add-to-cart-row">
+              <div class="custom-product-card__quantity-wrapper">
+                <label class="visually-hidden" for="Quantity-{{ product.id }}">Quantity</label>
+                <quantity-input class="quantity btn-radius border px-8 bg-grey flex align-items-center text-center mr-20 min-height-50">
+                  <button class="btn-reset flex justify-content-center align-items-center quantity__button no-js-hidden width-35" name="minus" type="button" aria-label="Decrease quantity">
+                    <svg width="11" height="2" viewBox="0 0 11 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M11 0.5V1.5H0V0.5H11Z" fill="#111111"/>
+                    </svg>
+                  </button>
+                  <input
+                    class="quantity__input bg-unset border-none text-center width-50 appearance-none p-0-important"
+                    type="number"
+                    name="quantity"
+                    id="Quantity-{{ product.id }}"
+                    min="1"
+                    value="1">
+                  <button class="btn-reset flex justify-content-center align-items-center quantity__button no-js-hidden width-35" name="plus" type="button" aria-label="Increase quantity">
+                    <svg width="11" height="12" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" clip-rule="evenodd" d="M5 11.5H6V6.5H11V5.5H6V0.5H5V5.5H0V6.5H5V11.5Z" fill="#111111"/>
+                    </svg>
+                  </button>
+                </quantity-input>
+              </div>
+              <button type="submit" class="custom-product-card__button custom-product-card__button--add" data-add-to-cart>
+                Quick Add
+              </button>
+            </div>
+          </form>
+        {% endif %}
+      {% else %}
+        <button class="custom-product-card__button custom-product-card__button--disabled" disabled>
+          Out of Stock
+        </button>
+      {% endif %}
+    </div>
+    <!-- END BUTTON SECTION -->
+  </div>
+</div>
+
+<!-- =============================================
+     DESCRIPTION POPUP
+     ============================================= -->
+<div class="cpop cpop--description" id="description-popup-{{ product.handle }}" data-description-popup aria-hidden="true" role="dialog" aria-label="{{ product.title }} description">
+  <div class="cpop__overlay" data-description-popup-close></div>
+  <div class="cpop__panel">
+    <button class="cpop__close" data-description-popup-close aria-label="Close">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1L13 13M13 1L1 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+
+    <div class="cpop__inner">
+      <!-- Left: Product Image -->
+      <div class="cpop__media">
+        {% if product.featured_image %}
+          {{ product.featured_image | image_url: width: 600 | image_tag:
+            class: 'cpop__image',
+            loading: 'lazy',
+            widths: '300, 600',
+            sizes: '(min-width: 768px) 600px, 100vw'
+          }}
+        {% else %}
+          <div class="cpop__image-placeholder">
+            {{ 'product-1' | placeholder_svg_tag }}
+          </div>
+        {% endif %}
+
+        {% if product.images.size > 1 %}
+          <div class="cpop__thumbnails">
+            {% for image in product.images limit: 4 %}
+              <button class="cpop__thumb {% if forloop.first %}is-active{% endif %}" data-image-src="{{ image | image_url: width: 600 }}" type="button">
+                {{ image | image_url: width: 80 | image_tag: loading: 'lazy' }}
+              </button>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Right: Product Info -->
+      <div class="cpop__info">
+        <p class="cpop__vendor">{{ product.vendor }}</p>
+        <h3 class="cpop__title">{{ product.title }}</h3>
+
+        <div class="cpop__price-row">
+          {% if product.compare_at_price > product.price %}
+            <span class="cpop__price cpop__price--compare">{{ product.compare_at_price | money }}</span>
+            <span class="cpop__price cpop__price--sale">{{ product.price | money }}</span>
+            {% assign discount = product.compare_at_price | minus: product.price %}
+            {% assign discount_percent = discount | times: 100 | divided_by: product.compare_at_price %}
+            <span class="cpop__badge">Save {{ discount_percent | round }}%</span>
+          {% else %}
+            <span class="cpop__price">{{ product.price | money }}</span>
+          {% endif %}
+        </div>
+
+        <div class="cpop__description">
+          {% if product.selected_or_first_available_variant.metafields.custom.variant_description %}
+            {{ product.selected_or_first_available_variant.metafields.custom.variant_description | metafield_tag }}
+          {% else %}
+            {{ product.description }}
+          {% endif %}
+        </div>
+
+        <a href="{{ product.url | within: collection }}" class="cpop__view-btn">
+          View Full Details →
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =============================================
+     VARIANT SELECTOR POPUP (multi-variant products)
+     ============================================= -->
+{% if product.variants.size > 1 %}
+<div class="cpop cpop--variant" id="variant-popup-{{ product.handle }}" data-variant-popup aria-hidden="true" role="dialog" aria-label="Select options for {{ product.title }}">
+  <div class="cpop__overlay" data-variant-popup-close></div>
+  <div class="cpop__panel cpop__panel--variant">
+    <button class="cpop__close" data-variant-popup-close aria-label="Close">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1L13 13M13 1L1 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+
+    <div class="cpop__inner">
+      <!-- Left: Product Image (updates with variant) -->
+      <div class="cpop__media">
+        {% assign variant_img_id = 'variant-popup-image-' | append: product.handle %}
+        {{ product.featured_image | image_url: width: 600 | image_tag:
+          class: 'cpop__image cpop__variant-image',
+          id: variant_img_id,
+          loading: 'lazy',
+          widths: '300, 600',
+          sizes: '(min-width: 768px) 600px, 100vw'
+        }}
+        {% if product.images.size > 1 %}
+          <div class="cpop__thumbnails">
+            {% for image in product.images limit: 4 %}
+              <button class="cpop__thumb {% if forloop.first %}is-active{% endif %}" data-image-src="{{ image | image_url: width: 600 }}" type="button">
+                {{ image | image_url: width: 80 | image_tag: loading: 'lazy' }}
+              </button>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Right: Variant Selection -->
+      <div class="cpop__info">
+        <p class="cpop__vendor">{{ product.vendor }}</p>
+        <h3 class="cpop__title">{{ product.title }}</h3>
+
+        <div class="cpop__price-row" id="variant-popup-price-{{ product.handle }}">
+          {% if product.compare_at_price > product.price %}
+            <span class="cpop__price cpop__price--compare">{{ product.compare_at_price | money }}</span>
+            <span class="cpop__price cpop__price--sale">{{ product.price | money }}</span>
+          {% else %}
+            <span class="cpop__price">{{ product.price | money }}</span>
+          {% endif %}
+        </div>
+
+        <!-- Variant Options -->
+        <form method="post" action="/cart/add" class="cpop__variant-form custom-product-card__form" data-type="add-to-cart-form" data-product-handle="{{ product.handle }}">
+          <input type="hidden" name="id" id="variant-popup-id-{{ product.handle }}" value="{{ product.selected_or_first_available_variant.id }}">
+
+          {% for option in product.options_with_values %}
+            <div class="cpop__option-group">
+              <label class="cpop__option-label">
+                {{ option.name }}:
+                <span class="cpop__option-selected" data-option-display="{{ option.position }}">{{ option.selected_value }}</span>
+              </label>
+              <div class="cpop__option-values">
+                {% for value in option.values %}
+                  <button
+                    type="button"
+                    class="cpop__option-btn {% if option.selected_value == value %}is-selected{% endif %}"
+                    data-option-position="{{ option.position }}"
+                    data-option-value="{{ value }}"
+                  >
+                    {{ value }}
+                  </button>
+                {% endfor %}
+              </div>
+            </div>
+          {% endfor %}
+
+          <!-- Availability status -->
+          <p class="cpop__availability" id="variant-popup-availability-{{ product.handle }}">
+            {% if product.selected_or_first_available_variant.available %}
+              <span class="cpop__avail--in">✓ In Stock</span>
+            {% else %}
+              <span class="cpop__avail--out">✗ Out of Stock</span>
+            {% endif %}
+          </p>
+
+          <!-- Quantity + Add -->
+          <div class="cpop__add-row">
+            <div class="cpop__qty">
+              <button type="button" class="cpop__qty-btn" data-qty-minus>
+                <svg width="10" height="2" viewBox="0 0 10 2" fill="none"><path d="M10 0.5V1.5H0V0.5H10Z" fill="currentColor"/></svg>
+              </button>
+              <input type="number" name="quantity" class="cpop__qty-input" value="1" min="1">
+              <button type="button" class="cpop__qty-btn" data-qty-plus>
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M4.5 10H5.5V5.5H10V4.5H5.5V0H4.5V4.5H0V5.5H4.5V10Z" fill="currentColor"/></svg>
+              </button>
+            </div>
+            <button type="submit" class="cpop__add-btn" data-add-to-cart>
+              Add to Cart
+            </button>
+          </div>
+
+          <a href="{{ product.url | within: collection }}" class="cpop__view-btn" style="margin-top: 12px;">
+            View Full Details →
+          </a>
+        </form>
+
+        <!-- Variant JSON for JS -->
+        <script type="application/json" id="variants-json-{{ product.handle }}">
+          [
+            {% for variant in product.variants %}
+              {
+                "id": {{ variant.id }},
+                "title": "{{ variant.title | escape }}",
+                "available": {{ variant.available }},
+                "price": {{ variant.price }},
+                "compare_at_price": {{ variant.compare_at_price | default: 'null' }},
+                "option1": {{ variant.option1 | json }},
+                "option2": {{ variant.option2 | json }},
+                "option3": {{ variant.option3 | json }},
+                "featured_image": {% if variant.featured_image %}"{{ variant.featured_image | image_url: width: 600 }}"{% else %}null{% endif %}
+              }{% unless forloop.last %},{% endunless %}
+            {% endfor %}
+          ]
+        </script>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}

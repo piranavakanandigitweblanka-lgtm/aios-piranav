@@ -1,0 +1,58 @@
+{%- layout none -%}<?xml version="1.0" encoding="UTF-8" ?>
+<rss xmlns:g="http://base.google.com/ns/1.0" version="2.0">
+<channel>
+    <title>{{ shop.name | escape }} Products</title>
+    <link>{{ shop.url }}</link>
+    <description>Product feed for Google Merchant Center</description>
+    
+    {% assign target_collection = collections['selected-2025'] %}
+    {% paginate target_collection.products by 5000 %}
+    
+    {% for product in target_collection.products %}
+        {%- assign current_variant = product.selected_or_first_available_variant -%}
+        
+        <!-- Product #{{ forloop.index }} -->
+        <item>
+            <g:id>{{ product.id }}</g:id>
+            <g:title>{{ product.title | strip_html | escape | replace: '&amp;', '&' }}</g:title>
+            <g:description>{{ product.description | strip_html | strip_newlines | truncate: 5000 | escape }}</g:description>
+            <g:link>{{ shop.url }}{{ product.url }}</g:link>
+            <g:image_link>https:{{ product.featured_image | img_url: 'large' }}</g:image_link>
+            <g:brand>{{ product.vendor | escape }}</g:brand>
+            <g:condition>new</g:condition>
+            <g:availability>{% if product.available %}in_stock{% else %}out_of_stock{% endif %}</g:availability>
+            <g:price>{{ product.price | money_without_currency }} {{ shop.currency }}</g:price>
+            <g:gtin>{{ current_variant.barcode }}</g:gtin>
+            <g:mpn>{{ current_variant.sku | default: product.id }}</g:mpn>
+            <g:product_type>{{ product.type | escape }}</g:product_type>
+            <g:item_group_id>{{ product.id }}</g:item_group_id>
+            <!-- Add this required field - you'll need to set the appropriate category ID -->
+            <g:google_product_category>{{ product.category | default : product.category }}</g:google_product_category>
+        </item>
+
+        {% if product.variants.size > 1 %}
+            {% for variant in product.variants %}
+                <!-- Variant #{{ forloop.index }} -->
+                <item>
+                    <g:id>{{ variant.id }}</g:id>
+                    <g:title>{{ product.title | strip_html | escape }} - {{ variant.title | escape }}</g:title>
+                    <g:description>{{ product.description | strip_html | strip_newlines | truncate: 5000 | escape }}</g:description>
+                    <g:link>{{ shop.url }}{{ variant.url }}</g:link>
+                    <g:image_link>https:{% if variant.image %}{{ variant.image | img_url: 'large' }}{% else %}{{ product.featured_image | img_url: 'large' }}{% endif %}</g:image_link>
+                    <g:brand>{{ product.vendor | escape }}</g:brand>
+                    <g:condition>new</g:condition>
+                    <g:availability>{% if variant.available %}in_stock{% else %}out_of_stock{% endif %}</g:availability>
+                    <g:price>{{ variant.price | money_without_currency }} {{ shop.currency }}</g:price>
+                    <g:gtin>{{ variant.barcode }}</g:gtin>
+                    <g:mpn>{{ variant.sku | default: variant.id }}</g:mpn>
+                    <g:product_type>{{ product.type | escape }}</g:product_type>
+                    <g:item_group_id>{{ product.id }}</g:item_group_id>
+                    <!-- Add this required field - you'll need to set the appropriate category ID -->
+                    <g:google_product_category>{{ category | escape }}</g:google_product_category>
+                </item>
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
+    {% endpaginate %}
+</channel>
+</rss>

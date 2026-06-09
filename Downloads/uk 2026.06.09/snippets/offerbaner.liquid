@@ -1,0 +1,339 @@
+<!-- Product Variant Notice -->
+<div id="variant-length-notice" class="product-notice product-notice--warning" style="display: none;">
+<p class="product-notice__text">
+    📝 <strong class="product-notice__label">Note:</strong>
+    Minimum buy 2 items get 15% off — Copy code: <strong style="color:#856404;">B2P10</strong> <button onclick="navigator.clipboard.writeText('B2P10').then(function(){var b=this;b.innerHTML='✓';setTimeout(function(){b.innerHTML='⧉';},1500)}.bind(this))" title="Copy code" style="background:none;border:1px solid #856404;border-radius:3px;cursor:pointer;padding:2px 6px;font-size:13px;color:#856404;margin-left:4px;vertical-align:middle;">⧉</button>
+</p>
+</div>
+<style>
+.product-notice {
+  padding: 12px 16px;
+  margin: 16px 0;
+  border-radius: 4px;
+  border-left: 4px solid;
+}
+.product-notice--warning {
+  background-color: #fff3cd;
+  border-left-color: #ffc107;
+}
+.product-notice__text {
+  margin: 0;
+  color: #856404;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.product-notice__label {
+  font-weight: 700;
+}
+</style>
+<script>
+(function() {
+  console.log('=== Product Variant Notice Handler ===');
+  // Qualifying variant IDs for the length notice
+  const CABLE_LENGTH_VARIANTS = [
+    55623289504130,
+55623289536898,
+55627041702274,
+55627041735042,
+55627359158658,
+55631178924418,
+55635057967490,
+55649641070978,
+55649641103746,
+55655424983426,
+55655425147266,
+55655425343874,
+55655781466498,
+55655829045634,
+55660068569474,
+55660068602242,
+55660068667778,
+55660068700546,
+55660068733314,
+55661066420610,
+55675737014658,
+55675737080194,
+55675737145730,
+55675823325570,
+55675823423874,
+55675823620482,
+55675823784322,
+55675996471682,
+55675996799362,
+55680545522050,
+55559632617858,
+55529435070850,
+55529435169154,
+55529435332994,
+55570600001922,
+55570976440706,
+55574754165122,
+55575302799746,
+55575577100674,
+55575577133442,
+55576282366338,
+55579779563906,
+55580254994818,
+55580650078594,
+55580836954498,
+55583845384578,
+55583845450114,
+55584129089922,
+55584129122690,
+55586809315714,
+55593439560066,
+55593439691138,
+55593439756674,
+55593439789442,
+55593439822210,
+55593439854978,
+55596279497090,
+55596279529858,
+55596288147842,
+55596288344450,
+55597179666818,
+55597179797890,
+55597179830658,
+55597179896194,
+55597179961730,
+55599836463490,
+55599866773890,
+55599866806658,
+55599866839426,
+55599866872194,
+55599867068802,
+55606987555202,
+55623289504130,
+55623289536898,
+55627041702274,
+55627041735042,
+55627359158658,
+55631178924418,
+55635057967490,
+55649641070978,
+55649641103746,
+55655424983426,
+55655425147266,
+55655425343874,
+55655781466498,
+55655829045634,
+55660068569474,
+55660068602242,
+55660068667778,
+55660068700546,
+55660068733314,
+55661066420610,
+55675737014658,
+55675737080194,
+55675737145730,
+55675823325570,
+55675823423874,
+55675823620482,
+55675823784322,
+55675996471682,
+55675996799362,
+55680545522050,
+55766021603714,
+55766021669250,
+55766021734786,
+55766021800322,
+55766021833090,
+55766021865858,
+55766021898626,
+55766021931394,
+55766497296770,
+55766497329538,
+55767137190274,
+55767178543490,
+55767538434434,
+55767598072194,
+55782020481410,
+55782020678018,
+55782020710786,
+55785829466498,
+55785829499266,
+55794628133250,
+55795335528834,
+55795335561602,
+55795335594370,
+55795377144194,
+55806921277826,
+55806961582466,
+55806961615234,
+55806961713538,
+55806961811842,
+55806973051266,
+55807890325890,
+55807890358658,
+55807890391426,
+55807890424194,
+55807890456962,
+55808014483842,
+55808014516610,
+55808014582146,
+55808493060482,
+55808493093250,
+55812025975170,
+55812036034946,
+55822250377602,
+55822250410370,
+55822250606978,
+55822301168002,
+55822301200770,
+55827978420610,
+55827978453378,
+55832621547906,
+55847652098434,
+55847652196738,
+55847652295042,
+55847652327810,
+55847652360578,
+55847652491650,
+55847652557186,
+55855975170434,
+55855975203202,
+55855975268738,
+56069416092034,
+56071795704194,
+56072221819266,
+56077263044994,
+56077263110530,
+56077263143298,
+56086392996226,
+56086393028994,
+56086393061762,
+56086393094530,
+56086393127298,
+56086393160066,
+56086393192834,
+56093098475906,
+56093099983234,
+56093100016002,
+56093100048770,
+56093100081538,
+56093100802434,
+56093100867970,
+56093100900738,
+56093181673858,
+56093181739394,
+56094051041666,
+56096553304450,
+56097049837954,
+56101503304066,
+56101503336834,
+56101503369602,
+56101503402370,
+56146107171202,
+56182228287874,
+56182948299138,
+56183533011330,
+56183533109634,
+56183533339010,
+56183533371778,
+56183533666690,
+56199748747650,
+56258501575042,
+56258501640578,
+56270920450434,
+56270920483202,
+56280092934530,
+56280093065602,
+56280147952002,
+56280147984770,
+56286315250050,
+56299994349954,
+56299994382722,
+56304510534018,
+56304510566786,
+56318075601282,
+56318075634050,
+56318107844994,
+56330812031362,
+56330812064130,
+56330812129666,
+56330812293506,
+56330812326274,
+56335495364994,
+56335495397762,
+56374180348290,
+56374186705282,
+56384746684802,
+56384756449666,
+56384756482434,
+56384756547970,
+56385896481154,
+56392093335938,
+44546639986938,
+44546640052474,
+44546640085242,
+42709459599610
+  ];
+  const noticeElement = document.getElementById('variant-length-notice');
+  // Check selected variant and toggle notice visibility
+  function updateNoticeVisibility() {
+    let currentVariantId = null;
+    // Method 1: Variant selector dropdown
+    const variantSelect = document.querySelector('select[name="id"]');
+    if (variantSelect && variantSelect.value) {
+      currentVariantId = parseInt(variantSelect.value);
+    }
+    // Method 2: Hidden variant input
+    if (!currentVariantId) {
+      const variantInput = document.querySelector('input[name="id"]');
+      if (variantInput && variantInput.value) {
+        currentVariantId = parseInt(variantInput.value);
+      }
+    }
+    // Method 3: URL query parameter
+    if (!currentVariantId) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const variantParam = urlParams.get('variant');
+      if (variantParam) {
+        currentVariantId = parseInt(variantParam);
+      }
+    }
+    console.log('Current variant ID:', currentVariantId);
+    console.log('Should show notice:', CABLE_LENGTH_VARIANTS.includes(currentVariantId));
+    // Show notice only for qualifying variants
+    if (currentVariantId && CABLE_LENGTH_VARIANTS.includes(currentVariantId)) {
+      console.log('✓ Displaying notice for variant:', currentVariantId);
+      if (noticeElement) {
+        noticeElement.style.display = 'block';
+      }
+    } else {
+      console.log('✗ Hiding notice');
+      if (noticeElement) {
+        noticeElement.style.display = 'none';
+      }
+    }
+  }
+  // Initialize on page load
+  setTimeout(updateNoticeVisibility, 100);
+  // Listen for variant selector changes
+  document.addEventListener('change', function(e) {
+    if (e.target.name === 'id' || e.target.closest('[name="id"]')) {
+      console.log('Variant selector changed');
+      setTimeout(updateNoticeVisibility, 50);
+    }
+  });
+  // Listen for variant option changes (radio/select)
+  document.addEventListener('change', function(e) {
+    if (e.target.matches('input[type="radio"][name*="option"]') || 
+        e.target.matches('select[name*="option"]')) {
+      console.log('Variant option changed');
+      setTimeout(updateNoticeVisibility, 150);
+    }
+  });
+  // Monitor URL changes for themes that update URL on variant selection
+  let previousUrl = location.href;
+  new MutationObserver(() => {
+    const currentUrl = location.href;
+    if (currentUrl !== previousUrl) {
+      previousUrl = currentUrl;
+      console.log('URL changed');
+      setTimeout(updateNoticeVisibility, 100);
+    }
+  }).observe(document, {subtree: true, childList: true});
+})();
+</script>

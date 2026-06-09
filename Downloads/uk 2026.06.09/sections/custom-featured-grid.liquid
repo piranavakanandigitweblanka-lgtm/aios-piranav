@@ -1,0 +1,547 @@
+{% schema %}
+{
+  "name": "Custom Featured Grid",
+  "settings": [
+    {
+      "type": "select",
+      "id": "main_product_position",
+      "label": "Main Product Position",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "header",
+      "content": "Layout Settings"
+    },
+    {
+      "type": "range",
+      "id": "grid_gap",
+      "label": "Grid gap",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "default": 20,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "section_padding_top",
+      "label": "Section padding top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "default": 40,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "section_padding_bottom",
+      "label": "Section padding bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "default": 40,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Main (Big) Product"
+    },
+    {
+      "type": "product",
+      "id": "main_product",
+      "label": "Select Main Product"
+    },
+    {
+      "type": "image_picker",
+      "id": "main_image",
+      "label": "Upload Custom Image (Optional)"
+    },
+    {
+      "type": "checkbox",
+      "id": "main_use_product_image",
+      "label": "Use product image instead of uploaded one",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "main_show_quicklook",
+      "label": "Show Quick Look Button",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Small Product 1"
+    },
+    {
+      "type": "product",
+      "id": "small_product_1",
+      "label": "Select Product 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "small_image_1",
+      "label": "Upload Custom Image for Product 1 (Optional)"
+    },
+    {
+      "type": "checkbox",
+      "id": "small1_use_product_image",
+      "label": "Use product image instead of uploaded one",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "small1_image_left",
+      "label": "Image on left side",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Small Product 2"
+    },
+    {
+      "type": "product",
+      "id": "small_product_2",
+      "label": "Select Product 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "small_image_2",
+      "label": "Upload Custom Image for Product 2 (Optional)"
+    },
+    {
+      "type": "checkbox",
+      "id": "small2_use_product_image",
+      "label": "Use product image instead of uploaded one",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "small2_image_left",
+      "label": "Image on left side",
+      "default": false
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom Featured Grid",
+      "category": "Custom Sections"
+    }
+  ]
+}
+{% endschema %}
+
+<style>
+.featured-grid-section {
+  padding-top: {{ section.settings.section_padding_top }}px;
+  padding-bottom: {{ section.settings.section_padding_bottom }}px;
+}
+ 
+.featured-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: {{ section.settings.grid_gap }}px;
+  max-width: 1400px;
+  margin: 0 auto;
+  align-items: stretch;
+ 
+}
+
+.featured-grid.main-right {
+  grid-template-columns: 1fr 1fr;
+  
+}
+
+.featured-main {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fafafa;
+  aspect-ratio: 1 / 1;
+}
+
+.featured-small {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fafafa;
+  
+}
+
+.featured-main img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.featured-small img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.featured-small-container {
+  display: flex;
+  flex-direction: column;
+  gap: {{ section.settings.grid_gap }}px;
+  height: 100%;
+   padding-right:10px;
+}
+
+.featured-small-block {
+  display: flex;
+  align-items: center;
+  background: #fafafa;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  height: 100%;
+  flex: 1;
+}
+
+.featured-small-block:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+.featured-small-block img {
+  width: 50%;
+  object-fit: cover;
+  height: 100%;
+  min-height: 150px;
+}
+
+.featured-small-content {
+  padding: 25px 20px;
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.featured-small-content h4 {
+  margin: 0 0 12px;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.featured-small-content p {
+  margin: 0 0 15px;
+  font-size: 2rem;
+  color: #FF0000;
+  font-weight: 500;
+}
+
+.featured-small-content .btn {
+  background: #000;
+  color: #fff;
+  padding: 10px 16px;
+  text-align: center;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 1.4rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border: 1px solid #000;
+}
+
+.featured-small-content .btn:hover {
+  background: #333;
+  border-color: #333;
+}
+
+.featured-main .overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0,0,0,0.8));
+  color: #fff;
+  padding: 30px 20px;
+  transition: opacity 0.3s ease;
+  opacity: 0;
+}
+
+.featured-main:hover .overlay {
+  opacity: 1;
+}
+
+.featured-main .overlay h2 {
+  margin: 0 0 8px;
+  font-size: 1.8rem;
+  color: rgb(243, 243, 243);
+  font-weight: 600;
+}
+
+.featured-main .overlay p {
+  margin: 0 0 10px;
+  font-size: 2rem;
+  font-weight: 500;
+  color: rgb(243, 243, 243);
+}
+
+.featured-main .overlay .btn {
+  margin-top: 10px;
+  display: inline-block;
+  background: #fff;
+  color: #000;
+  padding: 10px 20px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border: 1px solid #fff;
+}
+
+.featured-main .overlay .btn:hover {
+  background: transparent;
+  color: #fff;
+}
+
+/* Order classes for positioning */
+.featured-main-left {
+  order: 1;
+}
+
+.featured-small-container-left {
+  order: 2;
+}
+
+.featured-main-right {
+  order: 2;
+}
+
+.featured-small-container-right {
+  order: 1;
+}
+
+/* Image positioning classes - CRITICAL FOR MOBILE */
+.featured-small-block.image-left {
+  flex-direction: row;
+}
+
+.featured-small-block.image-right {
+  flex-direction: row-reverse;
+}
+
+/* Fallback for browsers that don't support aspect-ratio */
+@supports not (aspect-ratio: 1 / 1) {
+  .featured-main::before {
+    content: '';
+    display: block;
+    padding-top: 100%;
+  }
+  
+  .featured-main img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+  }
+}
+
+/* ✅ Fixed Mobile Styles */
+@media (max-width: 768px) {
+  .featured-grid-section {
+    padding-top: {{ section.settings.section_padding_top | divided_by: 2 }}px;
+    padding-bottom: {{ section.settings.section_padding_bottom | divided_by: 2 }}px;
+  }
+
+  .featured-grid,
+  .featured-grid.main-right {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .featured-main {
+    aspect-ratio: 1 / 1;
+    min-height: 300px;
+    order: 1 !important;
+  }
+
+  .featured-small-container {
+    order: 2 !important;
+    gap: 15px;
+  }
+
+  .featured-small-block {
+    min-height: 150px;
+    height: auto;
+  }
+
+  .featured-small-block img,
+  .featured-small-content {
+    width: 50%;
+  }
+
+  .featured-small-content {
+    padding: 20px 15px;
+    text-align: left;
+  }
+
+  /* ✅ PRESERVE IMAGE POSITIONING ON MOBILE */
+  .featured-small-block.image-left {
+    flex-direction: row;
+  }
+  
+  .featured-small-block.image-right {
+    flex-direction: row-reverse;
+  }
+
+  .featured-main .overlay {
+    padding: 20px 15px;
+    opacity: 1;
+  }
+
+  .featured-main .overlay h2 {
+    font-size: 1.4rem;
+  }
+
+  .featured-main .overlay p {
+    font-size: 1.1rem;
+  }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+  .featured-grid-section {
+    padding-top: {{ section.settings.section_padding_top | divided_by: 3 }}px;
+    padding-bottom: {{ section.settings.section_padding_bottom | divided_by: 3 }}px;
+  }
+
+  .featured-small-block {
+    min-height: 120px;
+  }
+
+  .featured-small-content {
+    padding: 15px 12px;
+  }
+
+  .featured-small-content h4 {
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+  }
+
+  .featured-small-content p {
+    font-size: 1.4rem;
+    margin-bottom: 10px;
+  }
+
+  .featured-small-content .btn {
+    padding: 8px 12px;
+    font-size: 1.2rem;
+  }
+
+  .featured-main .overlay {
+    padding: 15px 12px;
+  }
+
+  .featured-main .overlay h2 {
+    font-size: 1.2rem;
+  }
+
+  .featured-main .overlay p {
+    font-size: 1rem;
+  }
+}
+
+/* Extra small devices - stack vertically */
+@media (max-width: 360px) {
+  .featured-small-block {
+    flex-direction: column !important;
+    min-height: auto;
+  }
+
+  .featured-small-block img,
+  .featured-small-content {
+    width: 100%;
+  }
+
+  .featured-small-content {
+    text-align: center;
+    padding: 15px 10px;
+  }
+
+  .featured-small-content h4 {
+    font-size: 1.1rem;
+  }
+
+  .featured-small-content p {
+    font-size: 1.3rem;
+  }
+}
+</style>
+
+<div class="featured-grid-section">
+  <div class="featured-grid {% if section.settings.main_product_position == 'right' %}main-right{% endif %}">
+    <!-- Big Product -->
+    <div class="featured-main {% if section.settings.main_product_position == 'left' %}featured-main-left{% else %}featured-main-right{% endif %}">
+      {% assign main_prod = all_products[section.settings.main_product] %}
+      {% if section.settings.main_use_product_image and main_prod %}
+        <img src="{{ main_prod.featured_image | img_url: 'master' }}" alt="{{ main_prod.title }}">
+      {% elsif section.settings.main_image != blank %}
+        <img src="{{ section.settings.main_image | img_url: 'master' }}" alt="Main Image">
+      {% endif %}
+      <div class="overlay">
+        <h2>{{ main_prod.title }}</h2>
+        <p>{{ main_prod.price | money }}</p>
+        {% if section.settings.main_show_quicklook %}
+        <a href="#quicklook-{{ section.id }}" class="btn" onclick="openQuicklook('{{ section.id }}')">Quick Look</a>
+        {% else %}
+        <a href="{{ main_prod.url }}" class="btn">View Product</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Small products container -->
+    <div class="featured-small-container {% if section.settings.main_product_position == 'left' %}featured-small-container-left{% else %}featured-small-container-right{% endif %}">
+      {% for i in (1..2) %}
+        {% capture product_key %}small_product_{{ i }}{% endcapture %}
+        {% capture image_key %}small_image_{{ i }}{% endcapture %}
+        {% capture use_product_image_key %}small{{ i }}_use_product_image{% endcapture %}
+        {% capture image_side_key %}small{{ i }}_image_left{% endcapture %}
+        
+        {% assign prod = all_products[section.settings[product_key]] %}
+        {% assign custom_image = section.settings[image_key] %}
+        {% assign use_product_image = section.settings[use_product_image_key] %}
+        {% assign img_left = section.settings[image_side_key] %}
+        
+        {% if prod %}
+        <div class="featured-small-block {% if img_left %}image-left{% else %}image-right{% endif %}">
+          {% if use_product_image and prod.featured_image %}
+            <img src="{{ prod.featured_image | img_url: 'large' }}" alt="{{ prod.title }}">
+          {% elsif custom_image != blank %}
+            <img src="{{ custom_image | img_url: 'large' }}" alt="{{ prod.title }}">
+          {% else %}
+            <img src="{{ prod.featured_image | img_url: 'large' }}" alt="{{ prod.title }}">
+          {% endif %}
+          <div class="featured-small-content">
+            <h4>{{ prod.title }}</h4>
+            <p>{{ prod.price | money }}</p>
+            <a href="{{ prod.url }}" class="btn">View Product</a>
+          </div>
+        </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<script>
+function openQuicklook(id){
+  const modal = document.getElementById('quicklook-'+id);
+  if(modal) modal.style.display = 'flex';
+}
+</script>

@@ -1,0 +1,377 @@
+{{ 'custom-collection.css' | asset_url | stylesheet_tag }}
+<div class="custom-collection" data-section-id="{{ section.id }}">
+  {%- assign collection = collections[section.settings.collection] -%}
+
+  {% if collection and collection.products_count > 0 %}
+    <div class="custom-collection__header">
+      {% if section.settings.custom_heading != blank %}
+        <h2 class="custom-collection__title">{{ section.settings.custom_heading }}</h2>
+      {% endif %}
+      {% if collection.description != blank %}
+        <p class="custom-collection__description">{{ collection.description }}</p>
+      {% endif %}
+    </div>
+
+    <div class="custom-collection__grid custom-collection__grid--{{ section.settings.grid_columns }}-cols">
+      {% for product in collection.products limit: section.settings.products_per_page %}
+        <div class="custom-collection__item" data-product-id="{{ product.id }}">
+          {% render 'custom-product-card', product: product %}
+        </div>
+      {% endfor %}
+    </div>
+
+  {% else %}
+    <div class="custom-collection__empty">
+      <p>No products found in this collection.</p>
+    </div>
+  {% endif %}
+</div>
+
+{% schema %}
+{
+  "name": "Custom Collection",
+  "class": "custom-collection-section",
+  "settings": [
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Select Collection"
+    },
+    {
+      "type": "text",
+      "id": "custom_heading",
+      "label": "Custom Heading",
+      "default": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "min": 1,
+      "max": 50,
+      "step": 1,
+      "label": "Products per page",
+      "default": 24
+    },
+    {
+      "type": "select",
+      "id": "grid_columns",
+      "label": "Products per row",
+      "options": [
+        {"value": "2", "label": "2"},
+        {"value": "3", "label": "3"},
+        {"value": "4", "label": "4"},
+        {"value": "5", "label": "5"}
+      ],
+      "default": "4"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom Collection",
+      "category": "Collection"
+    }
+  ]
+}
+{% endschema %}
+
+<script>
+(function () {
+  'use strict';
+
+  document.addEventListener('DOMContentLoaded', function () {
+
+    /* ─────────────────────────────────────────
+       HELPER: open / close any .cpop popup
+    ───────────────────────────────────────── */
+    function openPopup(popup) {
+      if (!popup) return;
+      popup.classList.add('is-active');
+      popup.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closePopup(popup) {
+      if (!popup) return;
+      popup.classList.remove('is-active');
+      popup.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    function closeAllPopups() {
+      document.querySelectorAll('.cpop.is-active').forEach(closePopup);
+    }
+
+    /* ─────────────────────────────────────────
+       DESCRIPTION POPUPS
+    ───────────────────────────────────────── */
+    document.querySelectorAll('[data-description-popup-trigger]').forEach(function (trigger) {
+      trigger.addEventListener('click', function () {
+        var handle = this.getAttribute('data-product-handle');
+        var popup  = document.getElementById('description-popup-' + handle);
+        openPopup(popup);
+      });
+    });
+
+    document.querySelectorAll('[data-description-popup-close]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        closePopup(this.closest('.cpop'));
+      });
+    });
+
+    /* ─────────────────────────────────────────
+       VARIANT POPUPS
+    ───────────────────────────────────────── */
+    document.querySelectorAll('[data-variant-popup-trigger]').forEach(function (trigger) {
+      trigger.addEventListener('click', function () {
+        var handle = this.getAttribute('data-product-handle');
+        var popup  = document.getElementById('variant-popup-' + handle);
+        openPopup(popup);
+      });
+    });
+
+    document.querySelectorAll('[data-variant-popup-close]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        closePopup(this.closest('.cpop'));
+      });
+    });
+
+    /* ─────────────────────────────────────────
+       CLOSE on overlay click (any .cpop__overlay)
+    ───────────────────────────────────────── */
+    document.querySelectorAll('.cpop__overlay').forEach(function (overlay) {
+      overlay.addEventListener('click', function () {
+        closePopup(this.closest('.cpop'));
+      });
+    });
+
+    /* ─────────────────────────────────────────
+       CLOSE on Escape key
+    ───────────────────────────────────────── */
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeAllPopups();
+    });
+
+    /* ─────────────────────────────────────────
+       THUMBNAIL SWITCHER (both popup types)
+    ───────────────────────────────────────── */
+    document.querySelectorAll('.cpop__thumbnails').forEach(function (thumbs) {
+      var panel = thumbs.closest('.cpop__panel');
+      var mainImg = panel.querySelector('.cpop__image');
+
+      thumbs.querySelectorAll('.cpop__thumb').forEach(function (thumb) {
+        thumb.addEventListener('click', function () {
+          thumbs.querySelectorAll('.cpop__thumb').forEach(function (t) {
+            t.classList.remove('is-active');
+          });
+          this.classList.add('is-active');
+
+          var src = this.getAttribute('data-image-src');
+          if (mainImg && src) {
+            mainImg.style.opacity = '0';
+            setTimeout(function () {
+              mainImg.src = src;
+              mainImg.style.opacity = '1';
+            }, 180);
+          }
+        });
+      });
+    });
+
+    /* ─────────────────────────────────────────
+       VARIANT SELECTION LOGIC
+    ───────────────────────────────────────── */
+    document.querySelectorAll('.cpop--variant').forEach(function (popup) {
+      var handle   = popup.id.replace('variant-popup-', '');
+      var jsonEl   = document.getElementById('variants-json-' + handle);
+      if (!jsonEl) return;
+
+      var variants = [];
+      try { variants = JSON.parse(jsonEl.textContent); } catch (e) { return; }
+
+      var form         = popup.querySelector('.cpop__variant-form');
+      var hiddenId     = popup.querySelector('#variant-popup-id-' + handle);
+      var priceRow     = popup.querySelector('#variant-popup-price-' + handle);
+      var availEl      = popup.querySelector('#variant-popup-availability-' + handle);
+      var addBtn       = popup.querySelector('.cpop__add-btn');
+      var variantImg   = popup.querySelector('.cpop__variant-image');
+
+      // Track currently selected options
+      var selectedOptions = {};
+
+      // Initialise from is-selected buttons
+      popup.querySelectorAll('.cpop__option-btn.is-selected').forEach(function (btn) {
+        selectedOptions[btn.getAttribute('data-option-position')] = btn.getAttribute('data-option-value');
+      });
+
+      function formatMoney(cents) {
+        if (cents === null || cents === undefined) return '';
+        return (window.Shopify && window.Shopify.formatMoney)
+          ? window.Shopify.formatMoney(cents)
+          : '$' + (cents / 100).toFixed(2);
+      }
+
+      function findMatchingVariant() {
+        return variants.find(function (v) {
+          return (
+            (selectedOptions['1'] === undefined || v.option1 === selectedOptions['1']) &&
+            (selectedOptions['2'] === undefined || v.option2 === selectedOptions['2']) &&
+            (selectedOptions['3'] === undefined || v.option3 === selectedOptions['3'])
+          );
+        }) || null;
+      }
+
+      function updateUI(variant) {
+        if (!variant) return;
+
+        // Hidden id
+        if (hiddenId) hiddenId.value = variant.id;
+
+        // Price
+        if (priceRow) {
+          if (variant.compare_at_price && variant.compare_at_price > variant.price) {
+            priceRow.innerHTML =
+              '<span class="cpop__price cpop__price--compare">' + formatMoney(variant.compare_at_price) + '</span>' +
+              '<span class="cpop__price cpop__price--sale">' + formatMoney(variant.price) + '</span>';
+          } else {
+            priceRow.innerHTML = '<span class="cpop__price">' + formatMoney(variant.price) + '</span>';
+          }
+        }
+
+        // Availability
+        if (availEl) {
+          availEl.innerHTML = variant.available
+            ? '<span class="cpop__avail--in">✓ In Stock</span>'
+            : '<span class="cpop__avail--out">✗ Out of Stock</span>';
+        }
+
+        // Add button
+        if (addBtn) {
+          addBtn.disabled = !variant.available;
+          addBtn.textContent = variant.available ? 'Add to Cart' : 'Out of Stock';
+        }
+
+        // Variant image
+        if (variantImg && variant.featured_image) {
+          variantImg.style.opacity = '0';
+          setTimeout(function () {
+            variantImg.src = variant.featured_image;
+            variantImg.style.opacity = '1';
+          }, 180);
+        }
+      }
+
+      // Option button clicks
+      popup.querySelectorAll('.cpop__option-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var position = this.getAttribute('data-option-position');
+          var value    = this.getAttribute('data-option-value');
+
+          // Deselect siblings
+          popup.querySelectorAll('.cpop__option-btn[data-option-position="' + position + '"]').forEach(function (b) {
+            b.classList.remove('is-selected');
+          });
+          this.classList.add('is-selected');
+
+          // Update label display
+          var label = popup.querySelector('[data-option-display="' + position + '"]');
+          if (label) label.textContent = value;
+
+          selectedOptions[position] = value;
+          var matched = findMatchingVariant();
+          if (matched) updateUI(matched);
+        });
+      });
+    });
+
+    /* ─────────────────────────────────────────
+       QUANTITY INPUTS (both card + popup)
+    ───────────────────────────────────────── */
+    function setupQty(container) {
+      var input = container.querySelector('.cpop__qty-input, .quantity__input');
+      container.querySelectorAll('[data-qty-minus]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var val = parseInt(input.value, 10) || 1;
+          if (val > 1) input.value = val - 1;
+        });
+      });
+      container.querySelectorAll('[data-qty-plus]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var val = parseInt(input.value, 10) || 1;
+          input.value = val + 1;
+        });
+      });
+    }
+
+    document.querySelectorAll('.cpop__add-row').forEach(setupQty);
+    document.querySelectorAll('.custom-product-card__quantity-wrapper').forEach(function (wrapper) {
+      var minusBtn = wrapper.querySelector('[name="minus"]');
+      var plusBtn  = wrapper.querySelector('[name="plus"]');
+      var input    = wrapper.querySelector('.quantity__input');
+      if (!input) return;
+      if (minusBtn) minusBtn.addEventListener('click', function () {
+        var v = parseInt(input.value, 10) || 1;
+        if (v > 1) input.value = v - 1;
+      });
+      if (plusBtn) plusBtn.addEventListener('click', function () {
+        var v = parseInt(input.value, 10) || 1;
+        input.value = v + 1;
+      });
+    });
+
+    /* ─────────────────────────────────────────
+       ADD TO CART (handles both card forms
+       and variant popup forms)
+    ───────────────────────────────────────── */
+    function handleAddToCart(form) {
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        var btn = form.querySelector('[data-add-to-cart]');
+        if (!btn || btn.disabled) return;
+
+        var originalText = btn.textContent;
+        btn.textContent  = 'Adding…';
+        btn.disabled     = true;
+
+        try {
+          var response = await fetch('/cart/add.js', {
+            method:  'POST',
+            body:    new FormData(form),
+            headers: { 'Accept': 'application/json' }
+          });
+
+          if (!response.ok) throw new Error('cart add failed');
+
+          btn.textContent         = 'View Cart ✓';
+          btn.style.background    = '#1e7e34';
+          btn.style.borderColor   = '#1e7e34';
+          btn.disabled            = false;
+          btn.type                = 'button';
+
+          // Replace button to clear listeners, then add cart redirect
+          var newBtn = btn.cloneNode(true);
+          btn.parentNode.replaceChild(newBtn, btn);
+          newBtn.addEventListener('click', function () {
+            window.location.href = '/cart';
+          });
+
+        } catch (err) {
+          console.error('Add to cart error:', err);
+          btn.textContent       = 'Error — Try again';
+          btn.style.background  = '#c0392b';
+          btn.style.borderColor = '#c0392b';
+          setTimeout(function () {
+            btn.textContent       = originalText;
+            btn.style.background  = '';
+            btn.style.borderColor = '';
+            btn.disabled          = false;
+          }, 2500);
+        }
+      });
+    }
+
+    document.querySelectorAll('.custom-product-card__form, .cpop__variant-form').forEach(handleAddToCart);
+  });
+
+})();
+</script>

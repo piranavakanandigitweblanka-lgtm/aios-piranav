@@ -1,0 +1,4 @@
+{{ all_products['cluster-lampshade-chandelier-pendant-ceiling-light-decor-lamp'].title }}
+
+{% assign all_products.current_variant = product.selected_or_first_available_variant %}
+<span class="variant-sku">{{ current_variant.sku }}</span>

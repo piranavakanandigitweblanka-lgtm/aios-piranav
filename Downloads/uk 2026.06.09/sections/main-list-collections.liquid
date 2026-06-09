@@ -1,0 +1,430 @@
+{{ 'collections-list.css' | asset_url | stylesheet_tag: preload: true }}
+{%- if section.settings.layout == 'layout-1' -%}{{ 'collections-item.css' | asset_url | stylesheet_tag: preload: true }}{%- endif -%}
+{%- liquid
+  assign st = section.settings
+  assign column_gap = st.column_gap
+  assign type = st.type
+  assign infinite_scroll = st.collection_infinite_scroll
+  assign button_show_more = st.button_show_more
+  assign limit = st.collection_limit
+  assign layout = st.layout
+  assign media_aspect_ratio = st.image_ratio
+  assign custom_ratio = st.custom_ratio
+  assign limit_content_des = st.limit_content_des
+  assign show_more = false
+  assign custom_column = st.columns_desktop
+
+  assign column_gap_tablet = ''
+  if column_gap > 30
+    assign column_gap_tablet = ' gap-tablet'
+  endif
+  assign column_gap_mobile = ''
+  if column_gap > 15
+    assign column_gap_mobile = ' gap-mobile'
+  endif
+  assign responsive_column = ''
+  if layout == 'layout-1'
+    if custom_column == 1
+      assign responsive_column = 'row-cols-1'
+    elsif custom_column == 2
+      assign responsive_column = 'row-cols-1 row-cols-sm-2'
+    elsif custom_column == 3
+      assign responsive_column = 'row-cols-1 row-cols-sm-2'
+    elsif custom_column == 4
+      assign responsive_column = 'row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4'
+    elsif custom_column == 5
+      assign responsive_column = 'row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-5'
+    endif
+  else
+    assign responsive_column = 'row-cols-1 row-cols-xl-2'
+  endif
+-%}
+<div class="page-width">
+  <div class="page-title text-center">
+    <div class="{{ st.container }}">
+      <h1 class="title title--primary">{{ st.title | escape }}</h1>
+      <div class="description">
+        <p>{{ st.des_collection | escape }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="bls__section bls__product {{ st.container }}" style="--bls-gutter-x: {{ column_gap }}px;">
+    <div
+      class="row collection-list grid {{ responsive_column }} {{ layout }}{{ column_gap_tablet }}{{ column_gap_mobile }}"
+      style="--bs-gutter-x: {{ column_gap }}px;"
+      data-limit="{{ limit }}"
+    >
+      {%- if type == 'all' -%}
+        {%- liquid
+          case st.sort
+            when 'products_high', 'products_low'
+              assign collections = collections | sort: 'all_products_count'
+            when 'date', 'date_reversed'
+              assign collections = collections | sort: 'published_at'
+          endcase
+          if st.sort == 'products_high' or st.sort == 'date_reversed' or st.sort == 'alphabetical_reversed'
+            assign collections = collections | reverse
+          endif
+        -%}
+        {%- for collection in collections -%}
+          {%- liquid
+            assign hide = ''
+            if forloop.index > limit and infinite_scroll
+              assign show_more = true
+              assign hide = ' d-none'
+            endif
+          -%}
+          {% if forloop.index > limit and infinite_scroll %} {% endif %}
+          <div class="collection-list__item grid__item{{ hide }}">
+            {%- if layout == 'layout-1' -%}
+              {% render 'list-collection-item',
+                collection_item: collection,
+                media_aspect_ratio: media_aspect_ratio,
+                custom_ratio: custom_ratio,
+                limit_content_des: limit_content_des,
+                type: type,
+                st: st,
+                block: block,
+                columns: 3
+              %}
+            {%- else -%}
+              {% render 'list-collection-item-2',
+                collection_item: collection,
+                media_aspect_ratio: media_aspect_ratio,
+                custom_ratio: custom_ratio,
+                limit_content_des: limit_content_des,
+                type: type,
+                st: st,
+                block: block,
+                columns: 3
+              %}
+            {%- endif -%}
+          </div>
+        {%- endfor -%}
+      {%- else -%}
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'collection' -%}
+            {%- liquid
+              assign collection = collections[block.settings.collection]
+              assign hide = ''
+              if forloop.index > limit and infinite_scroll
+                assign show_more = true
+                assign hide = ' d-none'
+              endif
+            -%}
+            <div class="collection-list__item grid__item{{ hide }}">
+              {%- if layout == 'layout-1' -%}
+                {% render 'list-collection-item',
+                  collection_item: collection,
+                  media_aspect_ratio: media_aspect_ratio,
+                  custom_ratio: custom_ratio,
+                  limit_content_des: limit_content_des,
+                  type: type,
+                  st: st,
+                  block: block,
+                  columns: 3
+                %}
+              {%- else -%}
+                {% render 'list-collection-item-2',
+                  collection_item: collection,
+                  media_aspect_ratio: media_aspect_ratio,
+                  custom_ratio: custom_ratio,
+                  limit_content_des: limit_content_des,
+                  type: type,
+                  st: st,
+                  block: block,
+                  columns: 3
+                %}
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endif -%}
+      {%- if infinite_scroll and show_more -%}
+        <div class="collection-infinite-scroll w-full d-flex justify-content-center mt-30">
+          <a class="button btn-secondary">
+            <span>{{ button_show_more }}</span>
+          </a>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+{% schema %}
+{
+  "name": "Collections list page",
+  "class": "section",
+  "settings": [
+    {
+      "type": "select",
+      "id": "container",
+      "label": "Layout",
+      "default": "container-fluid",
+      "options": [
+        {
+          "value": "container",
+          "label": "Default"
+        },
+        {
+          "value": "container-fluid",
+          "label": "Fluid container"
+        },
+        {
+          "value": "full-width",
+          "label": "Full width"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "All Collections"
+    },
+    {
+      "type": "textarea",
+      "id": "des_collection",
+      "label": "Description",
+      "default": "Posuere in netus a eu varius adipiscing suspendisse elementum vitae tempor suspendisse ullamcorper aenean taciti morbi potenti."
+    },
+    {
+      "type": "header",
+      "content": "Collection List"
+    },
+    {
+      "type": "select",
+      "id": "type",
+      "options": [
+        {
+          "value": "all",
+          "label": "All Collection"
+        },
+        {
+          "value": "custom",
+          "label": "Custom Collection"
+        }
+      ],
+      "default": "all",
+      "label": "Type"
+    },
+    {
+      "type": "select",
+      "id": "sort",
+      "options": [
+        {
+          "value": "alphabetical",
+          "label": "Alphabetically, A-Z"
+        },
+        {
+          "value": "alphabetical_reversed",
+          "label": "Alphabetically, Z-A"
+        },
+        {
+          "value": "date_reversed",
+          "label": "Date: new to old"
+        },
+        {
+          "value": "date",
+          "label": "Date: old to new"
+        },
+        {
+          "value": "products_high",
+          "label": "Product count: high to low"
+        },
+        {
+          "value": "products_low",
+          "label": "Product count: low to high"
+        }
+      ],
+      "default": "alphabetical",
+      "label": "Sort collections by:"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "options": [
+        {
+          "value": "layout-1",
+          "label": "Content overlay image"
+        },
+        {
+          "value": "layout-2",
+          "label": "Content beside image"
+        }
+      ],
+      "default": "layout-1",
+      "label": "Collections design"
+    },
+    {
+      "type": "select",
+      "id": "hover_effect",
+      "label": "Hover effect",
+      "default": "zoom",
+      "options": [
+        {
+          "value": "zoom",
+          "label": "Zoom"
+        },
+        {
+          "value": "border-inset",
+          "label": "Border inset"
+        },
+        {
+          "value": "box-shadow",
+          "label": "Show shadow"
+        },
+        {
+          "value": "none",
+          "label": "None"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "options": [
+        {
+          "value": "original",
+          "label": "Original aspect ratio"
+        },
+        {
+          "value": "1/1",
+          "label": "1:1"
+        },
+        {
+          "value": "3/4",
+          "label": "3:4"
+        },
+        {
+          "value": "4/3",
+          "label": "4:3"
+        },
+        {
+          "value": "16/9",
+          "label": "16:9"
+        },
+        {
+          "value": "custom",
+          "label": "Custom ratio"
+        }
+      ],
+      "default": "original",
+      "label": "Image ratio"
+    },
+    {
+      "type": "text",
+      "id": "custom_ratio",
+      "label": "Custom ratio",
+      "default": "21:9"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_count_product",
+      "label": "Show count product",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Content overlay image setting"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "default": 3,
+      "label": "Number of columns on desktop"
+    },
+    {
+      "type": "header",
+      "content": "Content beside image setting"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_button",
+      "label": "Show button",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "btn_text",
+      "label": "Button label",
+      "default": "Shop now"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_description",
+      "label": "Show short description",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "limit_content_des",
+      "label": "Description length limit",
+      "min": 10,
+      "max": 50,
+      "step": 1,
+      "default": 23
+    },
+    {
+      "type": "range",
+      "min": 0,
+      "max": 50,
+      "unit": "px",
+      "step": 5,
+      "default": 30,
+      "label": "Column gap",
+      "id": "column_gap"
+    },
+    {
+      "type": "header",
+      "content": "Show more"
+    },
+    {
+      "type": "checkbox",
+      "id": "collection_infinite_scroll",
+      "label": "Show 'show more' button?",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "collection_limit",
+      "label": "Maximum collections to show",
+      "min": 1,
+      "max": 20,
+      "step": 1,
+      "default": 8
+    },
+    {
+      "type": "text",
+      "id": "button_show_more",
+      "label": "Button label",
+      "default": "Show More"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "collection",
+      "name": "Collection",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title_collection",
+          "label": "Collection heading"
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Select collection"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Select image"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

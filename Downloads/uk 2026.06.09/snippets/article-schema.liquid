@@ -1,0 +1,95 @@
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Article",
+    "articleBody": {{ article.content | strip_html | json }},
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": {{ request.origin | append: article.url | json }}
+    },
+    "headline": {{ article.title | json }},
+    {% if article.excerpt != blank %}
+      "description": {{ article.excerpt | strip_html | json }},
+    {% else %}
+      "description": {{ article.content | strip_html | truncatewords: 30 | json }},
+    {% endif %}
+    {% if article.image %}
+      "image": [
+        {{ article | image_url: width: article.image.width | prepend: "https:" | json }}
+      ],
+    {% endif %}
+    "datePublished": {{ article.published_at | date: '%Y-%m-%dT%H:%M:%SZ' | json }},
+    "dateModified": {{ article.updated_at | date: '%Y-%m-%dT%H:%M:%SZ' | json }},
+    "dateCreated": {{ article.created_at | date: '%Y-%m-%dT%H:%M:%SZ' | json }},
+    "author": {
+      "@type": "{% if article.author == 'led web' %}Organization{% else %}Person{% endif %}",
+      "name": {{ article.author | json }}
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": {{ shop.name | json }},
+      {% if settings.share_image %}
+        "logo": {
+          "@type": "ImageObject",
+          "url": {{ settings.share_image | image_url: width: settings.share_image.width | prepend: "https:" | json }},
+          "width": {{ settings.share_image.width | json }},
+          "height": {{ settings.share_image.height | json }}
+        }
+      {% endif %}
+    }
+  }
+</script>  ← THIS WAS MISSING
+
+{%- liquid
+  assign faq_blocks = section.blocks | where: 'type', 'faq'
+-%}
+{%- if faq_blocks.size > 0 -%}
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {%- for block in faq_blocks -%}
+      {
+        "@type": "Question",
+        "name": {{ block.settings.title | json }},
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": {{ block.settings.content | strip_html | json }}
+        }
+      }{%- unless forloop.last -%},{%- endunless -%}
+      {%- endfor -%}
+    ]
+  }
+</script>
+{%- endif -%}
+
+{%- if article.author == 'led web' -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "LEDSone Technical Editorial Team",
+  "url": "{{ shop.url }}{{ blog.url }}",
+  "parentOrganization": {
+    "@type": "Organization",
+    "name": "LEDSone",
+    "url": "{{ shop.url }}"
+  },
+  "description": "A specialized group of qualified lighting specialists, electrical technicians, and smart home experts dedicated to safety-first lighting information in the UK.",
+  "knowsAbout": [
+    "UK Electrical Standards (BS 7671)",
+    "LED Lighting Technology",
+    "Smart Home Integration",
+    "Industrial Lighting Safety",
+    "UKCA and CE Compliance"
+  ],
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "technical support",
+    "telephone": "02477220687",
+    "email": "sales@ledsone.co.uk"
+  }
+}
+</script>
+{%- endif -%}

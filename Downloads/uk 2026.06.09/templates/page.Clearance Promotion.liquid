@@ -1,0 +1,53 @@
+{%- layout none -%}
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss xmlns:g="http://base.google.com/ns/1.0" version="2.0">
+
+<channel>
+  <title>{{ shop.name | escape }} Products</title>
+  <link>{{ shop.url }}</link>
+
+  {% assign target_collection = collections['clearance-last-chance-deals'] %}
+  {% paginate target_collection.products by 5000 %}
+
+  {% for product in target_collection.products %}
+    {% if product.variants.size > 1 %}
+      {% for variant in product.variants %}
+        <item>
+          <g:id>{{ variant.id }}</g:id>
+          <g:title><![CDATA[{{ product.title | strip_html | strip_newlines | escape }} - Variant: {{ variant.title | escape }}]]></g:title>
+          <g:brand>{{ product.vendor | escape }}</g:brand>
+          <g:product_type>{{ product.type | escape }}</g:product_type>
+          <g:condition>new</g:condition>
+          <g:description><![CDATA[{{ product.description | strip_html | escape | truncate: 5000 }}]]></g:description>
+          <g:image_link>{{ variant.featured_image | product_img_url: 'large' }}</g:image_link>
+          <g:link>{{ shop.url }}{{ variant.url }}</g:link>
+          <g:price>{{ variant.price | money_with_currency }}</g:price>
+          <g:availability>{% if variant.available %}in_stock{% else %}out_of_stock{% endif %}</g:availability>
+          {% if variant.barcode %}<g:gtin>{{ variant.barcode }}</g:gtin>{% endif %}
+        </item>
+      {% endfor %}
+    {% else %}
+      <item>
+        <g:id>{{ product.id }}</g:id>
+        <g:title><![CDATA[{{ product.title | strip_html | strip_newlines | escape }}]]></g:title>
+        <g:brand>{{ product.vendor | escape }}</g:brand>
+        <g:product_type>{{ product.type | escape }}</g:product_type>
+        <g:condition>new</g:condition>
+        <g:description><![CDATA[{{ product.description | strip_html | escape | truncate: 5000 }}]]></g:description>
+        <g:image_link>{{ product.featured_image | product_img_url: 'large' }}</g:image_link>
+        <g:link>{{ shop.url }}{{ product.url }}</g:link>
+        {% if product.compare_at_price and product.price < product.compare_at_price %}
+          <g:price>{{ product.compare_at_price | money_with_currency }}</g:price>
+          <g:sale_price>{{ product.price | money_with_currency }}</g:sale_price>
+        {% else %}
+          <g:price>{{ product.price | money_with_currency }}</g:price>
+        {% endif %}
+        <g:availability>{% if product.available %}in_stock{% else %}out_of_stock{% endif %}</g:availability>
+        {% if product.selected_or_first_available_variant.barcode %}<g:gtin>{{ product.selected_or_first_available_variant.barcode }}</g:gtin>{% endif %}
+      </item>
+    {% endif %}
+  {% endfor %}
+  {% endpaginate %}
+
+</channel>
+</rss>

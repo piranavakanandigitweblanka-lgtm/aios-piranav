@@ -1,0 +1,189 @@
+
+<style>
+  .gallery1 {
+  border: 0.05px solid #fff;
+    /* text-align: center; */
+    /* vertical-align: middle; */
+    height: 50px;
+    width: 100%;
+    display: inline-grid;
+    align-content: center;
+}
+.gallery1:hover {
+  border: 1px solid #777;
+}
+.gallery {
+  border: 1px solid #ccc;
+}
+.gallery:hover {
+  border: 1px solid #777;
+}
+
+.gallery img {
+  width: 100%;
+  height: auto;
+}
+
+.desc {
+  padding: 15px;
+  text-align: center;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.responsive {
+  padding: 0 6px;
+  float: left;
+  width: 14%;
+  padding-bottom:1%;
+}
+
+@media only screen and (max-width: 700px) {
+  .responsive {
+    width: 49.99999%;
+    margin: 6px 0;
+  }
+}
+
+@media only screen and (max-width: 500px) {
+  .responsive {
+    width: 33.33%;
+  }
+}
+
+.clearfix:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+  .main_cont {
+    margin-top:2%;
+  }
+  .catmenu{
+    background-color: #bdbde3cf;
+    padding-left: 9%;
+    font-size: 15px;
+    color: #242323;
+    font-weight: 600;
+  }
+   .catmenu2{
+    background-color: #bdbde3cf;
+    padding-left: 9%;
+    color: #242323;
+    font-weight: 600;
+    font-size: 12px;
+    height: 40px;
+    line-height: normal;
+    align-content: space-around;
+  }
+  .img_size{
+    height:140px;
+  }
+</style>
+<div class="main_cont">
+ 
+ <div class="container-fluid section-full"> 
+    <h3>Wall Lamps</h3>
+     <div class="responsive">
+<div class="gallery1 catmenu">
+                   <a href="https://ledsone.co.uk/pages/transformers">
+                    <p>Transformers</p></a>
+                  </div>
+       
+                  <div class="gallery1 catmenu">
+                    <a href="https://ledsone.co.uk/pages/product-catalogue">
+                    <p>Pendant lights</p></a>
+                  </div>
+       
+                   <div class="gallery1 catmenu">
+                     <a href="https://ledsone.co.uk/pages/cat-wall-lamps">
+                    <p>Wall lights</p></a>
+                  </div>
+       
+                  <div class="gallery1 catmenu" >
+                       <a href="https://ledsone.co.uk/pages/catalogue-plugin-lights">
+                    <p>Plugin lights</p></a>
+                  </div>
+       
+                  <div class="gallery1 catmenu">
+                    <a href ="https://ledsone.co.uk/pages/table_lamps">
+                    <p>Table lights</p> </a>
+                  </div>
+      
+                   <div class="gallery1 catmenu">
+                     <a href=" https://ledsone.co.uk/pages/spider_lights">
+                    <p>Spider lights</p> </a>
+                  </div>
+       
+                   <div class="gallery1 catmenu">
+                    <p>Pendant holders</p>
+                  </div>
+       
+                   <div class="gallery1 catmenu">
+                    <p>Lamp Bulbs E27</p>
+                  </div>
+       
+                   <div class="gallery1 catmenu">
+                    <p>Lamp Bulbs B22</p>
+                  </div>
+                 <div class="gallery1 catmenu">
+                    <p>Lamp Bulbs E14</p>
+                  </div>
+     </div>
+</div>
+{% assign collection_handle = 'spider-light' %}
+{%	paginate collections[collection_handle].products by 1000 %}
+       {% assign same_type_available_products_array = collections[collection_handle].products %}
+ {%	endpaginate %}
+
+ <div class="container-fluid section-full">              
+{% for product in same_type_available_products_array %}
+  <div>
+     
+       {% if product.variants.size > 1 %}   
+         
+                {% for variant in product.variants %}
+               <div class="responsive">
+                  <div class="gallery">
+                   <div class="img_size">
+                     <a href="{{ variant.url }}">
+                  <img src="{{ variant.image | product_img_url: 'large' }}" alt="{{ product.title }}" style="width:600px;object-fit:contain;" > 
+                     </a> </div> 
+                  <br><div class=" catmenu2">{{ variant.title }} </div>
+                    <div class="desc">
+                    <div>Quantity:{{ variant.inventory_quantity }}</div>
+                 <p>Price: {{ variant.price | money }}  <del>{{ product.compare_at_price | money }}</del></p>
+                        <!-- <div><P>ID: {{ variant.id }}</P></div> -->
+                     
+                 <a href="{{ variant.url }}">View Product</a>
+                    </div>
+                  </div>
+               </div>
+                {% endfor %}
+         
+         {% else %}     
+              <div class="responsive">
+                 
+                <div class="gallery">
+                 <div class="img_size">
+                    <a href="{{ product.url }}">
+                  <img src="{{ product.images.first.src | product_img_url: 'large' }}" alt="{{ product.title }}" style="width:600px;object-fit:contain;">
+                    </a>  </div>  
+                  <div class=" catmenu2">&nbsp</div>
+                   <div class="desc">
+                    <div> Quantity:{{ product.variants.first.inventory_quantity }}</div>
+                 <p>Price: {{ product.price | money }}  <del>{{ product.compare_at_price | money }}</del></p>
+                     <!-- <div><P>ID: {{ product.id }}</P></div> -->
+                      
+                 <a href="{{ product.url }}">View Product</a>
+                    </div>
+      
+              </div>
+              </div>
+          {% endif %}
+  </div>
+{% endfor %}
+</div>
+</div>

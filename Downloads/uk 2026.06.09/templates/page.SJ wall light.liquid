@@ -1,0 +1,165 @@
+{%- layout none -%}<?xml version="1.0" encoding="UTF-8" ?>
+<rss xmlns:g="http://base.google.com/ns/1.0" version="2.0">
+<channel>
+  <title>{{ shop.name | escape }} Products</title>
+  <link>{{ shop.url }}</link>
+
+  {% assign target_collection = collections['best-deals-wall-light-indoor-outdoor'] %}
+  {% paginate target_collection.products by 5000 %}
+
+  {% for product in target_collection.products %}
+    {% assign first_variant = product.selected_or_first_available_variant %}
+    {% assign group_id = product.id %}
+
+    <!-- Parent (base) item for grouping; ID built from first variant SKU fallback to product ID -->
+    <item>
+      {%- assign parent_sku = first_variant.sku | default: product.handle -%}
+      <g:id>{{ parent_sku | default: group_id }}</g:id>
+      <g:item_group_id>{{ group_id }}</g:item_group_id>
+
+      <g:title><![CDATA[
+        {{ product.title
+          | strip_html | strip_newlines | escape
+          | replace: 'amp;', 'and' | replace: '&#38;', 'and'
+          | replace: "Ã©", "e" | replace: "Ã ", "a"
+        }}
+      ]]></g:title>
+
+      <g:brand>{{ product.vendor | escape }}</g:brand>
+      <g:product_type>{{ product.type | escape }}</g:product_type>
+      <!-- <g:google_product_category>{{ product.type | escape }}</g:google_product_category> -->
+      <g:condition>New</g:condition>
+
+      <g:description><![CDATA[
+        {{ product.description
+          | strip_html | strip_newlines
+          | replace: 'amp;', 'and' | replace: '&#38;', 'and'
+          | replace: "..", ". " | replace: " ", " "
+          | replace: "â€˜", "&#39;" | replace: "â€™", "&#39;"
+          | replace: "&#8216;", "&#39;" | replace: "&#8217;", "&#39;"
+          | replace: "Ã¢â‚¬â„¢", "&#39;" | replace: "Ã¢â‚¬Å“", "&#39;"
+          | replace: "Ã¢â‚¬Ëœ", "&#39;" | replace: "Ã‚Â´", "&#39;"
+          | replace: "â€œ", "&#34;" | replace: "â€", "&#34;"
+          | replace: "&#8211;", "-" | replace: "Ã¢â‚¬â€œ", "-" | replace: "Ã¢â‚¬â€", "-"
+          | replace: "â€“", "&mdash;" | replace: "â€”", "&mdash;"
+          | replace: "%", "&#37;" | replace: "Ã‚Â©", "&copy;" | replace: "Ã‚Â®", "&reg;"
+          | replace: "Ã¢â€žÂ¢", "&trade;" | replace: "Ã‚Â£", "&pound;"
+          | replace: "Ã¯Â¿Â", "&#42;" | replace: "Ã¢â‚¬Â¢", "&#42;"
+          | replace: "Ã¢â‚¬Â", "&#39;" | replace: "&#233;", "e" | replace: "Ã©", "e"
+          | replace: "Ã ", "a" | replace: "Ã³", "o" | replace: "Ãª", "e"
+          | replace: "ÃƒËœ", "O" | replace: "&#8482;", "" | replace: "&#174;", ""
+        }}
+      ]]></g:description>
+
+      <g:image_link>{{ product.featured_image | product_img_url: 'large' }}</g:image_link>
+      {% if product.images.size > 1 %}
+        {% for image in product.images offset:1 %}
+          <g:additional_image_link>{{ image | product_img_url: 'large' }}</g:additional_image_link>
+        {% endfor %}
+      {% endif %}
+
+      <g:link>{{ shop.url }}{{ product.url }}</g:link>
+      <g:price>{{ first_variant.price | money_without_currency }} {{ shop.currency }}</g:price>
+      {%- if first_variant.compare_at_price > first_variant.price -%}
+        <g:sale_price>{{ first_variant.price | money_without_currency }} {{ shop.currency }}</g:sale_price>
+      {%- endif -%}
+
+      <g:availability>{% if product.available %}in_stock{% else %}out_of_stock{% endif %}</g:availability>
+
+      {%- assign parent_barcode = first_variant.barcode -%}
+      {%- if parent_barcode and parent_barcode != '' -%}
+        <g:gtin>{{ parent_barcode }}</g:gtin>
+      {%- endif -%}
+
+      {%- if parent_sku and parent_sku != '' -%}
+        <g:mpn>{{ parent_sku }}</g:mpn>
+      {%- endif -%}
+
+      {%- comment -%}
+        identifier_exists:
+        true if we have GTIN or (brand AND MPN);
+        false if none available.
+      {%- endcomment -%}
+      {%- assign has_brand = product.vendor and product.vendor != '' -%}
+      {%- assign has_mpn = parent_sku and parent_sku != '' -%}
+      {%- assign has_gtin = parent_barcode and parent_barcode != '' -%}
+      <g:identifier_exists>{% if has_gtin or (has_brand and has_mpn) %}TRUE{% else %}FALSE{% endif %}</g:identifier_exists>
+    </item>
+
+    {% if product.variants.size > 1 %}
+      {% for variant in product.variants %}
+        <!-- Variant item; ID uses SKU (reference code) with fallback to variant ID -->
+        <item>
+          <g:item_group_id>{{ group_id }}</g:item_group_id>
+          <g:id>{{ variant.sku | default: variant.id }}</g:id>
+
+          <g:title><![CDATA[
+            {{ product.title
+              | strip_html | strip_newlines | escape
+              | replace: 'amp;', 'and' | replace: '&#38;', 'and'
+              | replace: "Ã©", "e" | replace: "Ã ", "a"
+            }}
+            - Variant: {{ variant.title | escape }}
+          ]]></g:title>
+
+          <g:brand>{{ product.vendor | escape }}</g:brand>
+          <g:product_type>{{ product.type | escape }}</g:product_type>
+          <g:condition>New</g:condition>
+
+          <g:description><![CDATA[
+            {{ variant.description | default: product.description
+              | strip_html | strip_newlines
+              | replace: 'amp;', 'and' | replace: '&#38;', 'and'
+              | replace: "..", ". " | replace: " ", " "
+              | replace: "â€˜", "&#39;" | replace: "â€™", "&#39;"
+              | replace: "&#8216;", "&#39;" | replace: "&#8217;", "&#39;"
+              | replace: "Ã¢â‚¬â„¢", "&#39;" | replace: "Ã¢â‚¬Å“", "&#39;"
+              | replace: "Ã¢â‚¬Ëœ", "&#39;" | replace: "Ã‚Â´", "&#39;"
+              | replace: "â€œ", "&#34;" | replace: "â€", "&#34;"
+              | replace: "&#8211;", "-" | replace: "Ã¢â‚¬â€œ", "-" | replace: "Ã¢â‚¬â€", "-"
+              | replace: "â€“", "&mdash;" | replace: "â€”", "&mdash;"
+              | replace: "%", "&#37;" | replace: "Ã‚Â©", "&copy;" | replace: "Ã‚Â®", "&reg;"
+              | replace: "Ã¢â€žÂ¢", "&trade;" | replace: "Ã‚Â£", "&pound;"
+              | replace: "Ã¯Â¿Â", "&#42;" | replace: "Ã¢â‚¬Â¢", "&#42;"
+              | replace: "Ã¢â‚¬Â", "&#39;" | replace: "&#233;", "e" | replace: "Ã©", "e"
+              | replace: "Ã ", "a" | replace: "Ã³", "o" | replace: "Ãª", "e"
+              | replace: "ÃƒËœ", "O" | replace: "&#8482;", "" | replace: "&#174;", ""
+            }}
+          ]]></g:description>
+
+          <g:image_link>{{ variant.featured_image | default: product.featured_image | product_img_url: 'large' }}</g:image_link>
+          <g:link>{{ shop.url }}{{ variant.url }}</g:link>
+
+          <g:price>{{ variant.price | money_without_currency }} {{ shop.currency }}</g:price>
+          {%- if variant.compare_at_price > variant.price -%}
+            <g:sale_price>{{ variant.price | money_without_currency }} {{ shop.currency }}</g:sale_price>
+          {%- endif -%}
+
+          <g:availability>{% if variant.available %}in_stock{% else %}out_of_stock{% endif %}</g:availability>
+
+          {%- if variant.barcode and variant.barcode != '' -%}
+            <g:gtin>{{ variant.barcode }}</g:gtin>
+          {%- endif -%}
+
+          {%- if variant.sku and variant.sku != '' -%}
+            <g:mpn>{{ variant.sku }}</g:mpn>
+          {%- endif -%}
+
+          {%- assign v_has_brand = product.vendor and product.vendor != '' -%}
+          {%- assign v_has_mpn = variant.sku and variant.sku != '' -%}
+          {%- assign v_has_gtin = variant.barcode and variant.barcode != '' -%}
+          <g:identifier_exists>{% if v_has_gtin or (v_has_brand and v_has_mpn) %}TRUE{% else %}FALSE{% endif %}</g:identifier_exists>
+
+          {%- comment -%}
+            Optional common attributes you can uncomment / adapt:
+            <g:color>{{ variant.option1 }}</g:color>
+            <g:size>{{ variant.option2 }}</g:size>
+            <g:material>{{ variant.option3 }}</g:material>
+          {%- endcomment -%}
+        </item>
+      {% endfor %}
+    {% endif %}
+  {% endfor %}
+  {% endpaginate %}
+</channel>
+</rss>

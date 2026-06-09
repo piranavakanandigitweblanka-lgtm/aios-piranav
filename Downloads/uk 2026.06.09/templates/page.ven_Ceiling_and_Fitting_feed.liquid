@@ -1,0 +1,145 @@
+{%- layout none -%}<?xml version="1.0" encoding="UTF-8" ?>
+<rss xmlns:g="http://base.google.com/ns/1.0" version="2.0">
+
+<channel>
+<title>{{shop.name | escape }} Products</title>
+<link>{{shop.url}}</link>
+   {%- assign target_collection = collections['hot-selling-products'] -%}
+{%- if target_collection -%}
+  {%- paginate target_collection.products by 1000 -%}
+    {%- for product in target_collection.products -%}
+      {%- assign group_id = product.id -%}
+      {%- assign first_variant = product.selected_or_first_available_variant -%}
+      
+      <!-- Parent product -->
+      <item>
+        <g:id>{{ first_variant.sku | default: product.id }}</g:id>
+        <g:item_group_id>{{ group_id }}</g:item_group_id>
+        <g:title>{{ product.title | strip_html | escape | replace: '&amp;', '&amp;' }}</g:title>
+        <g:description>
+          <![CDATA[{{ product.description | strip_html | truncatewords: 150 }}]]>
+        </g:description>
+        <g:link>{{ shop.url }}{{ product.url }}</g:link>
+        <g:image_link>https:{{ product.featured_image | img_url: 'large' }}</g:image_link>
+        
+        {%- if product.images.size > 1 -%}
+          {%- for image in product.images offset:1 limit:9 -%}
+            <g:additional_image_link>https:{{ image | img_url: 'large' }}</g:additional_image_link>
+          {%- endfor -%}
+        {%- endif -%}
+        
+        <g:availability>{% if product.available %}in_stock{% else %}out_of_stock{% endif %}</g:availability>
+        <g:price>{{ first_variant.price | money_without_currency }} {{ shop.currency }}</g:price>
+        
+        {%- if first_variant.compare_at_price > first_variant.price -%}
+          <g:sale_price>{{ first_variant.price | money_without_currency }} {{ shop.currency }}</g:sale_price>
+        {%- endif -%}
+        
+        <g:brand>{{ product.vendor | escape }}</g:brand>
+        <g:condition>new</g:condition>
+        <g:product_type>{{ product.type | escape }}</g:product_type>
+        
+        <!-- Google Product Category from Shopify Category -->
+        {%- if product.collections.first -%}
+          <g:google_product_category>{{ product.collections.first.title | escape }}</g:google_product_category>
+        {%- endif -%}
+        
+        <!-- Custom Label 0 from Product Tags -->
+        {%- if product.tags.size > 0 -%}
+          <g:custom_label_0>{{ product.tags | join: ', ' | truncate: 100, '' | escape }}</g:custom_label_0>
+        {%- endif -%}
+        
+        {%- if first_variant.barcode != blank -%}
+          <g:gtin>{{ first_variant.barcode }}</g:gtin>
+        {%- endif -%}
+        
+        {%- if first_variant.sku != blank -%}
+          <g:mpn>{{ first_variant.sku }}</g:mpn>
+        {%- endif -%}
+        
+        {%- assign has_brand = product.vendor != blank -%}
+        {%- assign has_mpn = first_variant.sku != blank -%}
+        {%- assign has_gtin = first_variant.barcode != blank -%}
+        <g:identifier_exists>{% if has_gtin or (has_brand and has_mpn) %}yes{% else %}no{% endif %}</g:identifier_exists>
+      </item>
+
+      <!-- Variants -->
+      {%- if product.variants.size > 1 -%}
+        {%- for variant in product.variants -%}
+          <item>
+            <g:id>{{ variant.sku | default: variant.id }}</g:id>
+            <g:item_group_id>{{ group_id }}</g:item_group_id>
+            <g:title>{{ product.title | strip_html | escape }} - {{ variant.title | escape }}</g:title>
+            <g:description>
+              <![CDATA[{{ product.description | strip_html | truncatewords: 150 }}]]>
+            </g:description>
+            <g:link>{{ shop.url }}{{ variant.url }}</g:link>
+            
+            {%- if variant.image -%}
+              <g:image_link>https:{{ variant.image | img_url: 'large' }}</g:image_link>
+            {%- else -%}
+              <g:image_link>https:{{ product.featured_image | img_url: 'large' }}</g:image_link>
+            {%- endif -%}
+            
+            <g:availability>{% if variant.available %}in_stock{% else %}out_of_stock{% endif %}</g:availability>
+            <g:price>{{ variant.price | money_without_currency }} {{ shop.currency }}</g:price>
+            
+            {%- if variant.compare_at_price > variant.price -%}
+              <g:sale_price>{{ variant.price | money_without_currency }} {{ shop.currency }}</g:sale_price>
+            {%- endif -%}
+            
+            <g:brand>{{ product.vendor | escape }}</g:brand>
+            <g:condition>new</g:condition>
+            
+            <!-- Google Product Category from Shopify Category -->
+            {%- if product.collections.first -%}
+              <g:google_product_category>{{ product.collections.first.title | escape }}</g:google_product_category>
+            {%- endif -%}
+            
+            <!-- Custom Label 0 from Product Tags -->
+            {%- if product.tags.size > 0 -%}
+              <g:custom_label_0>{{ product.tags | join: ', ' | truncate: 100, '' | escape }}</g:custom_label_0>
+            {%- endif -%}
+            
+            {%- if variant.barcode != blank -%}
+              <g:gtin>{{ variant.barcode }}</g:gtin>
+            {%- endif -%}
+            
+            {%- if variant.sku != blank -%}
+              <g:mpn>{{ variant.sku }}</g:mpn>
+            {%- endif -%}
+            
+            {%- assign v_has_brand = product.vendor != blank -%}
+            {%- assign v_has_mpn = variant.sku != blank -%}
+            {%- assign v_has_gtin = variant.barcode != blank -%}
+            <g:identifier_exists>{% if v_has_gtin or (v_has_brand and v_has_mpn) %}yes{% else %}no{% endif %}</g:identifier_exists>
+            
+            <!-- Variant attributes -->
+            {%- for option in product.options -%}
+              {%- assign option_index = forloop.index0 -%}
+              {%- assign option_name = option | downcase -%}
+              {%- assign option_value = variant.options[option_index] -%}
+              
+              {%- if option_name == 'color' or option_name == 'colour' -%}
+                <g:color>{{ option_value | escape }}</g:color>
+              {%- elsif option_name == 'size' -%}
+                <g:size>{{ option_value | escape }}</g:size>
+              {%- elsif option_name == 'material' -%}
+                <g:material>{{ option_value | escape }}</g:material>
+              {%- endif -%}
+            {%- endfor -%}
+          </item>
+        {%- endfor -%}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endpaginate -%}
+{%- else -%}
+  <!-- Collection not found -->
+  <item>
+    <g:id>error</g:id>
+    <g:title>Collection not found</g:title>
+    <g:description>The specified collection was not found</g:description>
+  </item>
+{%- endif -%}
+</channel>
+</rss>

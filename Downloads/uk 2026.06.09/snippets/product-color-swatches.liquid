@@ -1,0 +1,68 @@
+{%- liquid
+  assign st = settings
+  assign option_name = 'Color'
+  if st.option_name_color != blank
+    assign option_name = st.option_name_color
+  endif
+  assign color_swatches_size = st.color_swatches_size
+  assign color_swatches_style = st.color_swatches_style
+  assign has_color = false
+  for opt in product.options_with_values
+    if opt.name == option_name
+      assign has_color = true
+    endif
+  endfor
+-%}
+{% if product.has_only_default_variant == false and has_color == true %}
+  <div
+    class="bls__product-option option_color flex mt-4"
+  >
+    {%- for option in product.options_with_values -%}
+      {%- if option.name == option_name -%}
+       {%- assign visible_limit = 4 -%}
+        {%- assign swatch_total = option.values.size -%}
+        {%- assign swatch_index = 0 -%}
+        {%- for value in option.values -%}
+          {%- if swatch_index < visible_limit -%}
+            {%- liquid
+              assign active = ''
+              if forloop.first == true
+                assign active = 'active'
+              endif
+              assign op = 'option' | append: option.position
+              assign variant = product.variants | where: op, value
+              assign img = ''
+              assign color = false
+              assign is_available = false
+              for i in variant
+                if i.featured_image.src
+                  assign color = true
+                  assign img = i.featured_image.src
+                endif
+                if i.available
+                  assign is_available = true
+                endif
+              endfor
+            -%}
+            <div
+              class="bls__product-color-swatches bls__option-swatch-js {{ color_swatches_style }} {{ color_swatches_size }} {% if color %}bls_tooltip mr-5 bls__{{ value | downcase | replace: ' ', '-' }}{% endif %} {{ active }} {% unless is_available %}disabled{% endunless %}"
+              data-value="{{ value }}"
+              data-color="{{ value | downcase }}"
+              data-position="{{ option.position }}"
+              data-image="{{ img | img_url }}"
+            >
+              <span class="bls_tooltip-content">{{ value }}</span>
+            </div>
+          {%- endif -%}
+          {%- assign swatch_index = swatch_index | plus: 1 -%}
+        {%- endfor -%}
+        
+        {%- assign remaining = swatch_total | minus: visible_limit -%}
+        {%- if remaining > 0 -%}
+          <div class="bls__swatch-count">+{{ remaining }}</div>
+        {%- endif -%}
+
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+{% endif %}

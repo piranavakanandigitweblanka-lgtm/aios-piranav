@@ -1,0 +1,942 @@
+{% schema %}
+{
+  "name": "Hero Banner",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Main Banner Settings"
+    },
+    {
+      "type": "image_picker",
+      "id": "main_image",
+      "label": "Main Banner Image 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "mobile_image",
+      "label": "Mobile Banner Image 1",
+      "info": "Recommended size: 1000 x 800px. If left blank, the Main Banner Image will be used."
+    },
+    {
+      "type": "url",
+      "id": "main_banner_url",
+      "label": "Main Banner Link 1",
+      "info": "Leave empty to link to collection"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_second_banner",
+      "label": "Show Second Banner",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "main_image_2",
+      "label": "Main Banner Image 2 (Optional)"
+    },
+    {
+      "type": "image_picker",
+      "id": "mobile_image_2",
+      "label": "Mobile Banner Image 2 (Optional)",
+      "info": "Recommended size: 1000 x 800px."
+    },
+    {
+      "type": "url",
+      "id": "main_banner_url_2",
+      "label": "Main Banner Link 2"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_fade_slider",
+      "label": "Enable Fade Transition (if Image 2 is added)",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "fade_slider_time",
+      "label": "Fade Transition Time (seconds)",
+      "min": 2,
+      "max": 20,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "collection",
+      "id": "main_collection",
+      "label": "Main Banner Collection",
+      "info": "Used if no custom link is provided"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_mini_banners",
+      "label": "Show Mini Banners",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Banner Dimensions"
+    },
+    {
+      "type": "range",
+      "id": "banner_height",
+      "label": "Main Banner Height (Desktop)",
+      "min": 200,
+      "max": 700,
+      "step": 10,
+      "default": 400
+    },
+    {
+      "type": "range",
+      "id": "banner_height_mobile",
+      "label": "Main Banner Height (Mobile)",
+      "min": 200,
+      "max": 500,
+      "step": 10,
+      "default": 300
+    },
+    {
+      "type": "header",
+      "content": "Mini Banner Settings"
+    },
+    {
+      "type": "select",
+      "id": "mini_banners_layout",
+      "label": "Mini Banners Style",
+      "options": [
+        {
+          "value": "carousel",
+          "label": "Interactive Carousel (Scaling & Rotating)"
+        },
+        {
+          "value": "grid",
+          "label": "Fixed Grid/Row (Static boxes)"
+        }
+      ],
+      "default": "carousel"
+    },
+    {
+      "type": "range",
+      "id": "mini_banner_size",
+      "label": "Mini Banner Size (Desktop)",
+      "min": 80,
+      "max": 200,
+      "step": 10,
+      "default": 150,
+      "info": "Size in pixels"
+    },
+    {
+      "type": "range",
+      "id": "mini_banner_size_mobile",
+      "label": "Mini Banner Size (Mobile)",
+      "min": 40,
+      "max": 100,
+      "step": 5,
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "mini_banners_count_desktop",
+      "label": "Number of Mini Banners to Show (Desktop)",
+      "min": 1,
+      "max": 8,
+      "step": 1,
+      "default": 3,
+      "info": "Only applies to Carousel. Grid shows all selected products up to this limit."
+    },
+    {
+      "type": "range",
+      "id": "mini_banners_count_mobile",
+      "label": "Number of Mini Banners to Show (Mobile)",
+      "min": 1,
+      "max": 8,
+      "step": 1,
+      "default": 3,
+      "info": "Controls how many banners visible at once"
+    },
+    {
+      "type": "checkbox",
+      "id": "mini_banners_link_to_products",
+      "label": "Mini Banners Link to Individual Products",
+      "default": true,
+      "info": "If enabled, each mini banner links to its product page. If disabled, links to the product's collection."
+    },
+    {
+      "type": "range",
+      "id": "rotation_speed",
+      "label": "Carousel Rotation Speed (seconds)",
+      "min": 3,
+      "max": 30,
+      "step": 1,
+      "default": 5,
+      "info": "Only applies to Carousel mode"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero Banner with Auto Mini Products"
+    }
+  ]
+}
+{% endschema %}
+
+<div class="main-container">
+  <div class="banner-wrapper">
+    {% comment %} Main Banner {% endcomment %}
+    <div class="main-banners-slider {% if section.settings.enable_fade_slider and section.settings.show_second_banner and section.settings.main_image_2 %}fade-enabled{% endif %}" data-fade-time="{{ section.settings.fade_slider_time }}">
+      {% if section.settings.main_image %}
+        <div class="main-banner-slide active">
+          {% assign main_banner_url = section.settings.main_banner_url %}
+          {% unless main_banner_url %}
+            {% assign main_banner_url = collections[section.settings.main_collection].url %}
+          {% endunless %}
+
+          {% if main_banner_url %}
+            <a href="{{ main_banner_url }}" class="main-banner-link">
+          {% endif %}
+
+          <picture>
+            {% if section.settings.mobile_image %}
+              <source
+                media="(max-width: 768px)"
+                srcset="
+                  {{ section.settings.mobile_image | image_url: width: 600 }} 600w,
+                  {{ section.settings.mobile_image | image_url: width: 800 }} 800w,
+                  {{ section.settings.mobile_image | image_url: width: 1000 }} 1000w
+                "
+                sizes="100vw"
+              >
+            {% endif %}
+            <source
+              media="(min-width: 769px)"
+              srcset="
+                {{ section.settings.main_image | image_url: width: 600 }} 600w,
+                {{ section.settings.main_image | image_url: width: 800 }} 800w,
+                {{ section.settings.main_image | image_url: width: 1000 }} 1000w,
+                {{ section.settings.main_image | image_url: width: 1200 }} 1200w,
+                {{ section.settings.main_image | image_url: width: 1600 }} 1600w,
+                {{ section.settings.main_image | image_url: width: 2000 }} 2000w
+              "
+              sizes="100vw"
+            >
+            <img
+              src="{{ section.settings.main_image | image_url: width: 1200 }}"
+              class="main-banner"
+              style="--desktop-height: {{ section.settings.banner_height }}px; --mobile-height: {{ section.settings.banner_height_mobile }}px;"
+              fetchpriority="high"
+              loading="eager"
+              alt="{{ section.settings.main_image.alt | escape }}"
+              width="{{ section.settings.main_image.width | default: 2000 }}"
+              height="{{ section.settings.main_image.height | default: 400 }}"
+            >
+          </picture>
+
+          {% if main_banner_url %}
+            </a>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      {% if section.settings.show_second_banner and section.settings.main_image_2 %}
+        <div class="main-banner-slide">
+          {% assign main_banner_url_2 = section.settings.main_banner_url_2 %}
+          {% unless main_banner_url_2 %}
+            {% assign main_banner_url_2 = collections[section.settings.main_collection].url %}
+          {% endunless %}
+
+          {% if main_banner_url_2 %}
+            <a href="{{ main_banner_url_2 }}" class="main-banner-link">
+          {% endif %}
+
+          <picture>
+            {% if section.settings.mobile_image_2 %}
+              <source
+                media="(max-width: 768px)"
+                srcset="
+                  {{ section.settings.mobile_image_2 | image_url: width: 600 }} 600w,
+                  {{ section.settings.mobile_image_2 | image_url: width: 800 }} 800w,
+                  {{ section.settings.mobile_image_2 | image_url: width: 1000 }} 1000w
+                "
+                sizes="100vw"
+              >
+            {% endif %}
+            <source
+              media="(min-width: 769px)"
+              srcset="
+                {{ section.settings.main_image_2 | image_url: width: 600 }} 600w,
+                {{ section.settings.main_image_2 | image_url: width: 800 }} 800w,
+                {{ section.settings.main_image_2 | image_url: width: 1000 }} 1000w,
+                {{ section.settings.main_image_2 | image_url: width: 1200 }} 1200w,
+                {{ section.settings.main_image_2 | image_url: width: 1600 }} 1600w,
+                {{ section.settings.main_image_2 | image_url: width: 2000 }} 2000w
+              "
+              sizes="100vw"
+            >
+            <img
+              src="{{ section.settings.main_image_2 | image_url: width: 1200 }}"
+              class="main-banner"
+              style="--desktop-height: {{ section.settings.banner_height }}px; --mobile-height: {{ section.settings.banner_height_mobile }}px;"
+              loading="lazy"
+              alt="{{ section.settings.main_image_2.alt | escape }}"
+              width="{{ section.settings.main_image_2.width | default: 2000 }}"
+              height="{{ section.settings.main_image_2.height | default: 400 }}"
+            >
+          </picture>
+
+          {% if main_banner_url_2 %}
+            </a>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+
+    {% comment %} Mini Banners {% endcomment %}
+    {% if section.settings.show_mini_banners %}
+      {% assign collection = collections[section.settings.main_collection] %}
+      {% if collection and collection.products.size > 0 %}
+        {% assign products_count = collection.products.size %}
+        {% assign products_per_set = section.settings.mini_banners_count_desktop | default: 3 %}
+        {% assign products_per_set_mobile = section.settings.mini_banners_count_mobile | default: 3 %}
+        {% if section.settings.mini_banners_layout == 'grid' %}
+          {% assign is_grid_layout = true %}
+        {% else %}
+          {% assign is_grid_layout = false %}
+        {% endif %}
+        {% assign max_grid_items = products_per_set %}
+        {% if products_per_set_mobile > products_per_set %}
+          {% assign max_grid_items = products_per_set_mobile %}
+        {% endif %}
+        {% if max_grid_items > 8 %}
+          {% assign max_grid_items = 8 %}
+        {% endif %}
+
+        <div
+          class="mini-banners{% if is_grid_layout %} mini-banners--grid{% endif %}"
+          data-products-per-set-desktop="{{ products_per_set }}"
+          data-products-per-set-mobile="{{ products_per_set_mobile }}"
+          data-rotation-speed="{{ section.settings.rotation_speed }}"
+          data-layout="{{ section.settings.mini_banners_layout }}"
+          data-max-grid-items="{{ max_grid_items }}"
+        >
+          {% for product in collection.products %}
+            {% assign mini_banner_url = product.url %}
+            {% unless section.settings.mini_banners_link_to_products %}
+              {% assign mini_banner_url = product.collections.first.url | default: collection.url %}
+            {% endunless %}
+
+            <a
+              href="{{ mini_banner_url }}"
+              class="mini-banner {% if forloop.index0 < products_per_set %}visible{% endif %} {% if forloop.first %}active{% endif %}"
+              data-product-index="{{ forloop.index0 }}"
+              data-display-index="{% assign display_idx = forloop.index0 | modulo: products_per_set %}{{ display_idx }}"
+              title="{{ product.title | escape }}"
+            >
+              <img
+                src="{{ product.featured_image | image_url: width: 300 }}"
+                srcset="
+                  {{ product.featured_image | image_url: width: 150 }} 150w,
+                  {{ product.featured_image | image_url: width: 225 }} 225w,
+                  {{ product.featured_image | image_url: width: 300 }} 300w,
+                  {{ product.featured_image | image_url: width: 400 }} 400w
+                "
+                sizes="
+                  (max-width: 480px) {{ section.settings.mini_banner_size_mobile }}px,
+                  (max-width: 768px) {{ section.settings.mini_banner_size_mobile }}px,
+                  {{ section.settings.mini_banner_size }}px
+                "
+                {% if forloop.index > 4 %}
+                  loading="lazy"
+                {% else %}
+                  loading="eager" fetchpriority="high"
+                {% endif %}
+                alt="{{ product.title | escape }}"
+                width="300"
+                height="300"
+              >
+            </a>
+          {% endfor %}
+        </div>
+
+        {% comment %} Carousel dots - hidden in grid layout {% endcomment %}
+        {% if section.settings.mini_banners_layout == 'carousel' %}
+          <div class="banner-dots">
+            {% for i in (1..products_per_set) %}
+              <span
+                class="dot {% if forloop.first %}active{% endif %}"
+                data-index="{{ forloop.index0 }}"
+              ></span>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endif %}
+    {% endif %}
+  </div>
+</div>
+
+<style>
+  .main-container {
+    max-width: 2000px;
+    margin: 40px auto;
+    padding: 0 20px;
+    --mini-banner-size: {{ section.settings.mini_banner_size }}px;
+    --mini-banner-size-mobile: {{ section.settings.mini_banner_size_mobile }}px;
+  }
+
+  .banner-wrapper {
+    position: relative;
+        z-index: 1;
+  }
+
+  .main-banner-link {
+    display: block;
+    width: 100%;
+  }
+
+  .banner-wrapper picture {
+    display: block;
+    width: 100%;
+  }
+
+  .main-banners-slider {
+    position: relative;
+    width: 100%;
+  }
+
+  .main-banners-slider.fade-enabled {
+    display: grid;
+  }
+
+  .main-banner-slide {
+    width: 100%;
+  }
+
+  .main-banners-slider.fade-enabled .main-banner-slide {
+    grid-area: 1 / 1;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .main-banners-slider.fade-enabled .main-banner-slide.active {
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 2;
+  }
+
+  .main-banner {
+    width: 100%;
+    height: auto;
+    max-height: none;
+    border-radius: 0;
+    object-fit: contain;
+  }
+
+  /* Carousel Layout (Default) */
+  .mini-banners {
+    position: absolute;
+    top: 120px;
+    right: 60px;
+    display: flex;
+    gap: 10px;
+    perspective: 800px;
+    z-index: 30;
+    transition: opacity 0.5s ease;
+  }
+
+  .mini-banner {
+    width: var(--mini-banner-size);
+    height: var(--mini-banner-size);
+    border-radius: 12px;
+    overflow: hidden;
+    transform: scale(0.85);
+    opacity: 0.7;
+    transition: all 0.6s ease;
+    display: none;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .mini-banner.visible {
+    display: block;
+  }
+
+  .mini-banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+  }
+
+  .mini-banner:hover img {
+    transform: scale(1.05);
+  }
+
+  .mini-banner.active {
+    transform: scale(1.5);
+    opacity: 1;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.45);
+    z-index: 10;
+  }
+
+  .mini-banner:not(.active):hover {
+    transform: scale(0.95);
+    opacity: 0.9;
+  }
+
+  /* Grid Layout Style Overrides */
+  .mini-banners--grid {
+    position: absolute;
+    top: auto;
+    bottom: 40px;
+    right: 60px;
+    left: auto;
+    max-width: 600px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 12px;
+    perspective: none;
+    z-index: 30;
+  }
+
+  .mini-banners--grid .mini-banner.visible {
+    display: block;
+    width: var(--mini-banner-size) !important;
+    height: var(--mini-banner-size) !important;
+    transform: none !important;
+    opacity: 1 !important;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    transition: box-shadow 0.3s ease, border 0.3s ease;
+  }
+
+  .mini-banners--grid .mini-banner.visible:hover {
+    box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+    transform: translateY(-4px) !important;
+  }
+
+  .mini-banners--grid .mini-banner.visible.active {
+    transform: none !important;
+    opacity: 1 !important;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+    border: 3px solid #ffffff;
+  }
+
+  .banner-dots {
+    position: absolute;
+    bottom: 20px;
+    right: calc(60px + var(--mini-banner-size) * 2 + 20px);
+    display: flex;
+    gap: 10px;
+    z-index: 30;
+    transition: opacity 0.5s ease;
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    background: rgba(255,255,255,0.4);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  .dot.active {
+    width: 28px;
+    background: #fff;
+    border-radius: 20px;
+  }
+
+  .dot:hover {
+    background: rgba(255,255,255,0.7);
+  }
+
+  /* Tablet Responsiveness */
+  @media screen and (max-width: 1024px) {
+    .main-container {
+      margin: 20px auto;
+      padding: 0 15px;
+    }
+
+    .mini-banners {
+      top: 60px;
+      right: 30px;
+      gap: 10px;
+    }
+
+    .mini-banner.active {
+      transform: scale(1.2);
+    }
+
+    .mini-banners--grid {
+      bottom: 25px;
+      right: 30px;
+      max-width: 500px;
+      gap: 10px;
+    }
+
+    .banner-dots {
+      right: calc(30px + var(--mini-banner-size) * 2 + 20px);
+      bottom: 15px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+    }
+
+    .dot.active {
+      width: 24px;
+    }
+  }
+
+  /* Mobile Responsiveness */
+  @media screen and (max-width: 768px) {
+    .main-container {
+      margin: 10px auto;
+      padding: 0 10px;
+    }
+
+    .banner-wrapper {
+      position: relative;
+    }
+
+    .main-banner-link {
+      display: block;
+      width: 100%;
+    }
+
+    .mini-banners {
+      position: absolute;
+      top: auto;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      right: auto;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      z-index: 30;
+      width: 90%;
+      max-width: 500px;
+    }
+
+    .mini-banners--grid {
+      bottom: 25px !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important;
+      right: auto !important;
+      justify-content: center;
+      width: 90%;
+      max-width: 450px;
+      gap: 10px;
+    }
+
+    .mini-banner {
+      width: var(--mini-banner-size-mobile);
+      height: var(--mini-banner-size-mobile);
+      display: none;
+      transform: scale(0.9);
+      opacity: 0.7;
+    }
+
+    .mini-banner.visible {
+      display: block;
+    }
+
+    .mini-banner.active {
+      transform: scale(1.15);
+      opacity: 1;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      z-index: 5;
+    }
+
+    .mini-banners--grid .mini-banner.visible {
+      width: var(--mini-banner-size-mobile) !important;
+      height: var(--mini-banner-size-mobile) !important;
+    }
+
+    .banner-dots {
+      position: absolute;
+      bottom: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      right: auto;
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      z-index: 30;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.4);
+    }
+
+    .dot.active {
+      width: 18px;
+      background: #ffffff;
+    }
+  }
+
+  /* Small Mobile (< 480px) */
+  @media screen and (max-width: 480px) {
+    .main-container {
+      margin: 5px auto;
+      padding: 0 5px;
+    }
+
+    .mini-banners {
+      bottom: 30px;
+      gap: 8px;
+    }
+
+    .mini-banner {
+      border-radius: 5px;
+    }
+
+    .mini-banner.active {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
+
+    .mini-banners--grid {
+      gap: 8px;
+    }
+
+    .banner-dots {
+      bottom: 10px;
+    }
+
+    .dot {
+      width: 5px;
+      height: 5px;
+    }
+
+    .dot.active {
+      width: 14px;
+    }
+  }
+</style>
+
+<script>
+  const miniBannersContainer = document.querySelector('.mini-banners');
+
+  if (miniBannersContainer) {
+    const allBanners = document.querySelectorAll('.mini-banner');
+    const layoutType = miniBannersContainer.dataset.layout || 'carousel';
+    const isGrid = layoutType === 'grid';
+
+    if (allBanners.length > 0) {
+      let productsPerSet = 3;
+      const rotationSpeed = parseInt(miniBannersContainer.dataset.rotationSpeed) || 5;
+      const totalProducts = allBanners.length;
+      let currentSetStart = 0;
+      let currentActiveIndex = 0;
+      let rotationInterval;
+      let rotationTimeout;
+
+      function renderDots() {
+        if (isGrid) return;
+        const dotsContainer = document.querySelector('.banner-dots');
+        if (dotsContainer) {
+          dotsContainer.innerHTML = '';
+          for (let i = 0; i < productsPerSet; i++) {
+            const dot = document.createElement('span');
+            dot.className = 'dot';
+            dot.dataset.index = i;
+            if (i === currentActiveIndex) {
+              dot.classList.add('active');
+            }
+            dot.addEventListener('click', handleDotClick);
+            dotsContainer.appendChild(dot);
+          }
+        }
+      }
+
+      function updateProductsPerSet() {
+        const isMobile = window.innerWidth <= 768;
+        const countMobile = parseInt(miniBannersContainer.dataset.productsPerSetMobile) || 3;
+        const countDesktop = parseInt(miniBannersContainer.dataset.productsPerSetDesktop) || 3;
+        const oldProductsPerSet = productsPerSet;
+
+        productsPerSet = isMobile ? countMobile : countDesktop;
+
+        if (oldProductsPerSet !== productsPerSet) {
+          currentSetStart = 0;
+          currentActiveIndex = 0;
+          if (!isGrid) renderDots();
+          updateVisibleProducts();
+          setActive(0);
+          startRotation();
+        }
+      }
+
+      function updateVisibleProducts() {
+        allBanners.forEach((banner) => {
+          banner.classList.remove('visible', 'active');
+        });
+
+        for (let i = 0; i < productsPerSet; i++) {
+          const productIndex = (currentSetStart + i) % totalProducts;
+          const banner = allBanners[productIndex];
+          if (banner) {
+            banner.classList.add('visible');
+            if (i === currentActiveIndex) {
+              banner.classList.add('active');
+            }
+          }
+        }
+      }
+
+      function setActive(index) {
+        currentActiveIndex = index;
+        const visibleBanners = document.querySelectorAll('.mini-banner.visible');
+        const currentDots = document.querySelectorAll('.dot');
+
+        visibleBanners.forEach((b) => b.classList.remove('active'));
+        currentDots.forEach((d) => d.classList.remove('active'));
+
+        if (visibleBanners[index]) {
+          visibleBanners[index].classList.add('active');
+        }
+        if (currentDots[index]) {
+          currentDots[index].classList.add('active');
+        }
+      }
+
+      function rotateToNextSet() {
+        currentSetStart = (currentSetStart + productsPerSet) % totalProducts;
+        currentActiveIndex = 0;
+        updateVisibleProducts();
+        setActive(0);
+      }
+
+      function startRotation() {
+        clearInterval(rotationInterval);
+
+        if (allBanners.length > productsPerSet) {
+          if (isGrid) {
+            rotationInterval = setInterval(() => {
+              rotateToNextSet();
+            }, rotationSpeed * 1000);
+          } else {
+            rotationInterval = setInterval(() => {
+              const nextActiveIndex = currentActiveIndex + 1;
+              if (nextActiveIndex >= productsPerSet) {
+                rotateToNextSet();
+              } else {
+                setActive(nextActiveIndex);
+              }
+            }, rotationSpeed * 1000);
+          }
+        }
+      }
+
+      function stopRotation() {
+        clearInterval(rotationInterval);
+      }
+
+      function resetRotationTimeout() {
+        clearTimeout(rotationTimeout);
+        stopRotation();
+        rotationTimeout = setTimeout(startRotation, 10000);
+      }
+
+      function handleBannerClick(e) {
+        if (isGrid) return;
+        const banner = e.target.closest('.mini-banner.visible');
+        if (banner) {
+          const visibleBanners = Array.from(document.querySelectorAll('.mini-banner.visible'));
+          const index = visibleBanners.indexOf(banner);
+          if (index !== -1 && !banner.classList.contains('active')) {
+            e.preventDefault();
+            setActive(index);
+            resetRotationTimeout();
+          }
+        }
+      }
+
+      function handleDotClick() {
+        const index = Number(this.dataset.index);
+        setActive(index);
+        resetRotationTimeout();
+      }
+
+      function handleContainerHover(e) {
+        if (e.type === 'mouseenter') {
+          clearTimeout(rotationTimeout);
+          stopRotation();
+        } else {
+          startRotation();
+        }
+      }
+
+      // Initialize
+      const isMobileInit = window.innerWidth <= 768;
+      productsPerSet = isMobileInit
+        ? parseInt(miniBannersContainer.dataset.productsPerSetMobile) || 3
+        : parseInt(miniBannersContainer.dataset.productsPerSetDesktop) || 3;
+
+      if (!isGrid) {
+        renderDots();
+      }
+      updateVisibleProducts();
+      setActive(0);
+      startRotation();
+
+      // Event Listeners
+      document.addEventListener('click', handleBannerClick);
+      window.addEventListener('resize', updateProductsPerSet);
+
+      miniBannersContainer.addEventListener('mouseenter', handleContainerHover);
+      miniBannersContainer.addEventListener('mouseleave', handleContainerHover);
+
+      // Pause rotation when window is not visible
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          stopRotation();
+        } else {
+          startRotation();
+        }
+      });
+    }
+  }
+
+  // Fade Slider Logic
+  const mainBannersSlider = document.querySelector('.main-banners-slider.fade-enabled');
+  if (mainBannersSlider) {
+    const slides = mainBannersSlider.querySelectorAll('.main-banner-slide');
+    const miniBannersNode = document.querySelector('.mini-banners');
+    const bannerDotsNode = document.querySelector('.banner-dots');
+    
+    if (slides.length > 1) {
+      const fadeTime = parseInt(mainBannersSlider.dataset.fadeTime) || 5;
+      let currentSlide = 0;
+
+      setInterval(() => {
+        slides[currentSlide].classList.remove('active');
+        currentSlide = (currentSlide + 1) % slides.length;
+        slides[currentSlide].classList.add('active');
+        
+        // Hide mini banners and dots on the second slide
+        if (miniBannersNode) {
+          if (currentSlide === 0) {
+            miniBannersNode.style.opacity = '1';
+            miniBannersNode.style.pointerEvents = 'auto';
+            if (bannerDotsNode) {
+              bannerDotsNode.style.opacity = '1';
+              bannerDotsNode.style.pointerEvents = 'auto';
+            }
+          } else {
+            miniBannersNode.style.opacity = '0';
+            miniBannersNode.style.pointerEvents = 'none';
+            if (bannerDotsNode) {
+              bannerDotsNode.style.opacity = '0';
+              bannerDotsNode.style.pointerEvents = 'none';
+            }
+          }
+        }
+      }, fadeTime * 1000);
+    }
+  }
+</script>

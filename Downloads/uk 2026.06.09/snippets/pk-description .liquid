@@ -1,0 +1,237 @@
+<style>
+  /* ======= Description Drawer ======= */
+  .desc-drawer-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 2147483646;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+  }
+
+  .desc-drawer-overlay.open {
+    display: block;
+    opacity: 1;
+  }
+
+  .desc-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 420px;
+    max-width: 100vw;
+    height: 100%;
+    background: #ffffff;
+    z-index: 2147483647;
+    transform: translateX(100%);
+    transition: transform 0.38s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    display: flex;
+    flex-direction: column;
+    box-shadow: -4px 0 24px rgba(0, 0, 0, 0.12);
+  }
+
+  .desc-drawer.open {
+    transform: translateX(0);
+  }
+
+  .desc-drawer__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px;
+    border-bottom: 1px solid #e5e7eb;
+    flex-shrink: 0;
+  }
+
+  .desc-drawer__title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+  }
+
+  .desc-drawer__close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    color: #555;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease, color 0.2s ease;
+    line-height: 1;
+  }
+
+  .desc-drawer__close:hover {
+    background: #f3f4f6;
+    color: #111;
+  }
+
+  .desc-drawer__close svg {
+    width: 20px;
+    height: 20px;
+    display: block;
+  }
+
+  .desc-drawer__body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .desc-drawer__body img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 6px;
+  }
+  .desc-drawer__body p {
+    margin: 0 0 12px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #374151;
+  }
+  .desc-drawer__body ul,
+  .desc-drawer__body ol {
+    padding-left: 20px;
+    margin-bottom: 12px;
+    font-size: 14px;
+    color: #374151;
+    line-height: 1.7;
+  }
+  .desc-drawer__body h1,
+  .desc-drawer__body h2,
+  .desc-drawer__body h3,
+  .desc-drawer__body h4 {
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 16px 0 8px;
+  }
+
+  .desc-drawer__body::-webkit-scrollbar {
+    width: 5px;
+  }
+  .desc-drawer__body::-webkit-scrollbar-track {
+    background: #f9f9f9;
+  }
+  .desc-drawer__body::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 8px;
+  }
+
+  /* Trigger Button Styling */
+  .desc-drawer-trigger {
+    min-height: 48px;
+    padding: 10px 16px;
+    border: 1px solid #e5e7eb;
+    background: #364a9b;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: var(--btn-border-radius, 6px);
+    transition: all 0.25s ease;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    white-space: nowrap;
+    margin-bottom: 15px; /* Match theme button margin */
+  }
+
+  .desc-drawer-trigger:hover {
+    background: #012f6d;
+    color: #ffffff;
+    border-color: #012f6d;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(1, 47, 109, 0.15);
+  }
+
+  @media only screen and (max-width: 768px) {
+    .desc-drawer {
+      width: 100vw;
+    }
+  }
+</style>
+
+{%- unless desc_drawer_rendered -%}
+  <!-- Description Drawer Overlay & Panel (Rendered Only Once) -->
+  <div class="desc-drawer-overlay" id="descDrawerOverlay"></div>
+  <div class="desc-drawer" id="descDrawer" role="dialog" aria-modal="true" aria-label="Product Description">
+    <div class="desc-drawer__header">
+      <p class="desc-drawer__title">Product Description</p>
+      <button class="desc-drawer__close" id="descDrawerClose" aria-label="Close description">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="desc-drawer__body" id="descDrawerBody"></div>
+  </div>
+
+  <!-- Hidden dynamic description source -->
+  <div id="dynamic-variant-description" style="display:none;">
+    {% if product.selected_or_first_available_variant.metafields.custom.variant_description %}
+      {{ product.selected_or_first_available_variant.metafields.custom.variant_description | metafield_tag }}
+    {% else %}
+      {{ product.description }}
+    {% endif %}
+  </div>
+
+  <script>
+    (function () {
+      const descDrawer = document.getElementById('descDrawer');
+      const descDrawerOverlay = document.getElementById('descDrawerOverlay');
+      const descDrawerClose = document.getElementById('descDrawerClose');
+      const descDrawerBody = document.getElementById('descDrawerBody');
+
+      // Move drawer to body for better stacking
+      document.body.appendChild(descDrawerOverlay);
+      document.body.appendChild(descDrawer);
+
+      function openDescDrawer() {
+        const descEl = document.getElementById('dynamic-variant-description');
+        const inner = ((descEl && descEl.innerHTML) || '').trim();
+        descDrawerBody.innerHTML = inner || '<p>No description available.</p>';
+
+        descDrawerOverlay.style.display = 'block';
+        descDrawerOverlay.getBoundingClientRect(); 
+        descDrawerOverlay.classList.add('open');
+        descDrawer.classList.add('open');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeDescDrawer() {
+        descDrawer.classList.remove('open');
+        descDrawerOverlay.classList.remove('open');
+        document.body.style.overflow = '';
+        setTimeout(() => {
+          descDrawerOverlay.style.display = 'none';
+        }, 380);
+      }
+
+      // Delegate click event to trigger buttons
+      document.addEventListener('click', function(e) {
+        if (e.target.closest('.desc-drawer-trigger')) {
+          openDescDrawer();
+        }
+      });
+
+      if (descDrawerClose) descDrawerClose.addEventListener('click', closeDescDrawer);
+      if (descDrawerOverlay) descDrawerOverlay.addEventListener('click', closeDescDrawer);
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && descDrawer.classList.contains('open')) closeDescDrawer();
+      });
+    })();
+  </script>
+  {%- assign desc_drawer_rendered = true -%}
+{%- endunless -%}
+
+<!-- Trigger Button -->
+<button class="desc-drawer-trigger btn-radius" type="button">
+  View Description ▼
+</button>

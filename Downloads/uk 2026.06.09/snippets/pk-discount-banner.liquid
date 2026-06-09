@@ -1,0 +1,537 @@
+<!-- Combined Promo Banner -->
+<style>
+  /* ── Shared ── */
+  @keyframes pl-fadein {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes pl-pop {
+    0% {
+      transform: scale(0.8);
+      opacity: 0;
+    }
+    60% {
+      transform: scale(1.08);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  @keyframes vc-fadein {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* ── Promo Banner (Green) ── */
+  .pl-banner-slide {
+    display: none;
+    padding: 12px 16px;
+    border-left: 4px solid #28a745;
+    border-radius: 4px;
+    animation: pl-fadein 0.5s ease;
+    margin: 16px 0;
+    background-color: #d4edda;
+  }
+  .pl-banner-slide.active {
+    display: block;
+  }
+  .pl-banner-slide p {
+    color: #155724;
+    margin: 0 0 8px 0;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+  .pl-banner-slide mark {
+    background-color: #a8d5b5;
+    padding: 1px 4px;
+    border-radius: 3px;
+    color: inherit;
+  }
+  .pl-lock-msg {
+    color: #155724;
+    font-size: 13px;
+    font-weight: 600;
+    opacity: 0.75;
+  }
+  .pl-code-reveal {
+    display: none;
+    margin-top: 4px;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .pl-code-reveal.visible {
+    display: flex;
+  }
+  .pl-code-label {
+    color: #155724;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .pl-code {
+    display: inline-block;
+    background-color: #155724;
+    color: #ffffff;
+    font-family: monospace;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.15s;
+    user-select: none;
+  }
+  .pl-code:hover {
+    background-color: #1e7e34;
+    transform: scale(1.04);
+  }
+  .pl-code:active {
+    transform: scale(0.97);
+  }
+  .pl-code.copied {
+    background-color: #0d6e27;
+  }
+  .pl-toast {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    color: #0d6e27;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  .pl-toast.show {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+  .pl-code-reveal.pop {
+    animation: pl-pop 0.4s ease forwards;
+  }
+
+  /* ── Vintage Cables Carousel ── */
+  #vc-banner-carousel {
+    margin: 16px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .vc-banner-slide {
+    display: none;
+    padding: 12px 16px;
+    border-left: 4px solid;
+    border-radius: 4px;
+    animation: vc-fadein 0.5s ease;
+  }
+  .vc-banner-slide.active {
+    display: block;
+  }
+  .vc-banner-slide--note {
+    background-color: #fff3cd;
+    border-color: #ffc107;
+  }
+  .vc-banner-slide--note p {
+    color: #856404;
+  }
+  .vc-banner-slide--note mark {
+    background-color: #ffe082;
+    padding: 1px 4px;
+    border-radius: 3px;
+    color: inherit;
+  }
+  .vc-banner-slide--offer {
+    background-color: #d4edda;
+    border-color: #28a745;
+  }
+  .vc-banner-slide--offer p {
+    color: #155724;
+  }
+  .vc-banner-slide--offer mark {
+    background-color: #a8d5b5;
+    padding: 1px 4px;
+    border-radius: 3px;
+    color: inherit;
+  }
+  .vc-code-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+    border-radius: 4px;
+    overflow: hidden;
+    vertical-align: middle;
+  }
+  .vc-banner-slide--offer .vc-code {
+    display: inline-block;
+    background-color: #155724;
+    color: #ffffff;
+    font-family: monospace;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 2px 8px;
+    letter-spacing: 0.5px;
+  }
+  .vc-copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background-color: #28a745;
+    color: #ffffff;
+    border: none;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 2px 9px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    line-height: 1.6;
+    font-family: inherit;
+  }
+  .vc-copy-btn:hover {
+    background-color: #218838;
+  }
+  .vc-copy-btn.copied {
+    background-color: #145a23;
+  }
+  .vc-copy-label {
+    /* No additional styles needed, using inherited from span */
+  }
+  .vc-banner-slide p {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+  .vc-dots {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .vc-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: #ccc;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    border: none;
+    padding: 0;
+  }
+  .vc-dot.active {
+    background-color: #666;
+  }
+</style>
+
+<!-- Promo Banner: Wall Lights / Pendant Lights / Lampshades -->
+<div id="pl-banner" class="vc-banner-carousel" style="display: none;">
+  <div class="pl-banner-slide active">
+    <p>
+      🎉 Buy <mark><strong id="pl-product-label"></strong></mark> and get <mark><strong>10% off</strong></mark> on your
+      order!
+    </p>
+    <div id="pl-lock-msg">
+      <span class="pl-lock-msg" id="pl-lock-text"></span>
+    </div>
+    <div class="pl-code-reveal" id="pl-code-reveal">
+      <span class="pl-code-label">🔓 Your discount code click & copy : </span>
+      <span class="pl-code" id="pl-code"></span>
+      <span class="pl-toast" id="pl-toast">✅ Copied!</span>
+    </div>
+  </div>
+  <div class="pl-banner-slide pl-banner-slide--offer">
+    <p>
+      🎉 <strong>Order Offer:</strong> Get <mark><strong>15% Off</strong></mark> orders over
+      <mark><strong>£500</strong></mark>! Use code
+      <span class="vc-code-wrap">
+        <span class="vc-code">SAVESJ15</span>
+        <button class="vc-copy-btn" aria-label="Copy discount code">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+          </svg>
+          <span class="vc-copy-label">Copy</span>
+        </button>
+      </span>
+      at checkout.
+    </p>
+  </div>
+  <div class="vc-dots pl-dots" style="margin-top: 8px;">
+    <button class="vc-dot active" data-index="0" aria-label="Banner 1"></button>
+    <button class="vc-dot" data-index="1" aria-label="Banner 2"></button>
+  </div>
+</div>
+
+<!-- Vintage Cables Carousel -->
+<div id="vc-banner-carousel" style="display: none;">
+  <div class="vc-banner-slide vc-banner-slide--note active">
+    <p>
+      📝 <strong>Note:</strong> Available in <mark><strong>5m</strong></mark> and
+      <mark><strong>10m</strong></mark> pre-cut rolls. For a continuous wire length, select
+      <mark><strong>1m</strong></mark> and increase the quantity to your required length.
+    </p>
+  </div>
+  <div class="vc-banner-slide vc-banner-slide--offer">
+    <p>
+      🎉 <strong>Bulk Offer:</strong> Purchase a minimum of <mark><strong>100m</strong></mark> in
+      <mark><strong>1m continuous lengths</strong></mark> and get <mark><strong>10% off</strong></mark> your order! Use
+      code
+      <span class="vc-code-wrap">
+        <span class="vc-code">LEDCL10%</span>
+        <button class="vc-copy-btn" aria-label="Copy discount code">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+          </svg>
+          <span class="vc-copy-label">Copy</span>
+        </button>
+      </span>
+      at checkout.
+    </p>
+  </div>
+  <div class="vc-banner-slide vc-banner-slide--offer">
+    <p>
+      🎉 <strong>Order Offer:</strong> Get <mark><strong>15% Off</strong></mark> orders over
+      <mark><strong>£500</strong></mark>! Use code
+      <span class="vc-code-wrap">
+        <span class="vc-code">SAVESJ15</span>
+        <button class="vc-copy-btn" aria-label="Copy discount code">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+          </svg>
+          <span class="vc-copy-label">Copy</span>
+        </button>
+      </span>
+      at checkout.
+    </p>
+  </div>
+  <div class="vc-dots">
+    <button class="vc-dot active" data-index="0" aria-label="Banner 1"></button>
+    <button class="vc-dot" data-index="1" aria-label="Banner 2"></button>
+    <button class="vc-dot" data-index="2" aria-label="Banner 3"></button>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var productTags        = {{ product.tags | json }};
+    var productCollections = {{ product.collections | json }};
+
+    // ── 1. Promo Banner (Wall Lights / Pendant Lights / Lampshades) ────────────
+    var PL_CONFIG = {
+      'wall-light':      { label: '2 Wall Lights',    code: 'LIGHT10',  minQty: 2 },
+      'pendant-lights':  { label: '2 Pendant Lights', code: 'HLIGHT10', minQty: 2 },
+      'easy-fit-shades': { label: '3 Lampshades',     code: 'SHADE10',  minQty: 3 }
+    };
+
+    var matched = null;
+    productCollections.forEach(function (c) {
+      if (PL_CONFIG[c.handle]) matched = PL_CONFIG[c.handle];
+    });
+
+    var plBanner = document.getElementById('pl-banner');
+    if (plBanner && matched) {
+      document.getElementById('pl-product-label').textContent = matched.label;
+      var codeEl = document.getElementById('pl-code');
+      codeEl.textContent = matched.code;
+      document.getElementById('pl-lock-text').textContent =
+        '🔒 Enter a quantity of ' + matched.minQty + ' or more to unlock your discount code.';
+      plBanner.style.display = 'block';
+
+      var lockMsg    = document.getElementById('pl-lock-msg');
+      var codeReveal = document.getElementById('pl-code-reveal');
+      var toast      = document.getElementById('pl-toast');
+
+      codeEl.addEventListener('click', function () {
+        navigator.clipboard.writeText(matched.code).then(function () {
+          codeEl.textContent = '✅ ' + matched.code;
+          codeEl.classList.add('copied');
+          toast.classList.add('show');
+          setTimeout(function () {
+            codeEl.textContent = matched.code;
+            codeEl.classList.remove('copied');
+            toast.classList.remove('show');
+          }, 2000);
+        });
+      });
+
+      function checkQuantity() {
+        var qtyInput = document.querySelector('input[name="quantity"]');
+        var qty = qtyInput ? parseInt(qtyInput.value, 10) : 1;
+        if (qty >= matched.minQty) {
+          lockMsg.style.display = 'none';
+          if (!codeReveal.classList.contains('visible')) {
+            codeReveal.classList.add('visible');
+            setTimeout(function () { codeReveal.classList.add('pop'); }, 10);
+          }
+        } else {
+          lockMsg.style.display = 'block';
+          codeReveal.classList.remove('visible', 'pop');
+        }
+      }
+
+      checkQuantity();
+      document.addEventListener('change', function (e) {
+        if (e.target && e.target.name === 'quantity') checkQuantity();
+      });
+      document.addEventListener('click', function (e) {
+        var btn = e.target.closest('[data-quantity-plus], [data-quantity-minus], .quantity__button, [aria-label="Increase quantity"], [aria-label="Decrease quantity"]');
+        if (btn) setTimeout(checkQuantity, 100);
+      });
+
+      // Carousel Logic for PL
+      var plSlides  = plBanner.querySelectorAll('.pl-banner-slide');
+      var plDots    = plBanner.querySelectorAll('.pl-dots .vc-dot');
+      var plCurrent = 0;
+      var plTotal   = plSlides.length;
+      var plTimer   = null;
+
+      function plGoTo(index) {
+        plSlides[plCurrent].classList.remove('active');
+        plDots[plCurrent].classList.remove('active');
+        plCurrent = (index + plTotal) % plTotal;
+        plSlides[plCurrent].classList.add('active');
+        plDots[plCurrent].classList.add('active');
+      }
+
+      function plStartTimer() {
+        clearInterval(plTimer);
+        plTimer = setInterval(function () { plGoTo(plCurrent + 1); }, 10000);
+      }
+
+      plDots.forEach(function (dot) {
+        dot.addEventListener('click', function () {
+          plGoTo(parseInt(dot.getAttribute('data-index'), 10));
+          plStartTimer();
+        });
+      });
+
+      plBanner.addEventListener('mouseenter', function () { clearInterval(plTimer); });
+      plBanner.addEventListener('mouseleave', plStartTimer);
+
+      plBanner.querySelectorAll('.vc-copy-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var codeWrap = btn.closest('.vc-code-wrap');
+          var codeEl   = codeWrap.querySelector('.vc-code');
+          var labelEl  = codeWrap.querySelector('.vc-copy-label');
+          var code     = codeEl.textContent.trim();
+
+          navigator.clipboard.writeText(code).then(function () {
+            var originalText = labelEl.textContent;
+            labelEl.textContent = 'Copied!';
+            btn.classList.add('copied');
+            setTimeout(function () {
+              labelEl.textContent = originalText;
+              btn.classList.remove('copied');
+            }, 2000);
+          });
+        });
+      });
+
+      plStartTimer();
+    }
+
+    // ── 2. Vintage Cables Carousel ─────────────────────────────────────────────
+    var VC_COLLECTIONS = ['2core-round', '2core-twisted', '3core-round', '3core-twisted', 'vintage-cables'];
+
+    var hasVintageCablesTag  = productTags.includes('Vintage Cables');
+    var isInVcCollection     = productCollections.some(function (c) {
+      return VC_COLLECTIONS.includes(c.handle);
+    });
+
+    var carousel = document.getElementById('vc-banner-carousel');
+    if (carousel && (hasVintageCablesTag || isInVcCollection)) {
+      carousel.style.display = 'block';
+
+      var slides  = carousel.querySelectorAll('.vc-banner-slide');
+      var dots    = carousel.querySelectorAll('.vc-dot');
+      var current = 0;
+      var total   = slides.length;
+      var timer   = null;
+
+      function goTo(index) {
+        slides[current].classList.remove('active');
+        dots[current].classList.remove('active');
+        current = (index + total) % total;
+        slides[current].classList.add('active');
+        dots[current].classList.add('active');
+      }
+
+      function startTimer() {
+        clearInterval(timer);
+        timer = setInterval(function () { goTo(current + 1); }, 10000);
+      }
+
+      dots.forEach(function (dot) {
+        dot.addEventListener('click', function () {
+          goTo(parseInt(dot.getAttribute('data-index'), 10));
+          startTimer();
+        });
+      });
+
+      carousel.addEventListener('mouseenter', function () { clearInterval(timer); });
+      carousel.addEventListener('mouseleave', startTimer);
+
+      carousel.querySelectorAll('.vc-copy-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var codeWrap = btn.closest('.vc-code-wrap');
+          var codeEl   = codeWrap.querySelector('.vc-code');
+          var labelEl  = codeWrap.querySelector('.vc-copy-label');
+          var code     = codeEl.textContent.trim();
+
+          navigator.clipboard.writeText(code).then(function () {
+            var originalText = labelEl.textContent;
+            labelEl.textContent = 'Copied!';
+            btn.classList.add('copied');
+            setTimeout(function () {
+              labelEl.textContent = originalText;
+              btn.classList.remove('copied');
+            }, 2000);
+          });
+        });
+      });
+
+      startTimer();
+    }
+
+  })();
+</script>

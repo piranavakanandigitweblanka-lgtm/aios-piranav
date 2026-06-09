@@ -1,0 +1,355 @@
+{% comment %} <<-- Kuberan Added this code bulk order table - 16/09/2025 -->> {% endcomment %}
+
+<div class="bulk-order-section">
+ <table class="bulk-order-table">
+  <thead>
+    <tr>
+      <th>variations</th>
+      <th>Price</th>
+      <th>Quantity</th>
+      <th>Add</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for variant in product.variants %}
+      <tr data-variant-id="{{ variant.id }}">
+        <td class="variant-cell">
+          <div class="variant-content">
+            {% if variant.image %}
+            <img src="{{ variant.image | img_url: '100x100' }}"
+                 width="40" height="40"
+                 data-full="{{ variant.image | img_url: '' }}"
+                 alt="{{ variant.title | escape }}"
+                 class="variant-img"
+                 onclick="showImageModal(this)"
+                 loading="lazy">
+            {% else %}
+            <img src="{{ product.featured_image | img_url: '100x100' }}"
+                 width="40" height="40"
+                 data-full="{{ product.featured_image | img_url: '' }}"
+                 alt="{{ variant.title | escape }}"
+                 class="variant-img"
+                 onclick="showImageModal(this)"
+                 loading="lazy">
+            {% endif %}
+            <div class="variant-title clickable-title">
+              {% if product.variants.size == 1 and variant.title == 'Default Title' %}
+                {{ product.title }}
+              {% else %}
+                {{ variant.title }}
+              {% endif %}
+              {% unless variant.available %}
+                <span class="sold-out-tag">Sold Out</span>
+              {% endunless %}
+            </div>
+          </div>
+        </td>
+        <td>
+          <span class="price"
+                id="price-{{ variant.id }}"
+                data-unit-price="{{ variant.price | divided_by: 100.0 }}"
+                data-currency-symbol="£">
+            {{ variant.price | money }}
+          </span>
+        </td>
+        <td class="quantity-cell">
+          <div class="qty-wrapper">
+            <button type="button" class="qty-btn" onclick="changeQty({{ variant.id }}, -1)">−</button>
+            <input type="number" name="quantity" min="1" value="1" id="quantity-{{ variant.id }}">
+            <button type="button" class="qty-btn" onclick="changeQty({{ variant.id }}, 1)">+</button>
+          </div>
+        </td>
+        <td>
+          {% if variant.available %}
+            <button type="button"
+                    class="add-to-cart-btn"
+                    onclick="addToCart({{ variant.id }}, document.getElementById('quantity-{{ variant.id }}').value, this)">
+              Add to cart
+            </button>
+          {% else %}
+            <button type="button"
+                    class="add-to-cart-btn disabled"
+                    disabled
+                    title="Sold Out">
+              Sold Out
+            </button>
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- Modal container for enlarged image -->
+<div id="imageModal" class="image-modal">
+  <span class="image-modal-close" onclick="closeImageModal()">&times;</span>
+  <img class="image-modal-content" id="modalImage" src="" alt="" width="600" height="600">
+</div>
+
+<script>
+function formatMoney(amount, symbol) {
+  return symbol + parseFloat(amount).toFixed(2);
+}
+function changeQty(variantId, delta) {
+  const qtyInput = document.getElementById('quantity-' + variantId);
+  let qty = parseInt(qtyInput.value) + delta;
+  if (qty < 1) qty = 1;
+  qtyInput.value = qty;
+  updatePrice(variantId, qty);
+}
+function updatePrice(variantId, qty) {
+  const priceSpan = document.getElementById('price-' + variantId);
+  const unitPrice = parseFloat(priceSpan.getAttribute('data-unit-price'));
+  const symbol = priceSpan.getAttribute('data-currency-symbol');
+  const totalPrice = unitPrice * qty;
+  priceSpan.textContent = formatMoney(totalPrice, symbol);
+}
+function addToCart(variantId, qty, btnEl) {
+  fetch('/cart/add.js', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id: variantId, quantity: parseInt(qty) })
+  })
+  .then(res => res.json())
+  .then(data => {
+    showSuccessRow(btnEl);
+  })
+  .catch(err => console.error(err));
+}
+function showSuccessRow(btnEl) {
+  const tr = btnEl.closest('tr');
+  if (tr.nextElementSibling && tr.nextElementSibling.classList.contains('success-row')) {
+    tr.nextElementSibling.remove();
+  }
+  const colCount = tr.children.length;
+  const successTr = document.createElement('tr');
+  successTr.classList.add('success-row');
+  const td = document.createElement('td');
+  td.colSpan = colCount;
+  td.innerHTML = `
+    <div class="success-message">
+      <strong>Added successfully!</strong>
+      <a href="/cart" class="view-cart-link">View Cart</a>
+      <button class="dismiss-btn" onclick="this.closest('tr').remove()">Dismiss</button>
+    </div>
+  `;
+  successTr.appendChild(td);
+  tr.insertAdjacentElement('afterend', successTr);
+}
+function showImageModal(imgEl) {
+  const fullUrl = imgEl.getAttribute('data-full');
+  const modal = document.getElementById('imageModal');
+  const modalImg = document.getElementById('modalImage');
+  modal.style.display = 'flex';
+  modalImg.src = fullUrl;
+}
+function closeImageModal() {
+  document.getElementById('imageModal').style.display = 'none';
+}
+document.getElementById('imageModal').addEventListener('click', function (e) {
+  if (e.target === this) closeImageModal();
+});
+function updateVariantAvailability(variantId, available) {
+  const row = document.querySelector(`tr[data-variant-id='${variantId}']`);
+  if (!row) return;
+  const btn = row.querySelector('.add-to-cart-btn');
+  const soldOutTag = row.querySelector('.sold-out-tag');
+  if (available) {
+    btn.disabled = false;
+    btn.classList.remove('disabled');
+    btn.textContent = 'Add to cart';
+    if (soldOutTag) soldOutTag.remove();
+  } else {
+    btn.disabled = true;
+    btn.classList.add('disabled');
+    btn.textContent = 'Sold Out';
+    if (!soldOutTag) {
+      const titleDiv = row.querySelector('.variant-title');
+      const span = document.createElement('span');
+      span.classList.add('sold-out-tag');
+      span.textContent = 'Sold Out';
+      titleDiv.appendChild(span);
+    }
+  }
+}
+
+document.querySelectorAll('.qty-wrapper input[name="quantity"]').forEach(input => {
+  input.addEventListener('blur', function() {
+    const variantId = this.id.replace('quantity-', '');
+    let qty = parseInt(this.value);
+    if (isNaN(qty) || qty < 1) qty = 1;
+    this.value = qty;
+    updatePrice(variantId, qty);
+  });
+});
+
+document.querySelectorAll('.clickable-title').forEach(el => {
+  el.addEventListener('click', () => {
+    el.classList.toggle('expanded-title');
+  });
+});
+</script>
+
+<style>
+.bulk-order-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.bulk-order-table th,
+.bulk-order-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+  vertical-align: middle;
+  font-weight: 500;
+}
+.bulk-order-table th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+.bulk-order-table th:nth-child(1),
+.bulk-order-table td:nth-child(1) { width: 35%; }
+.bulk-order-table th:nth-child(3),
+.bulk-order-table td:nth-child(3) { width: 15%; }
+
+.variant-content {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+}
+.variant-img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 4px;
+  cursor: zoom-in;
+  flex-shrink: 0;
+}
+.variant-title {
+  display: block;
+  line-height: 1.2;
+  word-break: break-word;
+  text-align: left;
+  cursor: pointer;
+}
+.variant-title .sold-out-tag { cursor: default; }
+.sold-out-tag {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 6px;
+  background-color: #ff4d4f;
+  color: white;
+  font-size: 12px;
+  border-radius: 4px;
+  text-align: center;
+}
+.qty-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.qty-btn {
+  background-color: #eee;
+  border: 1px solid #ccc;
+  padding: 3px 6px;
+  cursor: pointer;
+}
+.qty-btn:hover { background-color: #ddd; }
+.qty-wrapper input {
+  width: 40px;
+  height: 24px;
+  text-align: center;
+  margin: 0 2px;
+  border: 1px solid #ccc;
+  border-radius: 0;
+  padding: 0 2px;
+}
+.add-to-cart-btn {
+  background-color: #001A72;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  display: inline-block;
+}
+.add-to-cart-btn:hover { background-color: #0030b0; }
+.add-to-cart-btn.disabled {
+  background-color: #999 !important;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+.image-modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.8);
+  justify-content: center;
+  align-items: center;
+}
+.image-modal-content {
+  max-width: 90%;
+  max-height: 90%;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+  border-radius: 8px;
+}
+.image-modal-close {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  color: #fff;
+  font-size: 30px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 10000;
+}
+.success-row td {
+  background-color: #f0f8ff;
+  text-align: center;
+  padding: 12px;
+}
+.success-message {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+  text-align: center;
+}
+.success-message .view-cart-link {
+  color: #001A72;
+  text-decoration: underline;
+}
+.success-message .dismiss-btn {
+  background: #ccc;
+  border: none;
+  padding: 4px 8px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.success-message .dismiss-btn:hover { background: #aaa; }
+
+/* --- MOBILE FIX --- */
+@media (max-width: 767px) {
+  .variant-title {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;  /* show only 2 lines */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 2.6em;
+    white-space: normal;
+  }
+
+  .variant-title.expanded-title {
+    -webkit-line-clamp: unset;
+    max-height: none;
+  }
+}
+</style>
+</div>

@@ -1,0 +1,103 @@
+{%- liquid
+  assign th_st = settings
+  assign money_format = shop.money_format
+  if settings.currency_code_enabled
+    assign money_format = shop.money_with_currency_format | strip_html
+  endif
+
+  assign show_newsletter = th_st.show_newsletter
+  assign show_promotion = th_st.show_promotion
+  assign show = false
+  if show_newsletter == 'show_newsletter_homepage'
+    if request.page_type == 'index'
+      assign show = true
+    endif
+  elsif show_newsletter == 'hide_newsletter'
+    assign show = false
+  else
+    assign show = true
+  endif
+-%}
+<script>
+
+  window.shopUrl = '{{ request.origin }}';
+  window.routes = {
+    cart_add_url: '{{ routes.cart_add_url }}',
+    cart_change_url: '{{ routes.cart_change_url }}',
+    cart_update_url: '{{ routes.cart_update_url }}',
+    cart_url: '{{ routes.cart_url }}',
+    search_url: '{{ routes.search_url }}',
+    predictive_search_url: '{{ routes.predictive_search_url }}',
+  };
+  window.cartStrings = {
+    error: `{{ 'sections.cart.cart_error' | t }}`,
+    no_shipping: `{{ 'sections.cart.no_shipping' | t }}`,
+    shipping_rate: `{{ 'sections.cart.shipping_rate' | t }}`,
+    quantityError: `{{ 'sections.cart.cart_quantity_error_html' | t: quantity: '[quantity]' }}`,
+    money_format: {{ money_format | json }},
+    quick_edit: `{{ 'sections.cart.quick_edit' | t }}`,
+    cart_symbol: '{{ cart.currency.symbol }}'
+  }
+  window.variantStrings = {
+    addToCart: `{{ 'products.product.add_to_cart' | t }}`,
+    soldOut: `{{ 'products.product.sold_out' | t }}`,
+    available: `{{ 'products.product.available' | t }}`,
+    unavailable: `{{ 'products.product.unavailable' | t }}`,
+    preOrder: `{{ 'products.product.pre_order' | t }}`,
+    outStock: `{{ 'products.product.outstock' | t }}`,
+    inStock: `{{ 'products.product.instock' | t }}`,
+    compare: `{{ 'products.product.compare' | t }}`,
+    removeCompare: `{{ 'products.product.remove_compare' | t }}`
+  }
+  window.stringsTemplate = {
+    messageRemoveCompare: `{{ 'products.product.remove_compare' | t }}`,
+    messageRemoveWishlist: `{{ 'products.product.remove_wishlist' | t }}`
+  }
+  window.menuStrings = {
+    verticalTitle: `{{ 'main_menu.vertical.title' | t }}`,
+    hideMenus: `{{ 'main_menu.vertical.hide' | t }}`,
+    moreMenus: `{{ 'main_menu.vertical.more' | t }}`
+  }
+  window.popup = {
+    newsletterPopup: {{ show }},
+    promotionPopup: {{ show_promotion }}
+  }
+  window.flashingBrowseTab = {
+    enable: {{ th_st.flashing_browser }},
+    firstNotification: `{{ th_st.first_notification }}`,
+    secondaryNotification: `{{ th_st.secondary_notification }}`
+  }
+</script>
+{%- if th_st.page_terms_conditions != blank -%}
+  <div
+    id="popup-terms-conditions"
+    class="d-none"
+    data-text="{{ 'general.cart.terms_conditions_text' | t }}">
+    <div class="terms-conditions-content bls_popup-content p-5">
+      {{ pages[th_st.page_terms_conditions].content }}
+    </div>
+  </div>
+{%- endif -%}
+{%- if th_st.help_chat != blank -%}
+  <div id="bls_help-chat">
+    {{ th_st.help_chat }}
+  </div>
+{%- endif -%}
+{%- if th_st.enable_eu_cookie_bar_gdpr != blank -%}
+  <div id="bls_cookie" class="bls_cookie d-none text-center rounded-5">
+    <div class="cookie-message col fs-small">
+      {{- th_st.message_cookie }}
+    </div>
+    {%- if th_st.cookie_button_text != blank -%}
+      <div class="cookie-compliance col-auto w-full">
+        <button class="cookie-btn cookie-dismiss w-full btn-primary mt-15 mb-7" id="ba-cookie-dismiss">
+          {{ th_st.cookie_button_text }}
+        </button>
+      </div>
+    {%- endif -%}
+  </div>
+{%- endif -%}
+
+{%- render 'form-infor' -%}
+{%- render 'form-infor-product' -%}
+{%- render 'form-infor-stock-notify' -%}

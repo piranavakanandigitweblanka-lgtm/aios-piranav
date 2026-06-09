@@ -1,0 +1,1066 @@
+{% schema %}
+{
+  "name": "Today's Deals",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Visibility Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_on_desktop",
+      "label": "Show on Desktop",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Desktop Visibility"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_title_desktop",
+      "label": "Show Title on Desktop",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_subtitle_desktop",
+      "label": "Show Subtitle on Desktop",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_on_mobile",
+      "label": "Show on Mobile",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Main Title",
+      "default": "Today's Deals"
+    },
+    {
+      "type": "checkbox",
+      "id": "subtitle_enabled",
+      "label": "Enable Subtitle",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle Text",
+      "default": "Limited-time offers"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#f8f8f8"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading Color",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "subtitle_color",
+      "label": "Subtitle Color",
+      "default": "#666666"
+    },
+    {
+      "type": "color",
+      "id": "price_color",
+      "label": "Price Color",
+      "default": "#e63946"
+    },
+    {
+      "type": "color",
+      "id": "discount_color",
+      "label": "Discount Color",
+      "default": "#2a9d8f"
+    },
+    {
+      "type": "color",
+      "id": "savings_color",
+      "label": "Savings Color",
+      "default": "#2a9d8f"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "deal_card",
+      "name": "Deal Card",
+      "settings": [
+        {
+          "type": "header",
+          "content": "Card Settings"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Deal Title"
+        },
+        {
+          "type": "text",
+          "id": "subtitle",
+          "label": "Subtitle",
+          "default": "Deal subtitle"
+        },
+        {
+          "type": "checkbox",
+          "id": "banner_enabled",
+          "label": "Enable Banner",
+          "default": false
+        },
+        {
+          "type": "image_picker",
+          "id": "banner",
+          "label": "Banner Image (Desktop)"
+        },
+        {
+          "type": "image_picker",
+          "id": "banner_mobile",
+          "label": "Banner Image (Mobile)"
+        },
+        {
+          "type": "checkbox",
+          "id": "hide_banner_mobile",
+          "label": "Hide Banner on Mobile",
+          "default": false
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        },
+        {
+          "type": "header",
+          "content": "Timer Settings"
+        },
+        {
+          "type": "checkbox",
+          "id": "timer_enabled",
+          "label": "Enable Timer",
+          "default": true
+        },
+        {
+          "type": "number",
+          "id": "timer_duration",
+          "label": "Timer Duration (seconds)",
+          "default": 86400,
+          "info": "86400 = 24 hours"
+        },
+        {
+          "type": "checkbox",
+          "id": "timer_auto_reset",
+          "label": "Auto Reset Timer",
+          "default": true
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Today's Deals",
+      "category": "Custom",
+      "blocks": [
+        {
+          "type": "deal_card",
+          "settings": {
+            "title": "Bestsellers",
+            "subtitle": "Top price & quality picks",
+            "timer_duration": 86400
+          }
+        },
+        {
+          "type": "deal_card",
+          "settings": {
+            "title": "SuperDeals",
+            "subtitle": "Up to 70% off",
+            "timer_duration": 43200
+          }
+        },
+        {
+          "type": "deal_card",
+          "settings": {
+            "title": "Big Save",
+            "subtitle": "500+ Brands",
+            "timer_duration": 21600
+          }
+        },
+        {
+          "type": "deal_card",
+          "settings": {
+            "title": "New Arrivals",
+            "subtitle": "Fresh picks just for you",
+            "timer_duration": 28800
+          }
+        },
+        {
+          "type": "deal_card",
+          "settings": {
+            "title": "Clearance",
+            "subtitle": "Last chance deals",
+            "timer_duration": 18000
+          }
+        },
+        {
+          "type": "deal_card",
+          "settings": {
+            "title": "Weekend Special",
+            "subtitle": "Limited time weekend offers",
+            "timer_duration": 172800
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
+
+{%- style -%}
+  .today-deals {
+    padding: 20px 0;
+    background-color: {{ section.settings.bg_color }};
+  }
+  .today-deals__header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  .today-deals__title {
+    color: {{ section.settings.heading_color }};
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  .today-deals__subtitle {
+    color: {{ section.settings.subtitle_color }};
+    font-size: 16px;
+    opacity: 0.9;
+    text-align: center;
+  }
+  
+  .deal-banner-container {
+    margin-bottom: 5px;
+    max-width: 1200px;
+  }
+  .deal-banner {
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 15px;
+    height: 165px;
+    object-fit: cover;
+    cursor: pointer;
+  }
+  .deal-banner.desktop-only {
+    display: block;
+    height: 195px;
+  }
+  .deal-banner.mobile-only {
+    display: none;
+  }
+  
+  .today-deals__container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+  
+  .deal-card {
+    background: white;
+    border-radius: 8px;
+    padding: 5px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 550px;
+  }
+  
+  .deal-card__header {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    width: 100%;
+    text-align: center;
+  }
+
+  .deal-card__title {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .deal-card__subtitle {
+    font-size: 14px;
+    color: #666;
+    margin: 5px 0 0;
+  }
+  
+  .deal-products-slider {
+    position: relative;
+    flex: 1;
+    min-height: 400px;
+    overflow: hidden;
+  }
+  
+  .deal-products-slider-container {
+    display: flex;
+    width: 100%;
+    transition: transform 0.5s ease;
+    will-change: transform;
+  }
+  
+  .deal-products-slide {
+    flex: 0 0 100%;
+    min-width: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 0 10px;
+    box-sizing: border-box;
+  }
+  
+  .deal-product {
+    flex: 0 0 calc(50% - 8px);
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+    min-width: 0;
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  .deal-product__image-container {
+    position: relative;
+    width: 100%;
+    padding-top: 100%;
+    margin-bottom: 10px;
+    background: #f5f5f5;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  
+  .deal-product__image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .deal-product__info {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .deal-product__name {
+    font-size: 14px;
+    margin: 0 0 5px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .deal-product__price {
+    font-weight: 700;
+    color: {{ section.settings.price_color }};
+    font-size: 16px;
+  }
+  
+  .deal-product__original-price {
+    text-decoration: line-through;
+    color: #999;
+    font-size: 14px;
+    margin-left: 5px;
+  }
+  
+  .deal-product__discount {
+    color: {{ section.settings.discount_color }};
+    font-weight: 600;
+    font-size: 14px;
+  }
+  
+  .deal-product__savings {
+    color: {{ section.settings.savings_color }};
+    font-size: 14px;
+    margin-top: 5px;
+  }
+  
+  .deal-countdown {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 15px;
+    font-family: monospace;
+    min-height: 50px;
+  }
+  
+  .countdown-segment {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .countdown-value {
+    font-size: 20px;
+    font-weight: bold;
+    color: {{ section.settings.price_color }};
+    background: white;
+    padding: 5px 8px;
+    border-radius: 4px;
+    min-width: 30px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .countdown-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    color: #666;
+    margin-top: 4px;
+  }
+  
+  .countdown-separator {
+    font-size: 20px;
+    font-weight: bold;
+    color: {{ section.settings.price_color }};
+    display: flex;
+    align-items: center;
+  }
+  
+  .slider-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  
+  .slider-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ddd;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .slider-dot.active {
+    background: #333;
+  }
+
+  .deal-cards-dots {
+    display: none;
+    justify-content: center;
+    gap: 8px;
+    margin: 15px 0;
+  }
+  
+  .deal-card-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #ddd;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .deal-card-dot.active {
+    background: #333;
+  }
+
+  @media (max-width: 749px) {
+    .today-deals {
+      padding: 15px 0;
+    }
+    .today-deals__title {
+      font-size: 18px;
+      margin-bottom: 5px;
+    }
+    .today-deals__subtitle {
+      font-size: 14px;
+    }
+    
+    .today-deals__container {
+      display: flex;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      gap: 15px;
+      padding: 0 15px 15px !important;
+      margin: 0 -15px !important;
+      scrollbar-width: none;
+    }
+    
+    .today-deals__container::-webkit-scrollbar {
+      display: none;
+    }
+    
+    .deal-card {
+      flex: 0 0 calc(100% - 30px);
+      scroll-snap-align: start;
+      min-width: 0;
+      margin-bottom: 0;
+      min-height: 450px;
+    }
+    
+    .deal-banner {
+      height: 190px;
+      margin-bottom: 10px;
+    }
+    
+    .deal-products-slider {
+      min-height: 350px;
+    }
+    
+    .deal-product__name {
+      font-size: 12px;
+    }
+    
+    .deal-product__price {
+      font-size: 13px;
+    }
+    
+    .countdown-value {
+      font-size: 16px;
+      padding: 3px 6px;
+      min-width: 24px;
+    }
+    
+    .countdown-separator {
+      font-size: 16px;
+    }
+    
+    .countdown-label {
+      font-size: 8px;
+    }
+    
+    .deal-banner.desktop-only {
+      display: none;
+    }
+    
+    .deal-banner.mobile-only {
+      display: block;
+    }
+    
+    .deal-banner-container .mobile-only.hidden {
+      display: none !important;
+    }
+    
+    .deal-banner-container .mobile-title-fallback {
+      display: show;
+    }
+    
+    .deal-banner-container .mobile-only.hidden + .mobile-title-fallback {
+      display: block;
+    }
+    
+    .today-deals__container {
+      scroll-padding: 0 15px;
+      scroll-snap-stop: always;
+    }
+    
+    .deal-card {
+      scroll-margin: 0 15px;
+    }
+    
+    .deal-products-slider {
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    
+    .deal-products-slider::-webkit-scrollbar {
+      display: none;
+    }
+    
+    .slider-dot {
+      display: none;
+    }
+    
+    .deal-products-slider-container {
+      display: flex;
+      flex-wrap: nowrap;
+      scroll-snap-type: x mandatory;
+    }
+    
+    .deal-products-slide {
+      flex: 0 0 100%;
+      scroll-snap-align: start;
+      min-width: 100%;
+    }
+    
+    .deal-product {
+      flex: 0 0 calc(50% - 8px);
+    }
+    
+    .deal-cards-dots {
+      display: flex;
+    }
+  }
+  
+  @media (min-width: 750px) {
+    .today-deals__container {
+      overflow-x: visible !important;
+      scroll-snap-type: none !important;
+    }
+    
+    .deal-card {
+      scroll-snap-align: none !important;
+    }
+    
+    .deal-products-slider {
+      overflow: hidden !important;
+    }
+    
+    .deal-products-slider-container {
+      display: flex !important;
+      flex-wrap: nowrap !important;
+    }
+    
+    .deal-products-slide {
+      flex: 0 0 100% !important;
+      min-width: 100% !important;
+    }
+    
+    .mobile-only {
+      display: none !important;
+    }
+    
+    .deal-cards-dots {
+      display: none !important;
+    }
+  }
+  
+  /* Hide mobile banner when setting is checked */
+  {% for block in section.blocks %}
+    {% if block.type == 'deal_card' and block.settings.hide_banner_mobile %}
+      #{{ block.settings.title | handleize }}-banner .deal-banner.mobile-only {
+        display: none !important;
+      }
+      #{{ block.settings.title | handleize }}-banner .mobile-title-fallback {
+        display: block !important;
+      }
+    {% endif %}
+  {% endfor %}
+{%- endstyle -%}
+
+{% if section.settings.show_on_desktop or section.settings.show_on_mobile %}
+<div class="today-deals {% unless section.settings.show_on_desktop %}desktop-hidden{% endunless %} {% unless section.settings.show_on_mobile %}mobile-hidden{% endunless %}">
+  <div class="today-deals__header">
+    <h2 class="today-deals__title">{{ section.settings.title }}</h2>
+    {% if section.settings.subtitle_enabled %}
+      <p class="today-deals__subtitle">{{ section.settings.subtitle }}</p>
+    {% endif %}
+  </div>
+  
+  <div class="today-deals__container">
+    {% for block in section.blocks %}
+      {% if block.type == 'deal_card' %}
+        {%- assign deal_collection = collections[block.settings.collection] -%}
+        
+        {% assign valid_collection = false %}
+        {% if deal_collection and deal_collection.products.size > 0 %}
+          {% assign valid_collection = true %}
+        {% endif %}
+        
+        <div class="deal-card" {{ block.shopify_attributes }}>
+          <div class="deal-card__header">
+            {% if block.settings.banner_enabled and block.settings.banner != blank %}
+              <div id="{{ block.settings.title | handleize }}-banner" class="deal-banner-container">
+                {% if block.settings.collection %}
+                  <img 
+                    class="deal-banner desktop-only" 
+                    src="{{ block.settings.banner | img_url: '800x' }}" 
+                    alt="{{ block.settings.title }}"
+                    data-collection-url="/collections/{{ block.settings.collection.handle }}"
+                    style="cursor: pointer;"
+                  >
+                {% else %}
+                  <img 
+                    class="deal-banner desktop-only" 
+                    src="{{ block.settings.banner | img_url: '800x' }}" 
+                    alt="{{ block.settings.title }}"
+                  >
+                {% endif %}
+                
+                {% if block.settings.banner_mobile != blank %}
+                  <img 
+                    class="deal-banner mobile-only {% if block.settings.hide_banner_mobile %}hidden{% endif %}" 
+                    src="{{ block.settings.banner_mobile | img_url: '800x' }}" 
+                    alt="{{ block.settings.title }}"
+                    {% if block.settings.collection %}data-collection-url="/collections/{{ block.settings.collection.handle }}"{% endif %}
+                    style="cursor: pointer;"
+                  >
+                {% else %}
+                  <img 
+                    class="deal-banner mobile-only {% if block.settings.hide_banner_mobile %}hidden{% endif %}" 
+                    src="{{ block.settings.banner | img_url: '800x' }}" 
+                    alt="{{ block.settings.title }}"
+                    {% if block.settings.collection %}data-collection-url="/collections/{{ block.settings.collection.handle }}"{% endif %}
+                    style="cursor: pointer;"
+                  >
+                {% endif %}
+                
+                {% if block.settings.hide_banner_mobile %}
+                  <div class="mobile-title-fallback">
+                    {% if block.settings.show_title_desktop or request.design_mode %}
+                      <h3 class="deal-card__title {% unless block.settings.show_title_desktop %}mobile-only{% endunless %}">
+                        {{ block.settings.title }}
+                      </h3>
+                    {% endif %}
+                    {% if block.settings.show_subtitle_desktop or request.design_mode %}
+                      <p class="deal-card__subtitle {% unless block.settings.show_subtitle_desktop %}mobile-only{% endunless %}">
+                        {{ block.settings.subtitle }}
+                      </p>
+                    {% endif %}
+                  </div>
+                {% endif %}
+              </div>
+            {% else %}
+              {% if block.settings.show_title_desktop or request.design_mode %}
+                <h3 class="deal-card__title {% unless block.settings.show_title_desktop %}mobile-only{% endunless %}">
+                  {{ block.settings.title }}
+                </h3>
+              {% endif %}
+              {% if block.settings.show_subtitle_desktop or request.design_mode %}
+                <p class="deal-card__subtitle {% unless block.settings.show_subtitle_desktop %}mobile-only{% endunless %}">
+                  {{ block.settings.subtitle }}
+                </p>
+              {% endif %}
+            {% endif %}
+          </div>
+          
+          <!-- Timer section -->
+          {% if block.settings.timer_enabled %}
+            <div class="deal-countdown" id="{{ block.settings.title | handleize }}-countdown-{{ section.id }}">
+              <div class="countdown-segment">
+                <span class="countdown-value" id="{{ block.settings.title | handleize }}-hours-{{ section.id }}">00</span>
+                <span class="countdown-label">Hours</span>
+              </div>
+              <div class="countdown-separator">:</div>
+              <div class="countdown-segment">
+                <span class="countdown-value" id="{{ block.settings.title | handleize }}-minutes-{{ section.id }}">00</span>
+                <span class="countdown-label">Minutes</span>
+              </div>
+              <div class="countdown-separator">:</div>
+              <div class="countdown-segment">
+                <span class="countdown-value" id="{{ block.settings.title | handleize }}-seconds-{{ section.id }}">00</span>
+                <span class="countdown-label">Seconds</span>
+              </div>
+            </div>
+          {% else %}
+            <!-- Empty space when timer is disabled to maintain consistent card height -->
+            <div style="height: 60px; margin-bottom: 15px;"></div>
+          {% endif %}
+          
+          <div class="deal-products-slider" id="{{ block.settings.title | handleize }}-slider-{{ section.id }}">
+            <div class="deal-products-slider-container">
+              {% if valid_collection %}
+                {% assign product_count = deal_collection.products.size %}
+                {% assign slides_needed = product_count | divided_by: 2.0 | ceil %}
+                
+                {% for i in (1..slides_needed) %}
+                  <div class="deal-products-slide" data-slide-index="{{ forloop.index0 }}">
+                    {% assign offset = forloop.index0 | times: 2 %}
+                    
+                    {% for product in deal_collection.products limit: 2 offset:offset %}
+                      <a href="{{ product.url }}" class="deal-product">
+                        <div class="deal-product__image-container">
+                          {% if product.featured_image %}
+                            <img class="deal-product__image" src="{{ product.featured_image | img_url: '300x300', crop: 'center' }}" alt="{{ product.title | escape }}" loading="lazy">
+                          {% else %}
+                            <div class="deal-product__image" style="background: #eee;"></div>
+                          {% endif %}
+                        </div>
+                        <div class="deal-product__info">
+                          <h4 class="deal-product__name">{{ product.title }}</h4>
+                          <div class="deal-product__price">
+                            {{ product.price | money }}
+                            {% if product.compare_at_price > product.price %}
+                              <span class="deal-product__original-price">{{ product.compare_at_price | money }}</span>
+                            {% endif %}
+                          </div>
+                          {% if product.compare_at_price > product.price %}
+                            {% assign discount_amount = product.compare_at_price | minus: product.price %}
+                            {% assign discount_percent = discount_amount | times: 100.0 | divided_by: product.compare_at_price | round %}
+                            <div class="deal-product__discount">{{ discount_percent }}% off</div>
+                            <div class="deal-product__savings">You save {{ discount_amount | money }}</div>
+                          {% endif %}
+                        </div>
+                      </a>
+                    {% endfor %}
+                  </div>
+                {% endfor %}
+              {% else %}
+                {% for i in (1..3) %}
+                  <div class="deal-products-slide" data-slide-index="{{ forloop.index0 }}">
+                    {% for j in (1..2) %}
+                      <a href="#" class="deal-product">
+                        <div class="deal-product__image-container">
+                          <div class="deal-product__image" style="background: #eee;"></div>
+                        </div>
+                        <div class="deal-product__info">
+                          <h4 class="deal-product__name">{{ block.settings.title }} Product {{ i }}-{{ j }}</h4>
+                          <div class="deal-product__price">
+                            {{ 1999 | money }}
+                            <span class="deal-product__original-price">{{ 4999 | money }}</span>
+                          </div>
+                          <div class="deal-product__discount">60% off</div>
+                          <div class="deal-product__savings">You save {{ 3000 | money }}</div>
+                        </div>
+                      </a>
+                    {% endfor %}
+                  </div>
+                {% endfor %}
+              {% endif %}
+            </div>
+            
+            {% if valid_collection and deal_collection.products.size > 2 or valid_collection == false %}
+              <div class="slider-dots" id="{{ block.settings.title | handleize }}-dots-{{ section.id }}">
+                {% assign slides_count = deal_collection.products.size | divided_by: 2.0 | ceil %}
+                {% if valid_collection == false %}
+                  {% assign slides_count = 3 %}
+                {% endif %}
+                {% for i in (1..slides_count) %}
+                  <div class="slider-dot {% if forloop.first %}active{% endif %}" 
+                       data-slider="{{ block.settings.title | handleize }}-slider-{{ section.id }}" 
+                       data-slide-index="{{ forloop.index0 }}"></div>
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // ======================
+  // BANNER CLICK HANDLERS
+  // ======================
+  document.querySelectorAll('.deal-banner[data-collection-url]').forEach(banner => {
+    banner.addEventListener('click', function(e) {
+      e.preventDefault();
+      const url = this.getAttribute('data-collection-url');
+      if (url) window.location.href = url;
+    });
+  });
+
+  // ======================
+  // COUNTDOWN TIMERS
+  // ======================
+  {% for block in section.blocks %}
+    {% if block.type == 'deal_card' and block.settings.timer_enabled %}
+      (function() {
+        const timerId = '{{ block.settings.title | handleize }}-countdown-{{ section.id }}';
+        const hoursId = '{{ block.settings.title | handleize }}-hours-{{ section.id }}';
+        const minutesId = '{{ block.settings.title | handleize }}-minutes-{{ section.id }}';
+        const secondsId = '{{ block.settings.title | handleize }}-seconds-{{ section.id }}';
+        const duration = {{ block.settings.timer_duration | default: 86400 }};
+        const autoReset = {{ block.settings.timer_auto_reset | default: true }};
+        
+        let timeLeft = duration;
+        let timerInterval;
+        
+        function updateTimerDisplay() {
+          const hours = Math.floor(timeLeft / 3600);
+          const minutes = Math.floor((timeLeft % 3600) / 60);
+          const seconds = timeLeft % 60;
+          
+          document.getElementById(hoursId).textContent = hours.toString().padStart(2, '0');
+          document.getElementById(minutesId).textContent = minutes.toString().padStart(2, '0');
+          document.getElementById(secondsId).textContent = seconds.toString().padStart(2, '0');
+        }
+        
+        function startTimer() {
+          updateTimerDisplay();
+          timerInterval = setInterval(function() {
+            timeLeft--;
+            updateTimerDisplay();
+            
+            if (timeLeft <= 0) {
+              clearInterval(timerInterval);
+              if (autoReset) {
+                timeLeft = duration;
+                startTimer();
+              }
+            }
+          }, 1000);
+        }
+        
+        // Initialize with IntersectionObserver
+        const timerElement = document.getElementById(timerId);
+        if (timerElement) {
+          const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+              if (entry.isIntersecting) {
+                if (timeLeft > 0 && !timerInterval) {
+                  startTimer();
+                }
+              } else {
+                if (timerInterval) {
+                  clearInterval(timerInterval);
+                  timerInterval = null;
+                }
+              }
+            });
+          }, { threshold: 0.1 });
+          
+          observer.observe(timerElement);
+        }
+      })();
+    {% endif %}
+  {% endfor %}
+
+  // ======================
+  // PRODUCT SLIDERS
+  // ======================
+  function initializeSliders() {
+    if (window.innerWidth <= 749) return;
+
+    document.querySelectorAll('.deal-products-slider').forEach(slider => {
+      const container = slider.querySelector('.deal-products-slider-container');
+      const slides = slider.querySelectorAll('.deal-products-slide');
+      const dots = slider.querySelectorAll('.slider-dot');
+      
+      if (slides.length <= 1) {
+        if (dots.length > 0) dots[0].classList.add('active');
+        return;
+      }
+      
+      let currentSlide = 0;
+      let autoSlideInterval;
+      
+      function updateSlider() {
+        container.style.transform = `translateX(-${currentSlide * 100}%)`;
+        dots.forEach((dot, index) => dot.classList.toggle('active', index === currentSlide));
+      }
+      
+      function nextSlide() {
+        currentSlide = (currentSlide + 1) % slides.length;
+        updateSlider();
+      }
+      
+      function startAutoSlide() {
+        stopAutoSlide();
+        autoSlideInterval = setInterval(nextSlide, 5000);
+      }
+      
+      function stopAutoSlide() {
+        clearInterval(autoSlideInterval);
+      }
+      
+      // Initialize
+      updateSlider();
+      startAutoSlide();
+      
+      // Dot click handlers
+      dots.forEach(dot => {
+        dot.addEventListener('click', function() {
+          currentSlide = parseInt(this.getAttribute('data-slide-index'));
+          updateSlider();
+          stopAutoSlide();
+          startAutoSlide();
+        });
+      });
+      
+      // Pause on hover
+      slider.addEventListener('mouseenter', stopAutoSlide);
+      slider.addEventListener('mouseleave', startAutoSlide);
+    });
+  }
+
+  // ======================
+  // MOBILE SWIPING
+  // ======================
+  function initializeMobileSwiping() {
+    const container = document.querySelector('.today-deals__container');
+    if (!container || window.innerWidth > 749) return;
+
+    // Cleanup existing
+    const existingDots = container.nextElementSibling;
+    if (existingDots && existingDots.classList.contains('deal-cards-dots')) {
+      existingDots.remove();
+    }
+
+    // Create dots
+    const dotsContainer = document.createElement('div');
+    dotsContainer.className = 'deal-cards-dots';
+    container.parentNode.insertBefore(dotsContainer, container.nextSibling);
+
+    const cards = document.querySelectorAll('.deal-card');
+    cards.forEach((_, index) => {
+      const dot = document.createElement('div');
+      dot.className = 'deal-card-dot';
+      dot.dataset.index = index;
+      if (index === 0) dot.classList.add('active');
+      dot.addEventListener('click', () => scrollToCard(index));
+      dotsContainer.appendChild(dot);
+    });
+
+    // Scroll handler
+    let isScrolling;
+    container.addEventListener('scroll', function() {
+      clearTimeout(isScrolling);
+      isScrolling = setTimeout(() => {
+        const scrollPosition = container.scrollLeft + (container.offsetWidth / 2);
+        let activeIndex = 0;
+        
+        cards.forEach((card, index) => {
+          const cardLeft = card.offsetLeft;
+          const cardRight = cardLeft + card.offsetWidth;
+          if (scrollPosition >= cardLeft && scrollPosition < cardRight) {
+            activeIndex = index;
+          }
+        });
+        
+        updateDots(activeIndex);
+      }, 100);
+    }, false);
+
+    function updateDots(activeIndex) {
+      const dots = dotsContainer.querySelectorAll('.deal-card-dot');
+      dots.forEach((dot, index) => {
+        dot.classList.toggle('active', index === activeIndex);
+      });
+    }
+
+    function scrollToCard(index) {
+      const card = cards[index];
+      if (card) {
+        container.scrollTo({
+          left: card.offsetLeft,
+          behavior: 'smooth'
+        });
+      }
+    }
+  }
+
+  // Initialize everything
+  initializeSliders();
+  initializeMobileSwiping();
+
+  // Handle resize
+  window.addEventListener('resize', function() {
+    initializeSliders();
+    initializeMobileSwiping();
+  });
+});
+</script>

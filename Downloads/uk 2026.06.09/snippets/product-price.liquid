@@ -1,0 +1,56 @@
+{%- if product.price_varies == false -%}
+  {%- liquid
+    if product.title
+      assign compare_at_price = product.compare_at_price
+      assign price = product.price
+      assign available = product.available
+    else
+      assign compare_at_price = 9999
+      assign price = 9999
+    endif
+    assign money_price = price | money
+  -%}
+  {% if compare_at_price > price %}
+    <span class="price special-price">{{ money_price }}</span>
+    <s class="compare-price">{{ compare_at_price | money }}</s>
+  {% else %}
+    <span class="price">{{ money_price }}</span>
+  {% endif %}
+
+{%- else -%}
+  {%- for variant in product.variants limit: 1 -%}
+    {%- liquid
+      if variant.title
+        assign compare_at_price = variant.compare_at_price
+        assign price = variant.price
+        assign available = variant.available
+      else
+        assign compare_at_price = 9999
+        assign price = 9999
+      endif
+      assign money_price = price | money
+    -%}
+    {% if compare_at_price > price %}
+      <span class="price special-price">{{ money_price }}</span>
+      <s class="compare-price">{{ compare_at_price | money }}</s>
+    {% else %}
+      <span class="price">{{ money_price }}</span>
+    {% endif %}
+  {%- endfor -%}
+{%- endif -%}
+{% if product.selected_or_first_available_variant.unit_price_measurement != null %}
+  <small class="unit-price caption">
+    <span class="visually-hidden">{{ 'products.product.price.unit_price' | t }}</span>
+    <span class="price-item price-item--last">
+      <span class="number">{{- product.selected_or_first_available_variant.unit_price | money -}}</span>
+      <span aria-hidden="true">/</span>
+      <span class="visually-hidden">&nbsp;{{ 'accessibility.unit_price_separator' | t }}&nbsp;</span>
+      <span class="unit">
+        {%- if product.selected_or_first_available_variant.unit_price_measurement.reference_value != 1 -%}
+          {{- product.selected_or_first_available_variant.unit_price_measurement.reference_value -}}
+        {%- endif -%}
+        {{ product.selected_or_first_available_variant.unit_price_measurement.reference_unit }}
+      </span>
+    </span>
+  </small>
+{% endif %}

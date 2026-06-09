@@ -1,0 +1,556 @@
+<!-- DAILY PROMOTION WITH TIMER IN GRID -->
+<section class="daily-promotion-grid-timer">
+  <div class="container">
+    <!-- SECTION HEADER -->
+    <div class="section-header">
+      <h2 class="section-title">One day. One smart decision</h2>
+      <p class="section-subtitle">Limited time offers - Refresh every 24 hours</p>
+    </div>
+
+    <!-- PROMOTION PRODUCTS GRID WITH TIMER -->
+    {% if section.settings.collection != blank %}
+      {% assign selected_collection = collections[section.settings.collection] %}
+      {% if selected_collection.products.size > 0 %}
+
+        {% assign current_day = 'now' | date: '%j' | plus: 0 %}
+        {% assign desktop_products = 5 %}
+        {% assign mobile_products = 4 %}
+        {% assign total_products = selected_collection.products.size %}
+        {% assign total_sets_desktop = total_products | divided_by: desktop_products %}
+        {% assign total_sets_mobile = total_products | divided_by: mobile_products %}
+
+        {% if total_sets_desktop < 1 %}
+          {% assign total_sets_desktop = 1 %}
+        {% endif %}
+        
+        {% if total_sets_mobile < 1 %}
+          {% assign total_sets_mobile = 1 %}
+        {% endif %}
+
+        {% assign today_set_index_desktop = current_day | modulo: total_sets_desktop %}
+        {% assign today_set_index_mobile = current_day | modulo: total_sets_mobile %}
+        
+        {% assign start_index_desktop = today_set_index_desktop | times: desktop_products %}
+        {% assign start_index_mobile = today_set_index_mobile | times: mobile_products %}
+
+        {% assign show_timer_card = section.settings.show_timer_card %}
+
+        <!-- For desktop: Show 5 products + timer card if enabled -->
+        {% assign desktop_product_limit = desktop_products %}
+        
+        <!-- For mobile: Always show 4 products -->
+        {% assign mobile_product_limit = mobile_products %}
+
+        <div class="promo-grid-with-timer {% unless show_timer_card %}no-timer-card{% endunless %}" 
+             data-timer-card="{{ show_timer_card }}">
+          
+        
+
+          <!-- PRODUCT CARDS -->
+          {% for product in selected_collection.products offset:start_index_desktop %}
+            {% comment %} Show 5 products for desktop, but will be filtered via CSS for mobile {% endcomment %}
+            {% if forloop.index0 < desktop_product_limit %}
+              <div class="promo-card-with-timer product-card product-card-{{ forloop.index }}">
+                <div class="promo-image">
+                  <a href="{{ product.url }}">
+                    <img src="{{ product.featured_image | img_url: '400x400' }}" alt="{{ product.title }}" loading="lazy">
+                  </a>
+
+                  <!-- IMPROVED DISCOUNT BADGE LOGIC -->
+                  {%- liquid
+                    assign target = product.selected_or_first_available_variant
+                    assign compare_at_price = target.compare_at_price
+                    assign price = target.price | default: 1999
+                  -%}
+                  {%- if compare_at_price > price and compare_at_price != blank -%}
+                    {%- assign discount_amount = compare_at_price | minus: price -%}
+                    {%- if discount_amount > 0 -%}
+                      {%- assign discount_percentage = discount_amount | times: 100.0 | divided_by: compare_at_price | round -%}
+                    {%- endif -%}
+                    <div class="discount-badge">
+                      -{{ discount_percentage }}%
+                    </div>
+                  {%- endif -%}
+
+                  <!-- SOLD OUT BADGE -->
+                  {% unless product.available %}
+                    <div class="sold-out-badge">
+                      Sold Out
+                    </div>
+                  {% endunless %}
+                  
+                  <!-- MINI TIMER ON PRODUCT CARD -->
+                  <div class="card-timer">
+                    <span class="card-timer-label">Ends in:</span>
+                    <span class="card-timer-value" id="card-timer-{{ forloop.index }}">23:59:59</span>
+                  </div>
+                </div>
+
+                <div class="promo-content">
+                  <h3 class="product-title">
+                    <a href="{{ product.url }}">{{ product.title }}</a>
+                  </h3>
+                  
+                  <!-- IMPROVED PRICING LOGIC -->
+                 <div class="promo-pricing">
+  <div class="price-wrapper">
+    {% if compare_at_price > price and compare_at_price != blank %}
+      <span class="original-price">{{ compare_at_price | money }}</span>
+      <span class="current-price sale-price">{{ price | money }}</span>
+    {% else %}
+      <span class="current-price">{{ price | money }}</span>
+    {% endif %}
+  </div>
+
+  <a href="{{ product.url }}" class="buy-now-inline">
+    Buy Now →
+  </a>
+</div>
+
+
+                </div>
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+      {% else %}
+        <div class="no-products-message">
+          <p>No products available in this collection.</p>
+        </div>
+      {% endif %}
+    {% else %}
+      <div class="no-collection-message">
+        <p>Please select a collection in the section settings.</p>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<style>
+/* SECTION STYLING */
+.daily-promotion-grid-timer {
+  padding: 20px 0;
+  font-family: var(--base-font-family);
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* SECTION HEADER */
+.section-header {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.section-title {
+  font-family: var(--heading-font-family);
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #1a202c;
+  letter-spacing: -0.5px;
+}
+
+.section-subtitle {
+  font-size: 1.4rem;
+  color:rgb(1, 2, 5);
+  margin: 0;
+}
+
+/* GRID WITH TIMER - DYNAMIC BASED ON TIMER CARD STATE */
+.promo-grid-with-timer {
+  display: grid;
+  gap: 10px;
+  align-items: start;
+  transition: grid-template-columns 0.3s ease;
+}
+
+/* DESKTOP LAYOUT */
+/* When timer card is ON: 1 timer card + 5 products = 6 columns total */
+.promo-grid-with-timer:not(.no-timer-card) {
+  grid-template-columns: 280px repeat(5, 1fr);
+}
+
+/* When timer card is OFF: 5 products = 5 columns */
+.promo-grid-with-timer.no-timer-card {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+/* PRODUCT CARDS WITH TIMER */
+.promo-card-with-timer {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.promo-card-with-timer:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.promo-image {
+  position: relative;
+  overflow: hidden;
+  padding-top: 100%; /* 1:1 Aspect Ratio */
+}
+
+.promo-image img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+
+
+/* DISCOUNT BADGE */
+.discount-badge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 135px;
+  background: #012f6d;
+  color: #fff;
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 6px 3px;
+  /* Ribbon effect */
+  transform: rotate(-45deg) translate(-28px, -20px);
+  box-shadow: 0 2px 8pxrgba(1, 48, 109, 0.4);
+ 
+}
+
+/* SOLD OUT BADGE */
+.sold-out-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  z-index: 10;
+  backdrop-filter: blur(5px);
+}
+
+/* CARD TIMER */
+.card-timer {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.47);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  backdrop-filter: blur(10px);
+  z-index: 2;
+}
+
+.card-timer-label {
+  font-size: 1.3rem;
+  opacity: 0.9;
+}
+
+.card-timer-value {
+  font-size: 1.3rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.5px;
+  color:rgb(240, 237, 237);
+}
+
+.promo-content {
+  padding: 10px;
+}
+
+.product-title {
+  margin-bottom: 10px;
+}
+
+.product-title a {
+    font-family: var(--heading-font-family);
+  font-size: 1.4rem;
+  font-weight: 600;
+  color:rgb(26, 67, 139);
+  text-decoration: none;
+  transition: color 0.2s ease;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.product-title a:hover {
+  color: #4a90e2;
+}
+
+.promo-pricing {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  gap: 8px;
+}
+
+.current-price {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a202c;
+}
+
+.current-price.sale-price {
+  color: rgb(218, 10, 10);
+}
+
+.original-price {
+  font-size: 1.8rem;
+  gap:5px;
+  color:rgb(1, 4, 8);
+  text-decoration: line-through;
+}
+
+/* MESSAGES */
+.no-products-message,
+.no-collection-message {
+  text-align: center;
+  padding: 40px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  color: #718096;
+  grid-column: 1 / -1;
+}
+
+/* RESPONSIVE DESIGN */
+
+/* Tablets ≤ 1200px */
+@media (max-width: 1200px) {
+  /* On tablets, show 4 products (hide the 5th) */
+  .promo-grid-with-timer:not(.no-timer-card) {
+    grid-template-columns: 280px repeat(3, 1fr);
+  }
+  
+  .promo-grid-with-timer.no-timer-card {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  /* Hide the 5th product card on tablets */
+  .promo-grid-with-timer:not(.no-timer-card) .product-card-5 {
+    display: none;
+  }
+  
+  .timer-card {
+    grid-column: 1 / -1 !important;
+    position: static;
+    max-width: 100%;
+    margin-bottom: 20px;
+  }
+}
+
+/* Mobile ≤ 768px - SHOW ONLY 4 PRODUCTS */
+@media (max-width: 768px) {
+  .daily-promotion-grid-timer {
+    padding: 20px 0;
+  }
+
+  /* MOBILE: Always show 4 products in 2x2 grid */
+  .promo-grid-with-timer {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px;
+  }
+  
+  .promo-grid-with-timer.no-timer-card {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* Hide the 5th product card on mobile */
+  .promo-grid-with-timer .product-card-5 {
+    display: none !important;
+  }
+
+  /* Timer card takes full width on mobile when enabled */
+  .promo-card-with-timer {
+    border-radius: 10px;
+  }
+
+  .promo-content {
+    padding: 15px;
+  }
+
+  .product-title a {
+    font-size: 1.2rem;
+  }
+
+  .current-price {
+    font-size: 1.4rem;
+      font-family: var(--base-font-family);
+  }
+
+  .original-price {
+    font-size: 1.2rem;
+      font-family: var(--base-font-family);
+  }
+
+  .promo-button {
+    padding: 8px 12px;
+    font-size: 1rem;
+  }
+}
+
+/* Small phones ≤ 480px */
+@media (max-width: 480px) {
+  .container {
+    padding: 0 12px;
+  }
+
+  /* Always 2 columns on very small screens */
+  .promo-grid-with-timer {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px;
+  }
+  
+  .promo-grid-with-timer.no-timer-card {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* Hide the 5th product card on mobile */
+  .promo-grid-with-timer .product-card-5 {
+    display: none !important;
+  }
+
+  .promo-card-with-timer {
+    border-radius: 10px;
+  }
+
+  .promo-image {
+    padding-top: 90%;
+  }
+
+  .card-timer {
+    padding: 6px 8px;
+  }
+
+  .promo-content {
+    padding: 12px;
+  }
+
+  .product-title a {
+    font-size: 1.2rem;
+  }
+}
+
+/* Single column for very narrow screens */
+@media (max-width: 360px) {
+  .promo-grid-with-timer {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .promo-grid-with-timer.no-timer-card {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* Still hide 5th product */
+  .promo-grid-with-timer .product-card-5 {
+    display: none !important;
+  }
+}
+.promo-pricing {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.price-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.buy-now-inline {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #012f6d;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.buy-now-inline:hover {
+  color: #4a90e2;
+  transform: translateX(3px);
+}
+</style>
+
+<script>
+/* COUNTDOWN TIMER FOR PRODUCT CARDS */
+document.addEventListener("DOMContentLoaded", function() {
+  function updateCardTimers() {
+    const now = new Date();
+    const midnight = new Date();
+    midnight.setHours(24, 0, 0, 0);
+    const diff = midnight - now;
+    
+    if (diff <= 0) return;
+    
+    const hours = Math.floor(diff / 1000 / 60 / 60);
+    const minutes = Math.floor((diff / 1000 / 60) % 60);
+    const seconds = Math.floor((diff / 1000) % 60);
+    
+    const format = (n) => (n < 10 ? "0" + n : n);
+    
+    const cardTimers = document.querySelectorAll('[id^="card-timer-"]');
+    cardTimers.forEach(timer => {
+      timer.textContent = `${format(hours)}:${format(minutes)}:${format(seconds)}`;
+    });
+  }
+  
+  updateCardTimers();
+  setInterval(updateCardTimers, 1000);
+});
+</script>
+
+{% schema %}
+{
+  "name": "Daily Promotion Timer",
+  "settings": [
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Choose collection"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_timer_card",
+      "label": "Show Timer Card",
+      "default": true,
+      "info": "Toggle to show/hide the timer card. Product cards will automatically realign."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Daily Promotion Timer",
+      "settings": {
+        "show_timer_card": true
+      }
+    }
+  ]
+}
+{% endschema %}

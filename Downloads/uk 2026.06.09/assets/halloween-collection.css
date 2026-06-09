@@ -1,0 +1,756 @@
+/* ============================================ */
+/* Halloween Collection Section Styles */
+/* ============================================ */
+
+.halloween-collection {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 20px;
+  background: linear-gradient(135deg, #1a0b0b 0%, #2d1a1a 100%);
+  border-radius: 20px;
+  margin-top: 40px;
+  margin-bottom: 40px;
+  box-shadow: 0 15px 40px rgba(255, 107, 0, 0.15);
+  position: relative;
+  overflow: hidden;
+  border: 2px solid #8b4513;
+  
+}
+
+.halloween-collection__header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.halloween-collection__title {
+  font-size: 3.2rem;
+  font-weight: 800;
+  color: #ff6b00;
+  margin-bottom: 20px;
+  text-shadow: 3px 3px 0 #8b4513, 6px 6px 0 rgba(0, 0, 0, 0.4);
+  font-family: 'Creepster', cursive, sans-serif;
+  letter-spacing: 3px;
+  position: relative;
+  display: inline-block;
+  animation: title-glow 3s ease-in-out infinite alternate;
+}
+
+.halloween-collection__description {
+  font-size: 1.1rem;
+  color: #666;
+  max-width: 400px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ============================================ */
+/* FIXED Grid Layout with Proper Spacing */
+/* ============================================ */
+.halloween-collection__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 10px;
+ 
+  justify-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 30px 20px 20px;
+}
+
+.halloween-collection__grid--2-cols {
+  grid-template-columns: repeat(2, minmax(280px, 1fr));
+}
+
+.halloween-collection__grid--3-cols {
+  grid-template-columns: repeat(3, minmax(280px, 1fr));
+}
+
+.halloween-collection__grid--4-cols {
+  grid-template-columns: repeat(4, minmax(280px, 1fr));
+}
+
+.halloween-collection__grid--5-cols {
+  grid-template-columns: repeat(5, minmax(280px, 1fr));
+}
+
+.halloween-collection__empty {
+  text-align: center;
+  padding: 60px 0;
+  color: #666;
+  font-size: 1.1rem;
+  grid-column: 1 / -1;
+}
+
+/* ============================================ */
+/* Fixed Halloween Product Card Styles */
+/* ============================================ */
+.halloween-product-card {
+  background: linear-gradient(145deg, #2d1a1a, #1a0b0b);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 12px 35px rgba(255, 107, 0, 0.25);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  border: 3px solid #8b4513;
+  transform-style: preserve-3d;
+  perspective: 600px;
+}
+.halloween-product-card:hover {
+ 
+  box-shadow: 0 25px 50px rgba(255, 107, 0, 0.35);
+  border-color: #ff6b00;
+}
+
+.halloween-product-card__image-wrapper {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 1;
+  flex-shrink: 0;
+}
+
+.halloween-product-card__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.halloween-product-card:hover .halloween-product-card__image {
+  transform: scale(1.05);
+}
+
+.halloween-product-card__link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.halloween-product-card__placeholder {
+  width: 100%;
+  height: 100%;
+  background: #f8f8f8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.halloween-product-card__placeholder-svg {
+  width: 80%;
+  height: 80%;
+  opacity: 0.3;
+}
+
+/* ============================================ */
+/* Halloween Badges (Sale, Sold Out) */
+/* ============================================ */
+.halloween-product-card__badge {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  padding: 8px 14px;
+  border-radius: 25px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  z-index: 3;
+  
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  animation: spooky-pulse 2.5s infinite;
+  border: 2px solid;
+  backdrop-filter: blur(10px);
+}
+
+@keyframes spooky-pulse {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.05) rotate(-1deg); }
+  75% { transform: scale(1.05) rotate(1deg); }
+}
+
+.halloween-product-card__badge--sale {
+  background: linear-gradient(45deg, #ff6b00, #ff4444, #ff6b00);
+  background-size: 200% 200%;
+  color:rgb(245, 241, 241);
+  border-color: #8b4513;
+  animation: spooky-pulse 2.5s infinite, gradient-shift 3s ease infinite;
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.halloween-product-card__badge--sold-out {
+  background: linear-gradient(45deg, #666, #333, #666);
+  color: #ff6b00;
+  border-color: #8b4513;
+}
+/* ============================================ */
+/* Halloween Product Card Content */
+/* ============================================ */
+.halloween-product-card__content {
+  padding: 20px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  color:#fff;
+}
+
+.halloween-product-card__title {
+  margin: 0 0 12px 0;
+  font-size: 1.4rem;
+  color:rgb(235, 231, 228);
+  font-weight: 600;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.8em;
+}
+
+.halloween-product-card__title-link {
+  text-decoration: none;
+  color: #fff;
+  transition: color 0.2s ease;
+}
+
+.halloween-product-card__title-link:hover {
+  color: #ff6b00;
+}
+
+.halloween-product-card__vendor {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ============================================ */
+/* Halloween Pricing */
+/* ============================================ */
+.halloween-product-card__price {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.halloween-product-card__price--current {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.halloween-product-card__price--current.halloween-product-card__price--sale {
+  color: #ff4444;
+}
+
+.halloween-product-card__price--compare {
+  font-size: 1.8rem;
+  color: #999;
+  text-decoration: line-through;
+}
+
+/* ============================================ */
+/* Halloween Button Section - Fixed Layout */
+/* ============================================ */
+.halloween-product-card__buttons {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.halloween-product-card__button {
+  width: 100%;
+  text-align: center;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  border: none;
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 🎃 Halloween Description Button */
+.halloween-product-card__button--description {
+  background: #012f6d;
+  color: #fff;
+  border: 1px solidrgb(100, 152, 221);
+}
+
+.halloween-product-card__button--description:hover {
+  background: #e55a00;
+  border-color: #e55a00;
+  transform: translateY(-2px);
+}
+
+/* 🎃 Halloween Quick Add Button */
+.halloween-product-card__button--add {
+  background: #012f6d;
+  color: #fff;
+  border: 1px solidrgb(100, 152, 221);
+}
+
+.halloween-product-card__button--add:hover {
+  background: #e55a00;
+  border-color: #e55a00;
+  transform: translateY(-2px);
+}
+
+/* 🎃 Halloween Select Options Button (multi-variant) */
+.halloween-product-card__button--options {
+  background: #012f6d;
+  color: #fff;
+   1px solidrgb(100, 152, 221);
+}
+
+.halloween-product-card__button--options:hover {
+  background: #e55a00;
+  color: #fff;
+}
+
+/* 🎃 Halloween Disabled Button */
+.halloween-product-card__button--disabled {
+  background: #ccc;
+  color: #666;
+  cursor: not-allowed;
+  border: 1px solid #bbb;
+}
+
+/* ============================================ */
+/* Side-by-side quantity and add to cart */
+/* ============================================ */
+.halloween-product-card__add-to-cart-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.halloween-product-card__quantity-wrapper {
+  flex: 0 0 auto;
+}
+
+.halloween-product-card__add-to-cart-row .halloween-product-card__button--add {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ============================================ */
+/* Halloween Quantity Selector Styling */
+/* ============================================ */
+.halloween-product-card__quantity-wrapper .quantity {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #f8f8f8;
+  min-width: 110px;
+  transition: all 0.2s ease;
+}
+
+.halloween-product-card__quantity-wrapper .quantity:hover {
+  border-color: #ff6b00;
+  background: #fff;
+}
+
+.halloween-product-card__quantity-wrapper .quantity__button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #333;
+  font-size: 1.2rem;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.halloween-product-card__quantity-wrapper .quantity__button:hover {
+  color: #ff6b00;
+}
+
+.halloween-product-card__quantity-wrapper .quantity__input {
+  width: 45px;
+  text-align: center;
+  border: none;
+  background: transparent;
+  font-size: 1rem;
+  color: #333;
+  appearance: textfield;
+}
+
+/* Remove input spin buttons */
+.halloween-product-card__quantity-wrapper .quantity__input::-webkit-outer-spin-button,
+.halloween-product-card__quantity-wrapper .quantity__input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* ============================================ */
+/* Halloween Description Popup Styles */
+/* ============================================ */
+
+.halloween-description-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.halloween-description-popup.is-active {
+  display: flex;
+}
+
+.halloween-description-popup__overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+}
+
+.halloween-description-popup__content {
+  position: relative;
+  background: white;
+  border-radius: 12px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 80vh;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  animation: halloweenDescriptionPopupFadeIn 0.3s ease-out;
+}
+
+@keyframes halloweenDescriptionPopupFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.halloween-description-popup__close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #ddd;
+  background: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #333;
+  font-size: 18px;
+  transition: all 0.25s ease;
+}
+
+.halloween-description-popup__close:hover {
+  background: #f5f5f5;
+  color: #000;
+  transform: scale(1.08);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.halloween-description-popup__header {
+  padding: 24px 24px 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.halloween-description-popup__title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  line-height: 1.3;
+  padding-right: 40px;
+}
+
+.halloween-description-popup__body {
+  padding: 20px 24px 24px;
+  max-height: calc(80vh - 100px);
+  overflow-y: auto;
+}
+
+.halloween-description-popup__body #halloween-dynamic-variant-description {
+  line-height: 1.6;
+  color: #555;
+}
+
+.halloween-description-popup__body #halloween-dynamic-variant-description p {
+  margin-bottom: 16px;
+}
+
+.halloween-description-popup__body #halloween-dynamic-variant-description ul,
+.halloween-description-popup__body #halloween-dynamic-variant-description ol {
+  margin-bottom: 16px;
+  padding-left: 24px;
+}
+
+.halloween-description-popup__body #halloween-dynamic-variant-description li {
+  margin-bottom: 8px;
+}
+
+.halloween-description-popup__body #halloween-dynamic-variant-description strong {
+  color: #333;
+  font-weight: 600;
+}
+
+/* ============================================ */
+/* Responsive Design - FIXED */
+/* ============================================ */
+
+/* Tablet Layout */
+@media (max-width: 1024px) {
+  .halloween-collection__grid--5-cols {
+    grid-template-columns: repeat(4, minmax(250px, 1fr));
+  }
+  
+  .halloween-collection__grid--4-cols {
+    grid-template-columns: repeat(3, minmax(250px, 1fr));
+  }
+  
+  .halloween-collection {
+    padding: 0 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .halloween-collection__grid {
+    grid-template-columns: repeat(2, minmax(250px, 1fr));
+    gap: 20px;
+  }
+  
+  .halloween-collection__grid--5-cols,
+  .halloween-collection__grid--4-cols,
+  .halloween-collection__grid--3-cols {
+    grid-template-columns: repeat(2, minmax(250px, 1fr));
+  }
+  
+  .halloween-collection__title {
+    font-size: 2rem;
+  }
+  
+  .halloween-product-card {
+    max-width: 100%;
+  }
+  
+  .halloween-product-card__content {
+    
+    padding: 15px;
+  }
+  
+  .halloween-product-card__title {
+    color:#fff;
+    font-size: 2rem;
+  }
+  
+  /* Popup mobile styles */
+  .halloween-description-popup {
+    padding: 15px;
+  }
+  
+  .halloween-description-popup__content {
+    max-height: 85vh;
+  }
+  
+  .halloween-description-popup__header {
+    padding: 20px 20px 12px;
+  }
+  
+  .halloween-description-popup__title {
+    font-size: 1.3rem;
+  }
+  
+  .halloween-description-popup__body {
+    padding: 16px 20px 20px;
+    max-height: calc(85vh - 80px);
+  }
+  
+  .halloween-description-popup__close {
+    top: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+  }
+}
+
+/* ============================================ */
+/* Mobile Layout: 2 Products Per Row - FIXED */
+/* ============================================ */
+@media (max-width: 480px) {
+  .halloween-collection__grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+
+  .halloween-collection__grid--5-cols,
+  .halloween-collection__grid--4-cols,
+  .halloween-collection__grid--3-cols,
+  .halloween-collection__grid--2-cols {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .halloween-collection {
+    padding: 0 10px;
+  }
+
+  .halloween-collection__header {
+    margin-bottom: 25px;
+  }
+
+  .halloween-collection__title {
+    font-size: 1.6rem;
+  }
+
+  .halloween-product-card {
+    max-width: 100%;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  }
+
+  .halloween-product-card__content {
+    padding: 12px;
+  }
+
+  .halloween-product-card__title {
+    font-size: 1rem;
+    min-height: 2.6em;
+  }
+
+  .halloween-product-card__price--current {
+    font-size: 2rem;
+  }
+
+  .halloween-product-card__price--compare {
+    font-size: 1.5rem;
+  }
+
+  .halloween-product-card__buttons {
+    gap: 8px;
+    padding-top: 12px;
+  }
+
+  .halloween-product-card__button {
+    font-size: 0.8rem;
+    padding: 10px 12px;
+  }
+
+  .halloween-product-card__badge {
+    font-size: 1.5rem;
+    padding: 4px 8px;
+    top: 8px;
+    left: 8px;
+  }
+
+  /* Adjust quantity selector for mobile */
+  .halloween-product-card__quantity-wrapper .quantity {
+    min-width: 90px;
+  }
+
+  .halloween-product-card__quantity-wrapper .quantity__input {
+    width: 35px;
+    font-size: 0.9rem;
+  }
+
+  .halloween-product-card__quantity-wrapper .quantity__button {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* Mobile adjustments for side-by-side layout */
+  .halloween-product-card__add-to-cart-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .halloween-product-card__add-to-cart-row .halloween-product-card__button--add {
+    width: 100%;
+  }
+  
+  /* Popup mobile styles */
+  .halloween-description-popup {
+    padding: 10px;
+  }
+  
+  .halloween-description-popup__content {
+    max-height: 90vh;
+  }
+  
+  .halloween-description-popup__header {
+    padding: 16px 16px 8px;
+  }
+  
+  .halloween-description-popup__title {
+    font-size: 1.2rem;
+  }
+  
+  .halloween-description-popup__body {
+    padding: 12px 16px 16px;
+    max-height: calc(90vh - 60px);
+  }
+}
+
+/* Small Mobile - Switch to 1 column for very small screens */
+@media (max-width: 360px) {
+  .halloween-collection__grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .halloween-collection__grid--5-cols,
+  .halloween-collection__grid--4-cols,
+  .halloween-collection__grid--3-cols,
+  .halloween-collection__grid--2-cols {
+    grid-template-columns: 1fr;
+  }
+  
+  .halloween-product-card__title {
+    font-size: 1rem;
+  }
+  
+  .halloween-product-card__price--current {
+    font-size: 1.2rem;
+  }
+  
+  .halloween-product-card__button {
+    font-size: 0.85rem;
+    padding: 12px 16px;
+  }
+}

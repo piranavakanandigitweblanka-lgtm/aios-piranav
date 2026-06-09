@@ -1,0 +1,321 @@
+{% comment %}
+SKU-based rotating similar products section.
+Does not use metafields. It derives candidates from the current product collections.
+{% endcomment %}
+
+{% if product %}
+  {% assign current_variant = product.selected_or_first_available_variant %}
+  {% assign base_sku = current_variant.sku | default: product.handle | upcase | strip %}
+
+  {% assign seen_handles = '|' | append: product.handle | append: '|' %}
+  {% assign tier_strong = '' %}
+
+  {% for parent_collection in product.collections limit: 8 %}
+    {% for candidate in parent_collection.products limit: 50 %}
+      {% unless candidate.handle == product.handle %}
+        {% assign handle_token = '|' | append: candidate.handle | append: '|' %}
+        {% unless seen_handles contains handle_token %}
+          {% assign seen_handles = seen_handles | append: candidate.handle | append: '|' %}
+
+          {% assign candidate_variant = candidate.selected_or_first_available_variant %}
+          {% assign candidate_sku = candidate_variant.sku | default: candidate.handle | upcase | strip %}
+          {% assign is_strong = false %}
+
+          {% if base_sku != blank and candidate_sku != blank %}
+            {% assign base_parts = base_sku | split: '+' %}
+            {% assign candidate_parts = candidate_sku | split: '+' %}
+
+            {% for base_part_raw in base_parts %}
+              {% assign base_part = base_part_raw | strip %}
+              {% assign base_len = base_part | size %}
+              {% if base_len > 2 %}
+                {% assign base_family_len = base_len | minus: 2 %}
+                {% assign base_family = base_part | slice: 0, base_family_len %}
+              {% else %}
+                {% assign base_family = base_part %}
+              {% endif %}
+
+              {% for candidate_part_raw in candidate_parts %}
+                {% assign candidate_part = candidate_part_raw | strip %}
+                {% assign candidate_len = candidate_part | size %}
+                {% if candidate_len > 2 %}
+                  {% assign candidate_family_len = candidate_len | minus: 2 %}
+                  {% assign candidate_family = candidate_part | slice: 0, candidate_family_len %}
+                {% else %}
+                  {% assign candidate_family = candidate_part %}
+                {% endif %}
+
+                {% if candidate_part == base_part or candidate_family == base_family %}
+                  {% assign is_strong = true %}
+                  {% break %}
+                {% endif %}
+              {% endfor %}
+
+              {% if is_strong %}
+                {% break %}
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+
+          {% if is_strong %}
+            {% assign tier_strong = tier_strong | append: candidate.handle | append: '||' %}
+          {% endif %}
+        {% endunless %}
+      {% endunless %}
+    {% endfor %}
+  {% endfor %}
+
+  {% assign candidate_handles = tier_strong | split: '||' %}
+  {% assign candidate_count = 0 %}
+  {% for handle in candidate_handles %}
+    {% if handle != blank %}
+      {% assign candidate_count = candidate_count | plus: 1 %}
+    {% endif %}
+  {% endfor %}
+
+  {% assign now_unix = 'now' | date: '%s' | plus: 0 %}
+  {% assign slot = now_unix | divided_by: 43200 %}
+  {% if candidate_count > 0 %}
+    {% assign start_index = slot | modulo: candidate_count %}
+  {% endif %}
+
+  <section class="sku-compare-section" id="sku-compare-{{ section.id }}">
+    <div class="sku-compare-wrap">
+      <div class="sku-compare-head">
+        <h2 class="sku-compare-title">{{ section.settings.title }}</h2>
+        {% if section.settings.description != blank %}
+          <div class="sku-compare-desc rte">{{ section.settings.description }}</div>
+        {% endif %}
+      </div>
+
+      {% if candidate_count > 0 %}
+        <div class="sku-compare-grid">
+          {% for i in (0..2) %}
+            {% assign pointer = start_index | plus: i | modulo: candidate_count %}
+            {% assign walk = 0 %}
+            {% assign selected_handle = '' %}
+            {% for handle in candidate_handles %}
+              {% if handle != blank %}
+                {% if walk == pointer %}
+                  {% assign selected_handle = handle %}
+                  {% break %}
+                {% endif %}
+                {% assign walk = walk | plus: 1 %}
+              {% endif %}
+            {% endfor %}
+
+            {% assign item = all_products[selected_handle] %}
+            {% if item %}
+              {% assign item_variant = item.selected_or_first_available_variant %}
+              <article class="sku-compare-card bls__product-item" data-product-handle="{{ item.handle }}">
+                {% if item.featured_image %}
+                  <a href="{{ item.url }}" class="sku-compare-image">
+                    <img
+                      src="{{ item.featured_image | image_url: width: 500 }}"
+                      alt="{{ item.title | escape }}"
+                      loading="lazy"
+                      width="220"
+                      height="220">
+                  </a>
+                {% endif %}
+
+                <h3 class="sku-compare-name">
+                  <a href="{{ item.url }}">{{ item.title }}</a>
+                </h3>
+
+                <div class="sku-compare-meta">
+                  {% if item.type != blank %}
+                    <span>{{ item.type }}</span>
+                  {% endif %}
+                  {% if item.vendor != blank %}
+                    <span>{{ item.vendor }}</span>
+                  {% endif %}
+                </div>
+
+                <div class="sku-compare-price">{{ item.price | money }}</div>
+                {% if item.compare_at_price > item.price %}
+                  <div class="sku-compare-was">Was {{ item.compare_at_price | money }}</div>
+                {% endif %}
+
+                {% if item.available and item_variant %}
+                  <form method="post" action="{{ routes.cart_add_url }}" class="sku-compare-form">
+                    <input type="hidden" name="id" value="{{ item_variant.id }}">
+                    <input type="hidden" name="quantity" value="1">
+                    <button type="submit" class="sku-compare-btn">{{ section.settings.button_label }}</button>
+                  </form>
+                {% else %}
+                  <button type="button" class="sku-compare-btn is-disabled" disabled>Sold out</button>
+                {% endif %}
+              </article>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% elsif request.design_mode %}
+        <p class="sku-compare-empty">No similar products found for this product yet. Check SKU pattern, vendor, type, or collection assignments.</p>
+      {% endif %}
+    </div>
+  </section>
+{% endif %}
+
+<style>
+  .sku-compare-section {
+    padding: 40px 0;
+  }
+
+  .sku-compare-wrap {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+
+  .sku-compare-head {
+    margin-bottom: 22px;
+  }
+
+  .sku-compare-title {
+    margin: 0 0 8px;
+    font-size: 28px;
+    line-height: 1.2;
+  }
+
+  .sku-compare-desc {
+    margin: 0;
+    color: #666;
+  }
+
+  .sku-compare-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .sku-compare-empty {
+    margin: 0;
+    padding: 14px 16px;
+    border: 1px dashed rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    color: #666;
+    font-size: 14px;
+  }
+
+  .sku-compare-card {
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    padding: 14px;
+    background: #fff;
+    text-align: center;
+  }
+
+  .sku-compare-image {
+    display: block;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+
+  .sku-compare-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .sku-compare-name {
+    margin: 0 0 8px;
+    font-size: 16px;
+    line-height: 1.35;
+  }
+
+  .sku-compare-name a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .sku-compare-meta {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 8px;
+  }
+
+  .sku-compare-price {
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .sku-compare-was {
+    color: #888;
+    font-size: 13px;
+    text-decoration: line-through;
+    margin-top: 2px;
+  }
+
+  .sku-compare-form {
+    margin-top: 12px;
+  }
+
+  .sku-compare-btn {
+    width: 100%;
+    border: 0;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-weight: 600;
+    cursor: pointer;
+    background: #111;
+    color: #fff;
+  }
+
+  .sku-compare-btn.is-disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  @media (max-width: 991px) {
+    .sku-compare-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 640px) {
+    .sku-compare-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .sku-compare-title {
+      font-size: 24px;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "SKU Compare Rotate 12H",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Compare Similar Products"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "default": "<p>Products are matched from SKU, vendor, and type. The set rotates every 12 hours.</p>"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "Add to cart"
+    }
+  ],
+  "presets": [
+    {
+      "name": "SKU Compare Rotate 12H"
+    }
+  ]
+}
+{% endschema %}

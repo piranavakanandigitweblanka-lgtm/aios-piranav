@@ -1,0 +1,229 @@
+{%- liquid
+  assign desktop_image = section.settings.desktop_image
+  assign mobile_image = section.settings.mobile_image | default: desktop_image
+  assign overlay_opacity = section.settings.overlay_opacity | divided_by: 100.0
+-%}
+
+<style>
+  .banner-{{ section.id }} {
+    position: relative;
+    width: 100%;
+    margin: 0 auto;
+    overflow: hidden;
+  }
+  
+  .banner-{{ section.id }} .banner__media {
+    width: 100%;
+    height: auto;
+  }
+  
+  .banner-{{ section.id }} .banner__content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    text-align: center;
+    z-index: 2;
+    padding: 0 20px;
+  }
+  
+  .banner-{{ section.id }} .banner__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+   /* background-color: {{ section.settings.overlay_color }};*/
+    opacity: {{ overlay_opacity }};
+    z-index: 1;
+  }
+  
+  /* Mobile-specific styles */
+  @media screen and (max-width: 749px) {
+    .banner-{{ section.id }} .desktop-image {
+      display: none;
+    }
+    
+    .banner-{{ section.id }} .mobile-image {
+      display: block;
+    }
+  }
+  
+  /* Desktop-specific styles */
+  @media screen and (min-width: 750px) {
+    .banner-{{ section.id }} .mobile-image {
+      display: none;
+    }
+    
+    .banner-{{ section.id }} .desktop-image {
+      display: block;
+    }
+  }
+</style>
+
+<div class="banner-{{ section.id }} {% if section.settings.full_width %}banner--full-width{% endif %}">
+  {%- if section.settings.link_url != blank -%}
+    <a href="{{ section.settings.link_url }}" class="banner__link">
+  {%- endif -%}
+  
+    {%- if desktop_image != blank -%}
+      <div class="banner__media">
+        {%- assign desktop_alt = desktop_image.alt | default: section.settings.heading -%}
+        {{ desktop_image | image_url: width: 2000 | image_tag:
+          fetchpriority:'high',
+          width: desktop_image.width,
+          height: desktop_image.height,
+          class: 'desktop-image',
+          alt: desktop_alt
+        }}
+        
+        {%- if mobile_image != blank -%}
+          {%- assign mobile_alt = mobile_image.alt | default: section.settings.heading -%}
+          {{ mobile_image | image_url: width: 1000 | image_tag:
+            fetchpriority:'high',
+            width: mobile_image.width,
+            height: mobile_image.height,
+            class: 'mobile-image',
+            alt: mobile_alt
+          }}
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+    
+    {%- if section.settings.show_overlay -%}
+      <div class="banner__overlay"></div>
+    {%- endif -%}
+    
+    {%- if section.settings.heading != blank or section.settings.subheading != blank or section.settings.button_label != blank -%}
+      <div class="banner__content">
+        {%- if section.settings.heading != blank -%}
+          <h2 class="banner__heading" style="color: {{ section.settings.text_color }}">{{ section.settings.heading }}</h2>
+        {%- endif -%}
+        
+        {%- if section.settings.subheading != blank -%}
+          <p class="banner__subheading" style="color: {{ section.settings.text_color }}">{{ section.settings.subheading }}</p>
+        {%- endif -%}
+        
+        {%- if section.settings.button_label != blank -%}
+          <button class="banner__button button" style="background-color: {{ section.settings.button_bg_color }}; color: {{ section.settings.button_text_color }};">
+            {{ section.settings.button_label }}
+          </button>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  
+  {%- if section.settings.link_url != blank -%}
+    </a>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Responsive Banner",
+  "tag": "section",
+  "class": "shopify-section--banner",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Full width",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "desktop_image",
+      "label": "Desktop Image",
+      "info": "Recommended size: 2000x800px"
+    },
+    {
+      "type": "image_picker",
+      "id": "mobile_image",
+      "label": "Mobile Image (optional)",
+      "info": "Recommended size: 1000x1000px. If not set, desktop image will be used."
+    },
+    {
+      "type": "url",
+      "id": "link_url",
+      "label": "Banner Link",
+      "info": "Link to collection, product, or custom URL"
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Banner Heading"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Add a tagline or promotion details here"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button Label",
+      "default": "Shop Now"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "button_bg_color",
+      "label": "Button Background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button Text",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Overlay"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_overlay",
+      "label": "Show Overlay",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Overlay Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Overlay Opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 30
+    }
+  ],
+  "presets": [
+    {
+      "name": "Responsive Banner",
+      "category": "Image"
+    }
+  ]
+}
+{% endschema %}

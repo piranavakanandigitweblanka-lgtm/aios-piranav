@@ -1,0 +1,145 @@
+{%- liquid
+  assign st = section.settings
+-%}
+{%- capture style -%}
+  {%- if st.bg_color != blank -%}--section-bg-color: {{ st.bg_color }};{%- endif -%}
+  --text-color: {{ st.color }};
+{%- endcapture -%}
+<div class="breadcrumbs {{ st.postion }} py-25 fs-small" style="{{ style | strip | strip_newlines }}">
+  <div class="{{ st.layout }}">
+    {% render 'breadcrumbs' %}
+  </div>
+</div>
+          
+<!-- Dynamic Breadcrumb Schema - Enhanced for SEO -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "{{ shop.url }}"
+    }
+    {%- if template contains 'product' -%}
+      {%- if collection -%}
+        ,{
+          "@type": "ListItem",
+          "position": 2,
+          "name": {{ collection.title | json }},
+          "item": "{{ shop.url }}{{ collection.url }}"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": {{ product.title | json }},
+          "item": "{{ shop.url }}{{ product.url }}"
+        }
+      {%- else -%}
+        ,{
+          "@type": "ListItem",
+          "position": 2,
+          "name": {{ product.title | json }},
+          "item": "{{ shop.url }}{{ product.url }}"
+        }
+      {%- endif -%}
+    {%- elsif template contains 'collection' and collection.handle -%}
+      ,{
+        "@type": "ListItem",
+        "position": 2,
+        "name": {{ collection.title | json }},
+        "item": "{{ shop.url }}{{ collection.url }}"
+      }
+    {%- elsif template contains 'blog' -%}
+      ,{
+        "@type": "ListItem",
+        "position": 2,
+        "name": {{ blog.title | json }},
+        "item": "{{ shop.url }}{{ blog.url }}"
+      }
+    {%- elsif template contains 'article' -%}
+      ,{
+        "@type": "ListItem",
+        "position": 2,
+        "name": {{ blog.title | json }},
+        "item": "{{ shop.url }}{{ blog.url }}"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": {{ article.title | json }},
+        "item": "{{ shop.url }}{{ article.url }}"
+      }
+    {%- elsif template contains 'page' -%}
+      ,{
+        "@type": "ListItem",
+        "position": 2,
+        "name": {{ page.title | json }},
+        "item": "{{ shop.url }}{{ page.url }}"
+      }
+    {%- endif -%}
+  ]
+}
+</script>
+
+{% schema %}
+{
+  "name": "Breadcrumbs",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "default": "container", 
+      "options": [
+        {
+          "value": "container",
+          "label": "Default"
+        },
+        {
+          "value": "container-fluid",
+          "label": "Fluid container"
+        },
+        {
+          "value": "full-width",
+          "label": "Full width"
+        }
+      ]
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background color"
+    },
+    {
+      "type": "color",
+      "id": "color",
+      "label": "Text color"
+    },
+    {
+      "type": "select",
+      "id": "postion",
+      "label": "Text alignment",
+      "default": "text-left",
+      "options": [
+        {
+          "label": "Center",
+          "value": "text-center"
+        },
+        {
+          "label": "Left",
+          "value": "text-left"
+        },
+        {
+          "label": "Right",
+          "value": "text-right"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

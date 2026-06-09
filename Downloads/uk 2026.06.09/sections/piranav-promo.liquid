@@ -1,0 +1,1678 @@
+{% comment %} <section class="piranav-promo">
+  <div class="container">
+
+    <!-- Header -->
+    <div class="promo-header">
+      <h2>{{ section.settings.heading }}</h2>
+      <p>{{ section.settings.subheading }}</p>
+    </div>
+
+    <!-- FULL-WIDTH TIMER -->
+    {% if section.settings.show_timer %}
+      <div class="promo-timer fullwidth">
+        <h3>Today's Deal Ends In</h3>
+
+        <div class="timer-box">
+          <div class="unit">
+            <span id="t-hours">23</span>
+            <label>Hours</label>
+          </div>
+          <span class="sep">:</span>
+          <div class="unit">
+            <span id="t-mins">59</span>
+            <label>Minutes</label>
+          </div>
+          <span class="sep">:</span>
+          <div class="unit">
+            <span id="t-secs">59</span>
+            <label>Seconds</label>
+          </div>
+        </div>
+
+        <div class="timer-note">
+          Next promotion starts at midnight<br>
+          FREE DELIVERY ON UK ORDER OVER £25<br>
+          30-Day Money Back Guarantee
+        </div>
+
+        <div class="timer-bar">
+          <div id="timer-bar-fill"></div>
+        </div>
+      </div>
+    {% endif %}
+
+    {% if section.settings.collection %}
+      {% assign coll = collections[section.settings.collection] %}
+
+      {% if coll and coll.products.size > 0 %}
+        
+        {% assign per_day = 5 %}
+        {% assign product_count = coll.products.size %}
+        {% assign day_num = 'now' | date: '%j' | plus: 0 %}
+
+        {% assign total_sets = product_count | plus: per_day | minus: 1 | divided_by: per_day %}
+        {% assign today_set = day_num | modulo: total_sets %}
+        {% assign offset_num = today_set | times: per_day %}
+
+        <!-- DESKTOP PRODUCT GRID -->
+        <div class="promo-grid desktop-view">
+          {% for product in coll.products limit: per_day offset: offset_num %}
+            {% assign variant = product.selected_or_first_available_variant %}
+            {% assign price = variant.price %}
+            {% assign compare_at_price = variant.compare_at_price %}
+            
+            {% assign discount = 0 %}
+            {% if compare_at_price and compare_at_price > price %}
+              {% assign discount = compare_at_price | minus: price | times: 100.0 | divided_by: compare_at_price | round %}
+            {% endif %}
+
+            <div class="promo-card">
+              <div class="promo-img-container">
+                <div class="promo-banner">
+                  <div class="b1">{{ section.settings.banner_line1 }}</div>
+                  <div class="b2">{{ section.settings.banner_line2 }}</div>
+                  <div class="bs">{{ section.settings.banner_subtitle }}</div>
+                </div>
+
+                {% if discount > 0 %}
+                  <div class="promo-badge">
+                    <div class="val">{{ discount }}%</div>
+                    <div class="txt">OFF</div>
+                  </div>
+                {% endif %}
+                <!-- ADD TO CART BUTTON FOR MOBILE -->
+                <div class="mobile-cta">
+                  <a href="{{ product.url }}" class="mobile-shop-btn">Shop Now   🛒</a>
+                </div>
+
+                <a href="{{ product.url }}" class="promo-img">
+                  <img src="{{ product.featured_image | img_url: '400x400', crop: 'center' }}" alt="{{ product.title }}" loading="lazy">
+                </a>
+              </div>
+              
+              <!-- TITLE BAR WITH SIDE-BY-SIDE LAYOUT -->
+              <div class="title-bar">
+                <div class="title-content">
+                  <a href="{{ product.url }}" class="product-title">{{ product.title }}</a>
+                  <div class="title-pricing">
+                    {% if discount > 0 %}
+                      <span class="current-price sale-price">{{ price | money }}</span>
+                      <span class="original-price">{{ compare_at_price | money }}</span>
+                    {% else %}
+                      <span class="current-price">{{ price | money }}</span>
+                    {% endif %}
+                  </div>
+                </div>
+                
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <!-- IMPROVED MOBILE SWIPER -->
+        <div class="mobile-promo-slider mobile-view">
+          <div class="swiper-container">
+            <div class="swiper-wrapper">
+              {% for product in coll.products limit: per_day offset: offset_num %}
+                {% assign variant = product.selected_or_first_available_variant %}
+                {% assign price = variant.price %}
+                {% assign compare_at_price = variant.compare_at_price %}
+                
+                {% assign discount = 0 %}
+                {% if compare_at_price and compare_at_price > price %}
+                  {% assign discount = compare_at_price | minus: price | times: 100.0 | divided_by: compare_at_price | round %}
+                {% endif %}
+
+                <div class="swiper-slide">
+                  <div class="promo-card">
+                    <div class="promo-img-container">
+                      <div class="promo-banner">
+                        <div class="b1">{{ section.settings.banner_line1 }}</div>
+                        <div class="b2">{{ section.settings.banner_line2 }}</div>
+                        <div class="bs">{{ section.settings.banner_subtitle }}</div>
+                      </div>
+
+                      {% if discount > 0 %}
+                        <div class="promo-badge">
+                          <div class="val">{{ discount }}%</div>
+                          <div class="txt">OFF</div>
+                        </div>
+                      {% endif %}
+
+                       <!-- PROMINENT CTA BUTTON -->
+                      <div class="mobile-cta">
+                        <a href="{{ product.url }}" class="mobile-shop-btn">Shop Now 🛒</a>
+                      </div>
+
+                      <a href="{{ product.url }}" class="promo-img">
+                        <img src="{{ product.featured_image | img_url: '400x400', crop: 'center' }}" alt="{{ product.title }}" loading="lazy">
+                      </a>
+                    </div>
+                    
+                    <!-- IMPROVED TITLE BAR FOR MOBILE -->
+                    <div class="title-bar">
+                      <div class="title-content">
+                        <a href="{{ product.url }}" class="product-title">{{ product.title }}</a>
+                        <div class="title-pricing">
+                          {% if discount > 0 %}
+                            <span class="current-price sale-price">{{ price | money }}</span>
+                            <span class="original-price">{{ compare_at_price | money }}</span>
+                          {% else %}
+                            <span class="current-price">{{ price | money }}</span>
+                          {% endif %}
+                        </div>
+                      </div>
+                     
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+            
+            <!-- IMPROVED PAGINATION -->
+            <div class="swiper-pagination"></div>
+            
+            <!-- VISIBLE NAVIGATION ARROWS -->
+            <div class="swiper-button-next">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="swiper-button-prev">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            
+            <!-- SLIDER PROGRESS BAR -->
+            <div class="slider-progress">
+              <div class="slider-progress-bar"></div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    {% endif %}
+
+  </div>
+</section>
+
+<style>
+/* SECTION */
+.piranav-promo .container {
+  padding: 0 10px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.promo-header {
+  text-align: center;
+  margin-bottom: 25px;
+}
+.promo-header h2 {
+  font-size: 2.2rem;
+  font-weight: 700;
+}
+.promo-header p {
+  color: #444;
+}
+
+/* TIMER */
+.promo-timer.fullwidth {
+  width: 100%;
+  background: #0b1a39;
+  color: white;
+  padding: 25px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+/* TIMER BOX */
+.timer-box {
+  display: inline-flex;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.timer-box span {
+  font-size: 2rem;
+  font-weight: 700;
+}
+.timer-box label {
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+/* TIMER BAR */
+.timer-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 3px;
+}
+#timer-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+}
+
+/* DESKTOP GRID */
+.promo-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+
+/* SWIPER - MOBILE */
+.mobile-view {
+  display: none;
+}
+
+.mobile-promo-slider {
+  width: 100%;
+  position: relative;
+}
+
+.swiper-container {
+  width: 100%;
+  padding: 10px 0 50px 0;
+  overflow: hidden;
+}
+
+.swiper-wrapper {
+  padding-bottom: 10px;
+}
+
+.swiper-slide {
+    height: auto;
+    padding: 0 6px;
+}
+
+/* IMPROVED SWIPER PAGINATION */
+.swiper-pagination {
+  position: absolute;
+  bottom: 25px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  z-index: 10;
+}
+
+.swiper-pagination-bullet {
+  width: 10px;
+  height: 10px;
+  background: #ddd;
+  opacity: 0.8;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.swiper-pagination-bullet-active {
+  background: #0b1a39;
+  opacity: 1;
+  width: 24px;
+}
+
+/* IMPROVED SWIPER NAVIGATION */
+.swiper-button-next,
+.swiper-button-prev {
+  color: #0b1a39;
+  background: white;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-top: 0;
+  transition: all 0.3s ease;
+}
+
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+  background: #0b1a39;
+  color: white;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.swiper-button-next:after,
+.swiper-button-prev:after {
+  display: none;
+}
+
+.swiper-button-next {
+  right: 10px;
+}
+
+.swiper-button-prev {
+  left: 10px;
+}
+
+/* SLIDER PROGRESS BAR */
+.slider-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: rgba(11, 26, 57, 0.1);
+  z-index: 10;
+}
+
+.slider-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  transition: width 0.3s ease;
+}
+
+/* PRODUCT CARD */
+.promo-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  overflow: hidden;
+  padding-bottom: 0;
+  height: 100%;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.promo-card:hover {
+  
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+/* IMAGE CONTAINER */
+.promo-img-container {
+  position: relative;
+  background: #f8f8f8;
+  aspect-ratio: 1 / 1; /* Ensures square aspect for consistent sizing */
+  overflow: hidden;
+}
+
+/* BANNER */
+.promo-banner {
+  position: absolute;
+  top: 20px;
+  left: 5px;
+ /*background: linear-gradient(135deg, #0b1a39, #3e0b06);*/
+    background: linear-gradient(135deg, #b30d10bf, #3e0b06);
+  padding: 6px 16px;
+  border-radius: 8px;
+  line-height: 1.15;
+  z-index: 1;
+  color: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+.b1 {
+  font-size: 14px;
+  font-weight: 800;
+  background: linear-gradient(to top, #B8860B 0%, #FFC72C 50%, #FFD700 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.b2 { font-size: 12px; font-weight: 600; }
+.bs { font-size: 10px; opacity: .8; margin-top: 2px; }
+/* BADGE */
+.promo-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  height: 70px;
+  width: 70px;
+  border-radius: 50%;
+  /*background: linear-gradient(135deg, #0b1a39, #3e0b06);*/
+       background: linear-gradient(104deg, #0f1a37e0, #000000de);
+
+  border: 3px solid white;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 1;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+.promo-badge .val {
+  font-size: 18px;
+  font-weight: 800;
+  background: linear-gradient(to bottom, #FFFFFF, #C0C0C0 50%, #404040);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.promo-badge .txt {
+  font-size: 12px;
+  margin-top: -3px;
+  font-weight: 600;
+}
+/* PRODUCT IMAGE */
+.promo-img {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+}
+
+.promo-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures images fill the container without distortion */
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+/* TITLE BAR - IMPROVED FOR MOBILE */
+.title-bar {
+  background:rgb(236, 241, 236);
+  color: #333;
+  padding: 12px; /* Increased padding for better spacing */
+  border-top: 1px solid #f0f0f0;
+}
+
+.title-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.product-title {
+  text-decoration: none;
+  font-size: 15px;
+  flex: 1;
+  padding-right: 8px;
+  line-height: 1.5;
+  font-weight: 600;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  border-right: 1px solid #eee;
+}
+
+.title-pricing {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.2;
+  flex-shrink: 0;
+}
+
+.title-pricing .current-price {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0b1a39;
+}
+
+.title-pricing .sale-price {
+  color:rgb(246, 27, 3);
+}
+
+.title-pricing .original-price {
+  font-size: 15px;
+  color: BLACK;
+  text-decoration: line-through;
+  margin-top: 2px;
+}
+
+/* MOBILE CTA BUTTON - IMPROVED PLACEMENT */
+.mobile-cta {
+  position: absolute;
+  bottom: 10px; /* Positioned at bottom for better visibility */
+  left: 50%;
+  transform: translateX(-50%); /* Centered horizontally */
+  z-index: 2;
+}
+
+.mobile-shop-btn {
+  display: inline-block;
+ /*background: linear-gradient(135deg, #0b1a39, #5a1a12);*/
+     background: linear-gradient(135deg, #b30d10bf, #3e0b06);
+
+
+  color: white;
+  text-align: center;
+  padding: 4px 24px; /* Slightly larger for better touch */
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(11, 26, 57, 0.2);
+  gap: 6px;
+}
+
+.mobile-shop-btn:hover {
+  {% comment %} background: linear-gradient(135deg, #1a3a7a, #2a5ab8); {% endcomment %}
+       background: linear-gradient(135deg, #7a421a, #b82a3170);
+  color:#fff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(11, 26, 57, 0.3);
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 992px) {
+  .promo-grid {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .desktop-view {
+    display: none;
+  }
+  
+  .mobile-view {
+    display: block;
+  }
+
+  .promo-header h2 {
+    font-size: 1.8rem;
+  }
+  
+  .promo-timer.fullwidth {
+    padding: 20px 15px;
+    margin: 0 15px 30px 15px;
+    width: calc(100% - 30px);
+  }
+  
+  .timer-box span {
+    font-size: 1.6rem;
+  }
+  
+  .swiper-container {
+    padding: 10px 0 50px 0;
+  }
+  
+  .swiper-slide {
+    padding: 0 10px;
+  }
+  
+  /* Mobile adjustments */
+  .title-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .title-pricing {
+    flex-direction: row;
+    align-items: center;
+    margin-top: 8px;
+    gap: 10px;
+  }
+  
+  .title-pricing .current-price {
+    font-size: 16px;
+  }
+  
+  .title-pricing .original-price {
+    font-size: 14px;
+  }
+  
+  .product-title {
+    font-size: 16px;
+    -webkit-line-clamp: 2;
+  }
+  
+  /* Improved image sizing for mobile */
+  .promo-img-container {
+    aspect-ratio: 1 / 1.2; /* Slightly taller for better product display */
+  }
+
+  /* Hide arrows on very small screens */
+  @media (max-width: 480px) {
+    .swiper-button-next,
+    .swiper-button-prev {
+      display: none;
+    }
+    
+    .swiper-container {
+      padding: 10px 0 40px 0;
+    }
+    
+    .swiper-pagination {
+      bottom: 15px;
+    }
+    
+    .mobile-shop-btn {
+      padding: 4px 30px;
+      font-size: 16px;
+    }
+  }
+  
+  /* Touch-friendly improvements */
+  .swiper-slide {
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+  
+  .promo-card {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Loading animation */
+.swiper-slide {
+  animation: fadeInUp 0.5s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Active slide indicator */
+.swiper-slide-active .promo-card {
+  border: 2px solid rgba(11, 26, 57, 0.1);
+}
+</style>
+
+<script>
+function promoTimer() {
+  if (!document.getElementById("timer-bar-fill")) return;
+
+  function tick() {
+    const now = new Date();
+    const midnight = new Date();
+    midnight.setHours(24,0,0,0);
+
+    const diff = midnight - now;
+    if (diff <= 0) location.reload();
+
+    let h = Math.floor(diff / (1000*60*60));
+    let m = Math.floor((diff % (1000*60*60)) / (1000*60));
+    let s = Math.floor((diff % (1000*60)) / 1000);
+
+    document.getElementById("t-hours").textContent = h < 10 ? "0"+h : h;
+    document.getElementById("t-mins").textContent = m < 10 ? "0"+m : m;
+    document.getElementById("t-secs").textContent = s < 10 ? "0"+s : s;
+
+    const total = 24*60*60*1000;
+    const used = total - diff;
+    const percent = (used / total) * 100;
+
+    document.getElementById("timer-bar-fill").style.width = percent + "%";
+  }
+
+  tick();
+  setInterval(tick, 1000);
+}
+
+function initSwiper() {
+  if (typeof Swiper === 'undefined') {
+    console.warn('Swiper library not loaded');
+    return;
+  }
+  
+  if (window.matchMedia('(max-width: 768px)').matches) {
+    if (!window.promoSwiper) {
+      window.promoSwiper = new Swiper('.mobile-promo-slider .swiper-container', {
+        slidesPerView: 1,
+        spaceBetween: 12,
+        centeredSlides: false,
+        loop: false,
+        speed: 400,
+        grabCursor: true,
+        pagination: {
+          el: '.swiper-pagination',
+          clickable: true,
+          dynamicBullets: true,
+        },
+        navigation: {
+          nextEl: '.swiper-button-next',
+          prevEl: '.swiper-button-prev',
+        },
+        breakpoints: {
+          480: {
+            slidesPerView: 1.05,
+            spaceBetween: 14
+          },
+          400: {
+            slidesPerView: 1.03,
+            spaceBetween: 12
+          },
+          360: {
+            slidesPerView: 1,
+            spaceBetween: 10
+          }
+        },
+        on: {
+          init: function() {
+            updateProgressBar(this);
+          },
+          slideChange: function() {
+            updateProgressBar(this);
+          }
+        }
+      });
+    }
+  } else {
+    if (window.promoSwiper) {
+      window.promoSwiper.destroy(true, true);
+      window.promoSwiper = null;
+    }
+  }
+}
+
+function updateProgressBar(swiper) {
+  const progressBar = document.querySelector('.slider-progress-bar');
+  if (progressBar) {
+    const progress = (swiper.activeIndex + 1) / swiper.slides.length * 100;
+    progressBar.style.width = progress + '%';
+  }
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+  promoTimer();
+  
+  // Load Swiper library if not already loaded
+  if (typeof Swiper === 'undefined') {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css';
+    document.head.appendChild(link);
+    
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.js';
+    script.onload = function() {
+      initSwiper();
+    };
+    document.head.appendChild(script);
+  } else {
+    initSwiper();
+  }
+  
+  // Reinitialize swiper on window resize
+  window.addEventListener('resize', initSwiper);
+  
+  // Add touch improvements
+  document.addEventListener('touchstart', function() {}, {passive: true});
+});
+</script>
+
+{% schema %}
+{
+  "name": "Piranav Promo Section",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Daily Promotion" },
+    { "type": "text", "id": "subheading", "label": "Subheading", "default": "Fresh Offers Every 24 Hours" },
+
+    { "type": "checkbox", "id": "show_timer", "label": "Show Timer Card", "default": true },
+
+    { "type": "collection", "id": "collection", "label": "Choose Collection" },
+
+    { "type": "text", "id": "banner_line1", "label": "Banner Line 1", "default": "BLACK FRIDAY" },
+    { "type": "text", "id": "banner_line2", "label": "Banner Line 2", "default": "WEEKEND SALE" },
+    { "type": "text", "id": "banner_subtitle", "label": "Banner Subtitle", "default": "Limited Time Deal" }
+  ],
+  "presets": [
+    { "name": "Piranav Promo Section", "category": "Promotional" }
+  ]
+}
+{% endschema %} {% endcomment %}
+
+<section class="piranav-promo">
+  <div class="container">
+
+    <!-- Header -->
+    <div class="promo-header">
+      <h2>{{ section.settings.heading }}</h2>
+      <p>{{ section.settings.subheading }}</p>
+    </div>
+
+    <!-- FULL-WIDTH TIMER -->
+    {% if section.settings.show_timer %}
+      <div class="promo-timer fullwidth">
+        <h3>Today's Deal Ends In</h3>
+
+        <div class="timer-box">
+          <div class="unit">
+            <span id="t-hours">23</span>
+            <label>Hours</label>
+          </div>
+          <span class="sep">:</span>
+          <div class="unit">
+            <span id="t-mins">59</span>
+            <label>Minutes</label>
+          </div>
+          <span class="sep">:</span>
+          <div class="unit">
+            <span id="t-secs">59</span>
+            <label>Seconds</label>
+          </div>
+        </div>
+
+        <div class="timer-note">
+          Next promotion starts at midnight<br>
+          FREE DELIVERY ON UK ORDER OVER £25<br>
+          30-Day Money Back Guarantee
+        </div>
+
+        <div class="timer-bar">
+          <div id="timer-bar-fill"></div>
+        </div>
+      </div>
+    {% endif %}
+
+    {% if section.settings.collection %}
+      {% assign coll = collections[section.settings.collection] %}
+
+      {% if coll and coll.products.size > 0 %}
+        
+        {% assign per_day = 5 %}
+        {% assign product_count = coll.products.size %}
+        {% assign day_num = 'now' | date: '%j' | plus: 0 %}
+
+        {% assign total_sets = product_count | plus: per_day | minus: 1 | divided_by: per_day %}
+        {% assign today_set = day_num | modulo: total_sets %}
+        {% assign offset_num = today_set | times: per_day %}
+
+        <!-- DESKTOP PRODUCT GRID -->
+        <div class="promo-grid desktop-view">
+          {% for product in coll.products limit: per_day offset: offset_num %}
+            {% assign variant = product.selected_or_first_available_variant %}
+            {% assign price = variant.price %}
+            {% assign compare_at_price = variant.compare_at_price %}
+            
+            {% assign discount = 0 %}
+            {% if compare_at_price and compare_at_price > price %}
+              {% assign discount = compare_at_price | minus: price | times: 100.0 | divided_by: compare_at_price | round %}
+            {% endif %}
+
+            <div class="promo-card">
+              <div class="promo-img-container">
+                <!-- PROMO BANNER -->
+                <div class="promo-banner">
+                  <div class="b1">{{ section.settings.banner_line1 }}</div>
+                  <div class="b2">{{ section.settings.banner_line2 }}</div>
+                  <div class="bs">{{ section.settings.banner_subtitle }}</div>
+                </div>
+
+                <!-- DISCOUNT BADGE -->
+                {% if discount > 0 %}
+                  <div class="promo-badge">
+                    <div class="val">{{ discount }}%</div>
+                    <div class="txt">OFF</div>
+                  </div>
+                {% endif %}
+
+                <!-- PRICE BADGE (NEW POSITION - BELOW BANNER) -->
+                <div class="price-badge">
+                  {% if discount > 0 %}
+                    <div class="price-content">
+                      <span class="current-price sale-price">{{ price | money }}</span>
+                      <span class="original-price">{{ compare_at_price | money }}</span>
+                    </div>
+                  {% else %}
+                    <div class="price-content">
+                      <span class="current-price">{{ price | money }}</span>
+                    </div>
+                  {% endif %}
+                </div>
+
+                <!-- ADD TO CART BUTTON FOR MOBILE -->
+                <div class="mobile-cta">
+                  <a href="{{ product.url }}" class="mobile-shop-btn">Shop Now 🛒</a>
+                </div>
+
+                <!-- PRODUCT IMAGE -->
+                <a href="{{ product.url }}" class="promo-img">
+  <img
+    src="{{ product.featured_image | img_url: '400x533', crop: 'center' }}"
+    alt="{{ product.title | escape }}"
+    loading="lazy"
+    width="400"
+    height="533"
+  >
+</a>
+
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <!-- IMPROVED MOBILE SWIPER -->
+        <div class="mobile-promo-slider mobile-view">
+          <div class="swiper-container">
+            <div class="swiper-wrapper">
+              {% for product in coll.products limit: per_day offset: offset_num %}
+                {% assign variant = product.selected_or_first_available_variant %}
+                {% assign price = variant.price %}
+                {% assign compare_at_price = variant.compare_at_price %}
+                
+                {% assign discount = 0 %}
+                {% if compare_at_price and compare_at_price > price %}
+                  {% assign discount = compare_at_price | minus: price | times: 100.0 | divided_by: compare_at_price | round %}
+                {% endif %}
+
+                <div class="swiper-slide">
+                  <div class="promo-card">
+                    <div class="promo-img-container">
+                      {% comment %} <!-- PROMO BANNER -->
+                      <div class="promo-banner">
+                        <div class="b1">{{ section.settings.banner_line1 }}</div>
+                        <div class="b2">{{ section.settings.banner_line2 }}</div>
+                        <div class="bs">{{ section.settings.banner_subtitle }}</div>
+                      </div> {% endcomment %}
+
+                      <!-- DISCOUNT BADGE -->
+                      {% if discount > 0 %}
+                        <div class="promo-badge">
+                          <div class="val">{{ discount }}%</div>
+                          <div class="txt">OFF</div>
+                        </div>
+                      {% endif %}
+
+                      <!-- PRICE BADGE (NEW POSITION - BELOW BANNER) -->
+                      <div class="price-badge">
+                        {% if discount > 0 %}
+                          <div class="price-content">
+                            <span class="current-price sale-price">{{ price | money }}</span>
+                            <span class="original-price">{{ compare_at_price | money }}</span>
+                          </div>
+                        {% else %}
+                          <div class="price-content">
+                            <span class="current-price">{{ price | money }}</span>
+                          </div>
+                        {% endif %}
+                      </div>
+
+                      <!-- PROMINENT CTA BUTTON -->
+                      <div class="mobile-cta">
+                        <a href="{{ product.url }}" class="mobile-shop-btn">Shop Now 🛒</a>
+                      </div>
+
+                      <!-- PRODUCT IMAGE -->
+                      <a href="{{ product.url }}" class="promo-img">
+  <img
+    src="{{ product.featured_image | img_url: '400x533', crop: 'center' }}"
+    alt="{{ product.title | escape }}"
+    loading="lazy"
+    width="400"
+    height="533"
+  >
+</a>
+
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+            
+            <!-- IMPROVED PAGINATION -->
+            <div class="swiper-pagination"></div>
+            
+            <!-- VISIBLE NAVIGATION ARROWS -->
+            <div class="swiper-button-next">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="swiper-button-prev">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            
+            <!-- SLIDER PROGRESS BAR -->
+            <div class="slider-progress">
+              <div class="slider-progress-bar"></div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    {% endif %}
+
+  </div>
+</section>
+
+<style>
+/* SECTION */
+.piranav-promo .container {
+  padding: 0 10px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.promo-header {
+  text-align: center;
+  margin-bottom: 25px;
+}
+.promo-header h2 {
+  font-size: 2.2rem;
+  font-weight: 700;
+}
+.promo-header p {
+  color: #444;
+}
+
+/* TIMER */
+.promo-timer.fullwidth {
+  width: 100%;
+  background: #0b1a39;
+  color: white;
+  padding: 25px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+/* TIMER BOX */
+.timer-box {
+  display: inline-flex;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.timer-box span {
+  font-size: 2rem;
+  font-weight: 700;
+}
+.timer-box label {
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+/* TIMER BAR */
+.timer-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 3px;
+}
+#timer-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+}
+
+/* DESKTOP GRID */
+.promo-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+
+/* SWIPER - MOBILE */
+.mobile-view {
+  display: none;
+}
+
+.mobile-promo-slider {
+  width: 100%;
+  position: relative;
+}
+
+.swiper-container {
+  width: 100%;
+  padding: 10px 0 50px 0;
+  overflow: hidden;
+}
+
+.swiper-wrapper {
+  padding-bottom: 10px;
+}
+
+.swiper-slide {
+    height: auto;
+    padding: 0 6px;
+}
+
+/* IMPROVED SWIPER PAGINATION */
+.swiper-pagination {
+  position: absolute;
+  bottom: 25px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  z-index: 10;
+}
+
+.swiper-pagination-bullet {
+  width: 10px;
+  height: 10px;
+  background: #ddd;
+  opacity: 0.8;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.swiper-pagination-bullet-active {
+  background: #0b1a39;
+  opacity: 1;
+  width: 24px;
+}
+
+/* IMPROVED SWIPER NAVIGATION */
+.swiper-button-next,
+.swiper-button-prev {
+  color: #0b1a39;
+  background: white;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-top: 0;
+  transition: all 0.3s ease;
+}
+
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+  background: #0b1a39;
+  color: white;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.swiper-button-next:after,
+.swiper-button-prev:after {
+  display: none;
+}
+
+.swiper-button-next {
+  right: 10px;
+}
+
+.swiper-button-prev {
+  left: 10px;
+}
+
+/* SLIDER PROGRESS BAR */
+.slider-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: rgba(11, 26, 57, 0.1);
+  z-index: 10;
+}
+
+.slider-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  transition: width 0.3s ease;
+}
+
+/* PRODUCT CARD */
+.promo-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  overflow: hidden;
+  padding-bottom: 0;
+  height: 100%;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.promo-card:hover {
+ 
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+/* IMAGE CONTAINER - NOW FILLS ENTIRE CARD */
+.promo-img-container {
+  position: relative;
+  background: #f8f8f8;
+ aspect-ratio: 3 / 4;
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+}
+
+/* BANNER */
+.promo-banner {
+  position: absolute;
+  top: 20px;
+  left: 5px;
+  background: linear-gradient(135deg, #b30d10bf, #3e0b06);
+  padding: 6px 16px;
+  border-radius: 8px;
+  line-height: 1.15;
+  z-index: 2;
+  color: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+.b1 {
+  font-size: 14px;
+  font-weight: 800;
+  background: linear-gradient(to top, #B8860B 0%, #FFC72C 50%, #FFD700 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.b2 { 
+  font-size: 12px; 
+  font-weight: 600; 
+}
+.bs { 
+  font-size: 10px; 
+  opacity: .8; 
+  margin-top: 2px; 
+}
+
+/* DISCOUNT BADGE */
+.promo-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  height: 70px;
+  width: 70px;
+  border-radius: 50%;
+  background: linear-gradient(104deg, #0f1a37e0, #000000de);
+  border: 3px solid white;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 2;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+.promo-badge .val {
+  font-size: 18px;
+  font-weight: 800;
+  background: linear-gradient(to bottom, #FFFFFF, #C0C0C0 50%, #404040);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.promo-badge .txt {
+  font-size: 12px;
+  margin-top: -3px;
+  font-weight: 600;
+}
+
+/* PRICE BADGE - NEW STYLE (BELOW BANNER) */
+.price-badge {
+      position: absolute;
+    top: 20px;
+    left: 5px;
+   background: linear-gradient(135deg, #39330b, #8a1e1e);
+    
+    padding: 4px 10px;
+    border-radius: 8px;
+    z-index: 2;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    border: 2px solid white;
+}
+
+.price-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.price-content .current-price {
+  font-size: 20px;
+  font-weight: 800;
+  color: white;
+}
+
+.price-content .sale-price {
+   color: rgb(236, 235, 230) !important;
+  font-weight: 900;
+}
+
+.price-content .original-price {
+  font-size: 14px;
+  color: rgba(255,255,255,0.8);
+  text-decoration: line-through;
+}
+
+/* PRODUCT IMAGE - NOW FILLS ENTIRE CARD */
+.promo-img {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+}
+
+.promo-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+/* MOBILE CTA BUTTON */
+.mobile-cta {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+
+.mobile-shop-btn {
+  display: inline-block;
+  background: linear-gradient(135deg, #b30d10bf, #3e0b06);
+  color: white;
+  text-align: center;
+  padding: 8px 28px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(11, 26, 57, 0.2);
+}
+
+.mobile-shop-btn:hover {
+  background: linear-gradient(135deg, #7a421a, #b82a3170);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(11, 26, 57, 0.3);
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 992px) {
+  .promo-grid {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .desktop-view {
+    display: none;
+  }
+  
+  .mobile-view {
+    display: block;
+  }
+
+  .promo-header h2 {
+    font-size: 1.8rem;
+  }
+  
+  .promo-timer.fullwidth {
+    padding: 20px 15px;
+    margin: 0 15px 30px 15px;
+    width: calc(100% - 30px);
+  }
+  
+  .timer-box span {
+    font-size: 1.6rem;
+  }
+  
+  .swiper-container {
+    padding: 10px 0 50px 0;
+  }
+  
+  .swiper-slide {
+    padding: 0 10px;
+  }
+  
+  /* Adjust price badge for mobile */
+  .price-badge {
+    top:20px;
+    padding: 6px 12px;
+  }
+  
+  .price-content .current-price {
+    font-size: 18px;
+  }
+  
+  .price-content .original-price {
+    font-size: 12px;
+  }
+  
+  /* Adjust banner for mobile */
+  .promo-banner {
+    top: 15px;
+    left: 10px;
+    padding: 5px 12px;
+  }
+  
+  .b1 {
+    font-size: 12px;
+  }
+  
+  .b2 {
+    font-size: 10px;
+  }
+  
+  .bs {
+    font-size: 9px;
+  }
+  
+  /* Adjust discount badge for mobile */
+  .promo-badge {
+    top: 10px;
+    right: 10px;
+    height: 60px;
+    width: 60px;
+  }
+  
+  .promo-badge .val {
+    font-size: 16px;
+  }
+  
+  .promo-badge .txt {
+    font-size: 10px;
+  }
+  
+  /* Mobile CTA button */
+  .mobile-shop-btn {
+    padding: 8px 24px;
+    font-size: 14px;
+  }
+
+  /* Hide arrows on very small screens */
+  @media (max-width: 480px) {
+    .swiper-button-next,
+    .swiper-button-prev {
+      display: none;
+    }
+    
+    .swiper-container {
+      padding: 10px 0 40px 0;
+    }
+    
+    .swiper-pagination {
+      bottom: 15px;
+    }
+    
+    .price-badge {
+      top: 25px;
+    }
+  }
+  
+  /* Touch-friendly improvements */
+  .swiper-slide {
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+  
+  .promo-card {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Loading animation */
+.swiper-slide {
+  animation: fadeInUp 0.5s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Active slide indicator */
+.swiper-slide-active .promo-card {
+  border: 2px solid rgba(11, 26, 57, 0.1);
+}
+</style>
+
+<script>
+function promoTimer() {
+  if (!document.getElementById("timer-bar-fill")) return;
+
+  function tick() {
+    const now = new Date();
+    const midnight = new Date();
+    midnight.setHours(24,0,0,0);
+
+    const diff = midnight - now;
+    if (diff <= 0) location.reload();
+
+    let h = Math.floor(diff / (1000*60*60));
+    let m = Math.floor((diff % (1000*60*60)) / (1000*60));
+    let s = Math.floor((diff % (1000*60)) / 1000);
+
+    document.getElementById("t-hours").textContent = h < 10 ? "0"+h : h;
+    document.getElementById("t-mins").textContent = m < 10 ? "0"+m : m;
+    document.getElementById("t-secs").textContent = s < 10 ? "0"+s : s;
+
+    const total = 24*60*60*1000;
+    const used = total - diff;
+    const percent = (used / total) * 100;
+
+    document.getElementById("timer-bar-fill").style.width = percent + "%";
+  }
+
+  tick();
+  setInterval(tick, 1000);
+}
+
+function initSwiper() {
+  if (typeof Swiper === 'undefined') {
+    return;
+  }
+  
+  const container = document.querySelector('.mobile-promo-slider .swiper-container');
+  if (!container) return;
+
+  if (window.matchMedia('(max-width: 768px)').matches) {
+    if (!window.promoSwiper) {
+      window.promoSwiper = new Swiper(container, {
+        slidesPerView: 1,
+        spaceBetween: 12,
+        centeredSlides: false,
+        loop: false,
+        speed: 400,
+        grabCursor: true,
+        observer: true,
+        observeParents: true,
+        pagination: {
+          el: '.swiper-pagination',
+          clickable: true,
+          dynamicBullets: true,
+        },
+        navigation: {
+          nextEl: '.swiper-button-next',
+          prevEl: '.swiper-button-prev',
+        },
+        breakpoints: {
+          480: {
+            slidesPerView: 1.05,
+            spaceBetween: 14
+          },
+          400: {
+            slidesPerView: 1.03,
+            spaceBetween: 12
+          },
+          360: {
+            slidesPerView: 1,
+            spaceBetween: 10
+          }
+        },
+        on: {
+          init: function() {
+            updateProgressBar(this);
+          },
+          slideChange: function() {
+            updateProgressBar(this);
+          }
+        }
+      });
+    }
+  } else {
+    if (window.promoSwiper) {
+      window.promoSwiper.destroy(true, true);
+      window.promoSwiper = null;
+    }
+  }
+}
+
+function updateProgressBar(swiper) {
+  const progressBar = document.querySelector('.slider-progress-bar');
+  if (progressBar) {
+    const progress = (swiper.activeIndex + 1) / swiper.slides.length * 100;
+    progressBar.style.width = progress + '%';
+  }
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+  promoTimer();
+  
+  const section = document.querySelector('.piranav-promo');
+  if (section) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          initSwiper();
+          observer.unobserve(section);
+        }
+      });
+    }, { rootMargin: '100px' });
+    observer.observe(section);
+  }
+
+  window.addEventListener('resize', initSwiper);
+  document.addEventListener('touchstart', function() {}, {passive: true});
+});
+</script>
+
+{% schema %}
+{
+  "name": "Piranav Promo Section",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Daily Promotion" },
+    { "type": "text", "id": "subheading", "label": "Subheading", "default": "Fresh Offers Every 24 Hours" },
+
+    { "type": "checkbox", "id": "show_timer", "label": "Show Timer Card", "default": true },
+
+    { "type": "collection", "id": "collection", "label": "Choose Collection" },
+
+    { "type": "text", "id": "banner_line1", "label": "Banner Line 1", "default": "BLACK FRIDAY" },
+    { "type": "text", "id": "banner_line2", "label": "Banner Line 2", "default": "WEEKEND SALE" },
+    { "type": "text", "id": "banner_subtitle", "label": "Banner Subtitle", "default": "Limited Time Deal" }
+  ],
+  "presets": [
+    { "name": "Piranav Promo Section", "category": "Promotional" }
+  ]
+}
+{% endschema %}

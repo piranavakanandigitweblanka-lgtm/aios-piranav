@@ -1,0 +1,363 @@
+<style>
+  /* ── Design tokens ── */
+  :root {
+    --bg:        #f5f3ef;
+    --surface:   #ffffff;
+    --border:    #e2ddd7;
+    --accent:    #c8a96e;
+    --accent-dk: #a8853e;
+    --text:      #1a1814;
+    --muted:     #6b6560;
+    --nav-bg:    #1a1814;
+    --nav-hover: #c8a96e;
+    --radius:    6px;
+    --shadow:    0 2px 12px rgba(0,0,0,0.08);
+    --shadow-h:  0 8px 28px rgba(0,0,0,0.14);
+    --font-head: 'Roboto', sans-serif;
+    --font-body: 'Roboto', sans-serif;
+  }
+
+  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  {% comment %} body { background: var(--bg); color: var(--text); font-family: var(--font-body); } {% endcomment %}
+
+  /* ── Page wrapper ── */
+  .pl-page {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  /* ── Page heading ── */
+  .pl-heading {
+    font-family: var(--font-head);
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 700;
+    letter-spacing: 0px;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .pl-heading-line {
+    width: 48px;
+    height: 2px;
+    background: var(--accent);
+    margin-bottom: 32px;
+  }
+
+  /* ── Category nav ── */
+  .pl-nav {
+    background: var(--nav-bg);
+    border-radius: var(--radius);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    padding: 6px;
+    margin-bottom: 40px;
+  }
+  .pl-nav a,
+  .pl-nav span {
+    display: inline-flex;
+    align-items: center;
+    padding: 9px 16px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: var(--font-body);
+    color: #c8c4be;
+    text-decoration: none;
+    letter-spacing: 0.3px;
+    transition: background 0.18s, color 0.18s;
+    cursor: default;
+    white-space: nowrap;
+  }
+  .pl-nav a:hover {
+    background: var(--accent);
+    color: #1a1814;
+    cursor: pointer;
+  }
+  .pl-nav a.active {
+    background: var(--accent);
+    color: #1a1814;
+  }
+  .pl-nav span { opacity: 0.45; }
+
+  /* ── Product grid ── */
+  .pl-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 20px;
+  }
+
+  /* ── Product card ── */
+  .pl-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow);
+    transition: box-shadow 0.22s, transform 0.22s;
+  }
+  .pl-card:hover {
+    box-shadow: var(--shadow-h);
+    transform: translateY(-3px);
+  }
+
+  /* image wrapper */
+  .pl-card__img-wrap {
+    position: relative;
+    background: #f0ece6;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+  }
+  .pl-card__img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: transform 0.4s ease;
+    padding: 8px;
+  }
+  .pl-card:hover .pl-card__img-wrap img {
+    transform: scale(1.04);
+  }
+
+  /* variant badge */
+  .pl-card__variant {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(26,24,20,0.72);
+    color: #f5f3ef;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.4px;
+    padding: 5px 10px;
+    backdrop-filter: blur(4px);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* card body */
+  .pl-card__body {
+    padding: 14px 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+  }
+
+  .pl-card__stock {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .pl-card__stock--in  { color: #4a9e6b; }
+  .pl-card__stock--out { color: #c0392b; }
+  .pl-card__stock--low { color: #d4880a; }
+
+  .pl-card__pricing {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .pl-card__price {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    font-family: var(--font-body);
+  }
+  .pl-card__compare {
+    font-size: 13px;
+    color: var(--muted);
+    text-decoration: line-through;
+  }
+  .pl-card__badge {
+    font-size: 10px;
+    font-weight: 600;
+    background: var(--accent);
+    color: #1a1814;
+    padding: 2px 7px;
+    border-radius: 20px;
+    letter-spacing: 0.3px;
+  }
+
+  .pl-card__cta {
+    margin-top: auto;
+    display: block;
+    text-align: center;
+    padding: 9px 14px;
+    background: var(--text);
+    color: #f5f3ef;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    border-radius: 4px;
+    transition: background 0.18s;
+  }
+  .pl-card__cta:hover { background: var(--accent-dk); }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .pl-nav { gap: 4px; }
+    .pl-nav a, .pl-nav span { font-size: 12px; padding: 7px 12px; }
+    .pl-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; }
+  }
+  @media (max-width: 480px) {
+    .pl-page { padding: 24px 14px 60px; }
+    .pl-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+  }
+</style>
+
+{% comment %} ── Collect products ── {% endcomment %}
+{% assign collection_handle = 'switches-and-sockets' %}
+{% paginate collections[collection_handle].products by 1000 %}
+  {% assign products_list = collections[collection_handle].products %}
+{% endpaginate %}
+
+<div class="pl-page">
+
+  <h1 class="pl-heading">Switches</h1>
+  <div class="pl-heading-line"></div>
+
+  {% comment %} ── Category navigation ── {% endcomment %}
+  <nav class="pl-nav" aria-label="Lighting categories">
+    
+    <a href="https://ledsone.co.uk/pages/switches-and-sockets" class="active">switches-and-sockets</a>
+    <a href="https://ledsone.co.uk/pages/ledsone-switches">Switches and accessories</a>
+    <a href="">Switches and Combo</a>
+   
+  
+  </nav>
+
+  {% comment %} ── Product grid ── {% endcomment %}
+  <div class="pl-grid">
+
+    {% for product in products_list %}
+
+      {% if product.variants.size > 1 %}
+
+        {% for variant in product.variants %}
+          {% comment %} BUG FIX: use variant.compare_at_price, not product.compare_at_price {% endcomment %}
+          {% assign compare = variant.compare_at_price %}
+          {% assign price   = variant.price %}
+
+          {% comment %} BUG FIX: fall back to first product image if variant has no image {% endcomment %}
+          {% if variant.image %}
+            {% assign img_src = variant.image | image_url: width: 600 %}
+          {% else %}
+            {% assign img_src = product.images.first | image_url: width: 600 %}
+          {% endif %}
+
+          {% comment %} Stock label logic {% endcomment %}
+          {% assign qty = variant.inventory_quantity %}
+          {% if qty <= 0 %}
+            {% assign stock_label = 'Out of stock' %}
+            {% assign stock_class = 'pl-card__stock--out' %}
+          {% elsif qty <= 5 %}
+            {% assign stock_label = 'Only ' | append: qty | append: ' left' %}
+            {% assign stock_class = 'pl-card__stock--low' %}
+          {% else %}
+            {% assign stock_label = 'In stock' %}
+            {% assign stock_class = 'pl-card__stock--in' %}
+          {% endif %}
+
+          {% comment %} Discount badge {% endcomment %}
+          {% if compare and compare > price %}
+            {% assign saving = compare | minus: price | times: 100 | divided_by: compare %}
+            {% assign show_badge = true %}
+          {% else %}
+            {% assign show_badge = false %}
+          {% endif %}
+
+          <article class="pl-card">
+            <a href="{{ variant.url }}" class="pl-card__img-wrap" aria-label="{{ product.title }} – {{ variant.title }}">
+              <img
+                src="{{ img_src }}"
+                alt="{{ product.title }} – {{ variant.title }}"
+                loading="lazy"
+                width="600"
+                height="600"
+              >
+              {% unless variant.title == 'Default Title' %}
+                <div class="pl-card__variant">{{ variant.title }}</div>
+              {% endunless %}
+            </a>
+            <div class="pl-card__body">
+              <span class="pl-card__stock {{ stock_class }}">{{ stock_label }}</span>
+              <div class="pl-card__pricing">
+                <span class="pl-card__price">{{ price | money }}</span>
+                {% if compare and compare > price %}
+                  <span class="pl-card__compare">{{ compare | money }}</span>
+                  {% if show_badge %}
+                    <span class="pl-card__badge">-{{ saving }}%</span>
+                  {% endif %}
+                {% endif %}
+              </div>
+              <a href="{{ variant.url }}" class="pl-card__cta">View Product</a>
+            </div>
+          </article>
+        {% endfor %}
+
+      {% else %}
+
+        {% assign variant = product.variants.first %}
+        {% assign compare  = variant.compare_at_price %}
+        {% assign price    = variant.price %}
+        {% assign qty      = variant.inventory_quantity %}
+
+        {% if qty <= 0 %}
+          {% assign stock_label = 'Out of stock' %}
+          {% assign stock_class = 'pl-card__stock--out' %}
+        {% elsif qty <= 5 %}
+          {% assign stock_label = 'Only ' | append: qty | append: ' left' %}
+          {% assign stock_class = 'pl-card__stock--low' %}
+        {% else %}
+          {% assign stock_label = 'In stock' %}
+          {% assign stock_class = 'pl-card__stock--in' %}
+        {% endif %}
+
+        {% if compare and compare > price %}
+          {% assign saving = compare | minus: price | times: 100 | divided_by: compare %}
+          {% assign show_badge = true %}
+        {% else %}
+          {% assign show_badge = false %}
+        {% endif %}
+
+        <article class="pl-card">
+          <a href="{{ product.url }}" class="pl-card__img-wrap" aria-label="{{ product.title }}">
+            <img
+              src="{{ product.images.first | image_url: width: 600 }}"
+              alt="{{ product.title }}"
+              loading="lazy"
+              width="600"
+              height="600"
+            >
+          </a>
+          <div class="pl-card__body">
+            <span class="pl-card__stock {{ stock_class }}">{{ stock_label }}</span>
+            <div class="pl-card__pricing">
+              <span class="pl-card__price">{{ price | money }}</span>
+              {% if compare and compare > price %}
+                <span class="pl-card__compare">{{ compare | money }}</span>
+                {% if show_badge %}
+                  <span class="pl-card__badge">-{{ saving }}%</span>
+                {% endif %}
+              {% endif %}
+            </div>
+            <a href="{{ product.url }}" class="pl-card__cta">View Product</a>
+          </div>
+        </article>
+
+      {% endif %}
+
+    {% endfor %}
+
+  </div><!-- /.pl-grid -->
+</div><!-- /.pl-page -->

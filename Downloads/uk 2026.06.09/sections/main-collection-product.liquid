@@ -1,0 +1,526 @@
+{{ 'product.css' | asset_url | stylesheet_tag }}
+{{ 'collection.css' | asset_url | stylesheet_tag }}
+{% # theme-check-disable ContentForHeaderModification %}
+{%- capture contentForQuerystring -%}
+  {{ content_for_header }}{%- endcapture -%}
+{% # theme-check-enable ContentForHeaderModification %}
+
+{%- assign pageUrl = contentForQuerystring
+  | split: '"pageurl":"'
+  | last
+  | split: '"'
+  | first
+  | split: request.host
+  | last
+  | replace: '\/', '/'
+  | replace: '%20', ' '
+  | replace: '\u0026', '&'
+-%}
+{%- assign pageQuerystring = pageUrl | split: '?' | last -%}
+{%- liquid
+  assign th_st = settings
+  assign product_style = th_st.product_style
+  assign st = section.settings
+  assign se_block = section.blocks
+  assign enable_sidebar = st.enable_sidebar
+  assign enable_list_view = st.enable_list_view
+  assign sidebar_ps = st.sidebar_position
+  assign products_column = st.products_column
+  if pageQuerystring contains 'sidebar='
+    assign sidebar_position = pageQuerystring | split: 'sidebar=' | last | split: '&' | first
+    if sidebar_position == 'left_sidebar' or sidebar_position == 'right_sidebar' or sidebar_position == 'dropdonw_sidebar' or sidebar_position == 'filter_canvas'
+      assign enable_sidebar = true
+      assign sidebar_ps = sidebar_position
+    endif
+  endif
+  assign view = ''
+  if pageQuerystring contains 'view='
+    assign view = pageQuerystring | split: 'view=' | last | split: '&' | first
+  endif
+  if enable_list_view
+    assign view = 'list'
+  endif
+  assign pagination = st.pagination
+  if pageQuerystring contains 'pagination='
+    assign pagination_pr = pageQuerystring | split: 'pagination=' | last | split: '&' | first
+    if pagination_pr == 'default' or pagination_pr == 'load_more' or pagination_pr == 'infinit_scrolling'
+      assign pagination = pagination_pr
+    endif
+  endif
+  if pageQuerystring contains 'column='
+    assign column = pageQuerystring | split: 'column=' | last | split: '&' | first
+    if column == '1' or column == '2' or column == '3' or column == '4' or column == '5' or column == '6'
+      assign products_column = column
+    endif
+  endif
+-%}
+
+<div
+  class="section-{{ section.id }} section-collection-product"
+  data-section-id="{{ section.id }}"
+>
+  {%- if enable_sidebar and sidebar_ps == 'filter_canvas' -%}
+    {%- render 'collection-sidebar',
+      st: st,
+      se_block: se_block,
+      enable_sidebar: enable_sidebar,
+      sidebar_ps: sidebar_ps
+    -%}
+  {%- endif -%}
+  <div
+    class="{{ st.layout }}"
+  >
+    <div
+      class="row"
+    >
+      {%- if enable_sidebar and sidebar_ps == 'left_sidebar' -%}
+        {%- render 'collection-sidebar',
+          st: st,
+          se_block: se_block,
+          enable_sidebar: enable_sidebar,
+          sidebar_ps: sidebar_ps
+        -%}
+      {%- endif -%}
+      <div
+        id="productgridcontainer"
+        class="flex-1"
+      >
+        {% comment %} {%- liquid
+          render 'collection-toolbar' | st: st, pageurl: view, enable_sidebar: enable_sidebar, sidebar_ps: sidebar_ps, products_column: products_column
+        -%} {% endcomment %}
+          {%- render 'collection-toolbar',
+          st: st,
+          pageurl: view,
+          enable_sidebar: enable_sidebar,
+          sidebar_ps: sidebar_ps,
+          products_column: products_column
+        -%}
+        {%- if enable_sidebar -%}
+          {%- render 'filter-current' -%}
+        {%- endif -%}
+        {%- if enable_sidebar and sidebar_ps == 'dropdonw_sidebar' -%}
+          {%- render 'collection-sidebar',
+            st: st,
+            se_block: se_block,
+            enable_sidebar: enable_sidebar,
+            sidebar_ps: sidebar_ps
+          -%}
+        {%- endif -%}
+
+        <div
+          class="product-grid-container"
+        >
+          {%- liquid
+            assign number_products = section.settings.number_products_grid
+            if view == 'list'
+              assign number_products = section.settings.number_products_list
+            endif
+          -%}
+          {%- paginate collection.products by number_products -%}
+            {%- if collection.products.size == 0 -%}
+              <div
+                class="collection collection--empty page-width"
+                id="product-grid"
+                data-id="{{ section.id }}"
+              >
+                <div
+                  class="title-wrapper"
+                >
+                  <p
+                    class="title title--primary"
+                  >
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 18 18"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M7.97727 1.19847C8.54999 0.715744 9.47454 0.715744 10.0309 1.19847L11.3236 2.30302C11.5691 2.50756 12.0354 2.67938 12.3627 2.67938H13.7536C14.6209 2.67938 15.3327 3.3912 15.3327 4.25847V5.64938C15.3327 5.97665 15.5045 6.43483 15.7091 6.68029L16.8136 7.97302C17.2964 8.54574 17.2964 9.47029 16.8136 10.0267L15.7091 11.3194C15.5045 11.5648 15.3327 12.023 15.3327 12.3503V13.7412C15.3327 14.6085 14.6209 15.3203 13.7536 15.3203H12.3627C12.0354 15.3203 11.5773 15.4921 11.3318 15.6967L10.0391 16.8012C9.46636 17.2839 8.54181 17.2839 7.98545 16.8012L6.69272 15.6967C6.44727 15.4921 5.9809 15.3203 5.66181 15.3203H4.22999C3.36272 15.3203 2.6509 14.6085 2.6509 13.7412V12.3421C2.6509 12.023 2.48727 11.5567 2.28272 11.3194L1.17817 10.0185C0.703629 9.45393 0.703629 8.53756 1.17817 7.97302L2.28272 6.67211C2.48727 6.42665 2.6509 5.96847 2.6509 5.64938V4.26665C2.6509 3.39938 3.36272 2.68756 4.22999 2.68756H5.64545C5.97272 2.68756 6.4309 2.51574 6.67636 2.3112L7.97727 1.19847Z"
+                        stroke="#907341"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round" />
+                      <path
+                        d="M9 5.8457V9.79752"
+                        stroke="#907341"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round" />
+                      <path
+                        d="M8.99609 12.2852H9.00344"
+                        stroke="#907341"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round" />
+                    </svg>
+                    {{ 'sections.collection_template.empty' | t -}}
+                    {{
+                      'sections.collection_template.use_fewer_filters_html'
+                      | t: link: collection.url, class: 'underlined-link link'
+                    }}
+                  </p>
+                </div>
+              </div>
+            {%- else -%}
+              <div
+                id="product-grid"
+                class="collection page-width"
+              >
+                <div
+                  id="bls__product-grid"
+                  data-id="{{ section.id }}"
+                  class="{% if view == 'list' %}list product-list{% else %}grid product-grid {{ product_style }}{% endif %} container-products-switch bls__grid row row-cols-2 row-cols-lg-{{ products_column }}"
+                  data-view-mode="{{ products_column }}"
+                >
+                  {%- for product in collection.products -%}
+                    <div
+                      class="bls__grid__item"
+                    >
+                      {%- if view == 'list' -%}
+                        {%- render 'product-list-item', product: product -%}
+                      {%- else -%}
+                        {%- liquid
+                          assign loading = 'lazy'
+                          if forloop.index <= 4
+                            assign loading = 'eager'
+                          endif
+                        -%}
+                        {%- render 'product-item', product: product, loading: loading -%}
+                      {%- endif -%}
+                    </div>
+                  {%- endfor -%}
+                </div>
+                {%- if paginate.pages > 1 -%}
+                  {% render 'pagination',
+                    paginate: paginate,
+                    st: st,
+                    anchor: '',
+                    pageurl: view,
+                    pagination: pagination
+                  %}
+                {%- endif -%}
+              </div>
+            {%- endif -%}
+          {%- endpaginate -%}
+        </div>
+      </div>
+      {%- if enable_sidebar and sidebar_ps == 'right_sidebar' -%}
+        {% render 'collection-sidebar',
+          st: st,
+          se_block: se_block,
+          enable_sidebar: enable_sidebar,
+          sidebar_ps: sidebar_ps
+        %}
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+        <!-- piranav-Add 14/07/2025 -->                
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": {{ collection.title | json }},
+  "url": {{ request.origin | append: collection.url | json }},
+  "numberOfItems": {{ collection.products_count }},
+  "itemListElement": [
+    {% for product in collection.products %}
+      {
+        "@type": "ListItem",
+        "position": {{ forloop.index }},
+        "item": {
+          "@type": "Product",
+          "name": {{ product.title | json }},
+          "url": {{ request.origin | append: product.url | json }},
+          "image": [
+            {{ product.featured_image | image_url: width: 800 | prepend: "https:" | json }}
+          ],
+          "offers": {
+            "@type": "Offer",
+            "priceCurrency": "{{ shop.currency }}",
+            "price": "{{ product.price | money_without_currency | replace: ',', '' }}",
+            "availability": "https://schema.org/{% if product.available %}InStock{% else %}OutOfStock{% endif %}"
+          }
+        }
+      }{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  ]
+}
+</script>
+
+
+                        
+
+{% schema %}
+{
+  "name": "Collection main",
+  "class": "section",
+  "settings": [
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "default": "container",
+      "options": [
+        {
+          "value": "container",
+          "label": "Default"
+        },
+        {
+          "value": "container-fluid",
+          "label": "Fluid container"
+        },
+        {
+          "value": "full-width",
+          "label": "Full width"
+        }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_list_view",
+      "label": "Enable layout list product",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "products_column",
+      "label": "Items per row",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "number_products_grid",
+      "label": "Max number products grid",
+      "min": 1,
+      "max": 24,
+      "step": 1,
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "number_products_list",
+      "label": "Max number products list",
+      "min": 1,
+      "max": 24,
+      "step": 1,
+      "default": 12
+    },
+    {
+      "type": "select",
+      "id": "pagination",
+      "label": "Pagination",
+      "default": "default",
+      "options": [
+        {
+          "value": "default",
+          "label": "Default"
+        },
+        {
+          "value": "load_more",
+          "label": "Load more"
+        },
+        {
+          "value": "infinit_scrolling",
+          "label": "Infinit scrolling"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Toolbar Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "product_page_count",
+      "label": "Show product per page count",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "product_sort_options",
+      "label": "Show product sort options",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "progress_bar",
+      "label": "Show list, grid bar",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": " Sidebar & Filters"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sidebar",
+      "label": "Enable sidebar?",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "sidebar_position",
+      "label": "Sidebar position on desktop",
+      "default": "left_sidebar",
+      "options": [
+        {
+          "value": "left_sidebar",
+          "label": "Left sidebar"
+        },
+        {
+          "value": "right_sidebar",
+          "label": "Right sidebar"
+        },
+        {
+          "value": "dropdonw_sidebar",
+          "label": "Dropdown sidebar"
+        },
+        {
+          "value": "filter_canvas",
+          "label": "Canvas sidebar"
+        }
+      ]
+    },
+    {
+      "type": "textarea",
+      "id": "variant_color",
+      "label": "Add variant option name you want to show color swatchs",
+      "info": "Example: Color, couleur, Farbe, Kleur, Farge"
+    },
+    {
+      "type": "textarea",
+      "id": "variant_size",
+      "label": "Add variant option name you want to show size swatchs",
+      "info": "Example: 'Size, Dimensione, Taille'."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_count",
+      "label": "Show product count",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "categories",
+      "name": "Categories",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Category"
+        },
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Select Menu"
+        }
+      ]
+    },
+    {
+      "type": "filter_by_tags",
+      "name": "Filter by tags",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title"
+        },
+        {
+          "type": "textarea",
+          "id": "tag",
+          "label": "Tag Filter",
+          "info": "Example: 'Tag1, Tag2, Tag3'."
+        }
+      ]
+    },
+    {
+      "type": "filter_by_dynamic",
+      "name": "Filter Dynamic",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "This options will not work  with collection contains more than 1000 .[How to set?](/admin/menus)"
+        }
+      ]
+    },
+    {
+      "type": "popular_product",
+      "name": "Popular Product",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Featured Product"
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Select collection"
+        },
+        {
+          "type": "select",
+          "id": "type_product",
+          "label": "Product type",
+          "default": "list",
+          "info": "Type is list defaut show 3 products",
+          "options": [
+            {
+              "value": "list",
+              "label": "List"
+            },
+            {
+              "value": "grid",
+              "label": "Grid"
+            }
+          ]
+        },
+        {
+          "type": "range",
+          "id": "maximum",
+          "label": "Maximum products to show",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "default": 3
+        }
+      ]
+    },
+    {
+      "type": "image_banner",
+      "name": "Image Banner",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image Banner",
+          "info": "Upload image: png, jpg or gif file(1920 x 200px recommended)"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Link"
+        },
+        {
+          "type": "checkbox",
+          "id": "open_link",
+          "label": "Open link in new window",
+          "default": false
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

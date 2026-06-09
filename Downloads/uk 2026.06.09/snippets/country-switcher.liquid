@@ -1,0 +1,34 @@
+{% if localization.available_countries.size > 1 %}
+  <localization-form>
+    {%- assign form_id = 'localization-country-' | append: section.id -%}
+    {% form 'localization', id: form_id %}
+      <div class="disclosure relative d-inline-flex py-5">
+        <div class="button-localization disclosure__button">
+          {{ localization.country.name }}
+          ({{ localization.country.currency.iso_code }}
+          {{ localization.country.currency.symbol }})
+          <i class="icon-chevron-down"></i>
+        </div>
+        <ul class="disclosure__list p-20 list-none my-0 absolute right-0 hidden">
+          {% for country in localization.available_countries %}
+            <li class="disclosure__item" tabindex="-1">
+              <a
+                href="#"
+                {% if country.iso_code == localization.country.iso_code %}
+                  aria-current="true"
+                {% endif %}
+                data-value="{{ country.iso_code }}"
+              >
+                {{ country.name }}
+                ({{ country.currency.iso_code }}
+                {{ country.currency.symbol }})
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+
+        <input type="hidden" name="country_code" value="{{ localization.country.iso_code }}">
+      </div>
+    {% endform %}
+  </localization-form>
+{% endif %}

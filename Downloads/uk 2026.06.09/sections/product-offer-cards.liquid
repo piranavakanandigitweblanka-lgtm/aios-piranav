@@ -1,0 +1,1776 @@
+{%- liquid
+  assign section_id = 'product-offer-cards-' | append: section.id
+  assign container_class = 'products-container'
+  if section.settings.container_width == 'narrow'
+    assign container_class = container_class | append: ' container-narrow'
+  elsif section.settings.container_width == 'wide'
+    assign container_class = container_class | append: ' container-wide'
+  endif
+-%}
+
+<style>
+  #{{ section_id }} {
+    padding: {{ section.settings.section_padding }}px 0;
+    background-color: {{ section.settings.background_color }};
+  }
+
+  #{{ section_id }} .products-container {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    justify-content: flex-start;
+    gap: {{ section.settings.card_gap }}px;
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 20px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    cursor: grab;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+  }
+
+  #{{ section_id }} .products-container::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
+  }
+
+  #{{ section_id }} .products-container:active {
+    cursor: grabbing;
+  }
+
+  #{{ section_id }} .container-narrow {
+    max-width: 1000px;
+  }
+
+  #{{ section_id }} .container-wide {
+    max-width: 1400px;
+  }
+
+  #{{ section_id }} .product-card {
+    position: relative;
+    width: {{ section.settings.card_width }}px;
+    background: {{ section.settings.card_background }};
+    border-radius: {{ section.settings.card_border_radius }}px;
+    overflow: hidden;
+    box-shadow: {{ section.settings.card_shadow }};
+    transition: transform {{ section.settings.hover_animation_duration }}s ease, box-shadow {{ section.settings.hover_animation_duration }}s ease;
+    scroll-snap-align: start;
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  #{{ section_id }} .product-card:hover {
+    transform: translateY(-{{ section.settings.hover_lift }}px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+
+  @media (hover: none) {
+    #{{ section_id }} .product-card:hover {
+      transform: none;
+      box-shadow: {{ section.settings.card_shadow }};
+    }
+  }
+
+  #{{ section_id }} .offer-badge {
+    position: absolute;
+    top: {{ section.settings.badge_position_top }}px;
+    left: {{ section.settings.badge_position_left }}px;
+    background: {{ section.settings.badge_background }};
+    color: {{ section.settings.badge_text_color }};
+    padding: {{ section.settings.badge_padding }}px;
+    border-radius: {{ section.settings.badge_border_radius }}px;
+    font-weight: {{ section.settings.badge_font_weight }};
+    text-align: center;
+    box-shadow: {{ section.settings.badge_shadow }};
+    z-index: 2;
+    line-height: 1.2;
+  }
+
+  #{{ section_id }} .offer-percent {
+    font-size: {{ section.settings.badge_percent_size }}px;
+    display: block;
+  }
+
+  #{{ section_id }} .offer-text {
+    font-size: {{ section.settings.badge_text_size }}px;
+    letter-spacing: {{ section.settings.badge_letter_spacing }}px;
+    display: block;
+    text-transform: {{ section.settings.badge_text_transform }};
+  }
+
+  #{{ section_id }} .product-image-container {
+    height: {{ section.settings.image_height }}px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  #{{ section_id }} .product-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform {{ section.settings.image_hover_duration }}s ease;
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  #{{ section_id }} .product-card:hover .product-image {
+    transform: scale({{ section.settings.image_hover_scale }});
+  }
+
+  #{{ section_id }} .shop-now {
+    position: absolute;
+    bottom: {{ section.settings.shop_now_bottom }}px;
+    right: {{ section.settings.shop_now_right }}px;
+    background: {{ section.settings.shop_now_background }};
+    color: {{ section.settings.shop_now_text_color }};
+    padding: {{ section.settings.shop_now_padding }}px;
+    border-radius: {{ section.settings.shop_now_border_radius }}px;
+    font-size: {{ section.settings.shop_now_font_size }}px;
+    text-transform: {{ section.settings.shop_now_text_transform }};
+    letter-spacing: {{ section.settings.shop_now_letter_spacing }}px;
+    cursor: pointer;
+    transition: all {{ section.settings.shop_now_hover_duration }}s ease;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  #{{ section_id }} .shop-now:hover {
+    background: {{ section.settings.shop_now_hover_background }};
+    color: {{ section.settings.shop_now_hover_text_color }};
+  }
+
+  #{{ section_id }} .product-info {
+    padding: 0;
+    margin: 0;
+  }
+
+  #{{ section_id }} .info-row {
+    display: flex;
+    width: 100%;
+    height: 80px;
+    padding: 0;
+    margin: 0;
+    background: none;
+    border-radius: 0 0 {{ section.settings.card_border_radius }}px {{ section.settings.card_border_radius }}px;
+    overflow: hidden;
+  }
+
+  #{{ section_id }} .product-title,
+  #{{ section_id }} .product-price {
+    flex: 1 1 0;
+    min-width: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 0;
+    border-radius: 0;
+  }
+
+  #{{ section_id }} .product-title {
+    align-items: flex-start;
+    background: {{ section.settings.info_row_title_background }};
+    color: {{ section.settings.info_row_title_text_color }};
+    font-weight: {{ section.settings.title_font_weight }};
+    font-size: {{ section.settings.title_font_size }}px;
+    border-bottom-left-radius: {{ section.settings.card_border_radius }}px;
+    padding-left: 16px;
+    padding-right: 0;
+  }
+
+  #{{ section_id }} .product-price {
+    align-items: flex-end;
+    background: {{ section.settings.info_row_price_background }};
+    color: {{ section.settings.info_row_price_text_color }};
+    border-bottom-right-radius: {{ section.settings.card_border_radius }}px;
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+
+  #{{ section_id }} .price-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  #{{ section_id }} .current-price {
+    font-size: {{ section.settings.current_price_size }}px;
+    font-weight: {{ section.settings.current_price_weight }};
+  }
+
+  #{{ section_id }} .original-price {
+    font-size: {{ section.settings.original_price_size }}px;
+    color: {{ section.settings.original_price_color }};
+    text-decoration: line-through;
+    margin-top: 2px;
+  }
+
+  #{{ section_id }} .info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 10px;
+  }
+  #{{ section_id }} .product-title {
+    flex: 1 1 60%;
+    text-align: left;
+  }
+  #{{ section_id }} .product-price {
+    flex: 0 0 auto;
+    text-align: right;
+  }
+
+  /* Scroll indicators */
+  #{{ section_id }} .scroll-indicator {
+    display: none;
+    text-align: center;
+    margin-top: 15px;
+  }
+  
+  #{{ section_id }} .scroll-indicator span {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #ccc;
+    margin: 0 5px;
+    cursor: pointer;
+  }
+  
+  #{{ section_id }} .scroll-indicator span.active {
+    background: #333;
+  }
+
+  /* View all button */
+  #{{ section_id }} .view-all {
+    text-align: center;
+    margin-top: 30px;
+  }
+  
+  #{{ section_id }} .view-all a {
+    display: inline-block;
+    padding: 10px 20px;
+    background: {{ section.settings.view_all_background }};
+    color: {{ section.settings.view_all_text_color }};
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
+  }
+  
+  #{{ section_id }} .view-all a:hover {
+    background: {{ section.settings.view_all_hover_background }};
+    color: {{ section.settings.view_all_hover_text_color }};
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    #{{ section_id }} {
+      padding: {{ section.settings.mobile_section_padding | default: 20 }}px 0;
+    }
+
+    #{{ section_id }} .section-header h2 {
+      font-size: {{ section.settings.mobile_section_title_size | default: 24 }}px !important;
+      line-height: 1.3;
+      margin-bottom: 10px;
+    }
+
+    #{{ section_id }} .section-header p {
+      font-size: {{ section.settings.mobile_section_subtitle_size | default: 14 }}px !important;
+      line-height: 1.4;
+    }
+
+    #{{ section_id }} .products-container {
+      gap: {{ section.settings.mobile_card_gap | default: 15 }}px;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scroll-padding: 20px;
+      padding: 0 15px;
+    }
+    
+    #{{ section_id }} .product-card {
+      min-width: calc(100vw - 60px);
+      max-width: calc(100vw - 60px);
+      width: calc(100vw - 60px);
+      scroll-snap-align: start;
+      border-radius: {{ section.settings.mobile_card_border_radius | default: 8 }}px;
+    }
+
+    #{{ section_id }} .product-image-container {
+      height: {{ section.settings.mobile_image_height | default: 200 }}px;
+    }
+
+    #{{ section_id }} .offer-badge {
+      top: {{ section.settings.mobile_badge_position_top | default: 10 }}px;
+      left: {{ section.settings.mobile_badge_position_left | default: 10 }}px;
+      padding: {{ section.settings.mobile_badge_padding | default: 6 }}px;
+      border-radius: {{ section.settings.mobile_badge_border_radius | default: 3 }}px;
+    }
+
+    #{{ section_id }} .offer-percent {
+      font-size: {{ section.settings.mobile_badge_percent_size | default: 18 }}px;
+    }
+
+    #{{ section_id }} .offer-text {
+      font-size: {{ section.settings.mobile_badge_text_size | default: 12 }}px;
+    }
+
+    #{{ section_id }} .shop-now {
+      bottom: {{ section.settings.mobile_shop_now_bottom | default: 10 }}px;
+      right: {{ section.settings.mobile_shop_now_right | default: 10 }}px;
+      padding: {{ section.settings.mobile_shop_now_padding | default: 6 }}px;
+      font-size: {{ section.settings.mobile_shop_now_font_size | default: 10 }}px;
+    }
+
+    #{{ section_id }} .product-title {
+      font-size: {{ section.settings.mobile_title_font_size | default: 16 }}px;
+      line-height: 1.3;
+      padding: 12px 16px;
+      height: auto;
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+    }
+
+    #{{ section_id }} .current-price {
+      font-size: {{ section.settings.mobile_current_price_size | default: 18 }}px;
+    }
+
+    #{{ section_id }} .original-price {
+      font-size: {{ section.settings.mobile_original_price_size | default: 14 }}px;
+    }
+
+    #{{ section_id }} .product-info {
+      padding: 0;
+    }
+
+    #{{ section_id }} .info-row {
+      flex-direction: column;
+      height: auto;
+      border-radius: 0 0 {{ section.settings.mobile_card_border_radius | default: 8 }}px {{ section.settings.mobile_card_border_radius | default: 8 }}px;
+    }
+
+    #{{ section_id }} .product-title,
+    #{{ section_id }} .product-price {
+      border-radius: 0;
+      width: 100%;
+      height: auto;
+      min-height: 48px;
+      justify-content: center;
+      padding: 12px 16px;
+      text-align: left;
+    }
+
+    #{{ section_id }} .product-price {
+      justify-content: center;
+      padding: 12px 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    #{{ section_id }} .price-stack {
+      align-items: flex-start;
+      width: 100%;
+    }
+
+    #{{ section_id }} .scroll-indicator {
+      display: block;
+      margin-top: 20px;
+    }
+
+    #{{ section_id }} .scroll-indicator span {
+      width: 8px;
+      height: 8px;
+      margin: 0 3px;
+    }
+
+    #{{ section_id }} .view-all {
+      margin-top: 20px;
+      padding: 0 15px;
+    }
+
+    #{{ section_id }} .view-all a {
+      width: 100%;
+      padding: 12px 20px;
+      font-size: 16px;
+      text-align: center;
+    }
+  }
+
+  /* Tablet adjustments */
+  @media (min-width: 769px) and (max-width: 1024px) {
+    #{{ section_id }} .products-container {
+      gap: {{ section.settings.tablet_card_gap | default: 20 }}px;
+      padding: 0 30px;
+    }
+    
+    #{{ section_id }} .product-card {
+      width: {{ section.settings.tablet_card_width | default: 240 }}px;
+    }
+
+    #{{ section_id }} .product-image-container {
+      height: {{ section.settings.tablet_image_height | default: 240 }}px;
+    }
+
+    #{{ section_id }} .product-title {
+      font-size: {{ section.settings.tablet_title_font_size | default: 16 }}px;
+    }
+
+    #{{ section_id }} .current-price {
+      font-size: {{ section.settings.tablet_current_price_size | default: 18 }}px;
+    }
+  }
+
+  /* Small mobile adjustments */
+  @media (max-width: 480px) {
+    #{{ section_id }} .products-container {
+      gap: 10px;
+      padding: 0 10px;
+    }
+    
+    #{{ section_id }} .product-card {
+      min-width: calc(100vw - 40px);
+      max-width: calc(100vw - 40px);
+      width: calc(100vw - 40px);
+    }
+
+    #{{ section_id }} .product-image-container {
+      height: {{ section.settings.small_mobile_image_height | default: 180 }}px;
+    }
+
+    #{{ section_id }} .product-title {
+      font-size: {{ section.settings.small_mobile_title_font_size | default: 14 }}px;
+      padding: 10px 12px;
+    }
+
+    #{{ section_id }} .current-price {
+      font-size: {{ section.settings.small_mobile_current_price_size | default: 16 }}px;
+    }
+
+    #{{ section_id }} .offer-badge {
+      top: 8px;
+      left: 8px;
+      padding: 4px;
+    }
+
+    #{{ section_id }} .offer-percent {
+      font-size: 16px;
+    }
+
+    #{{ section_id }} .offer-text {
+      font-size: 10px;
+    }
+  }
+</style>
+
+<div id="{{ section_id }}" class="product-offer-cards-section" aria-label="Product offers" role="region" aria-roledescription="Product offers carousel">
+  {% if section.settings.section_title != blank %}
+    <div class="section-header text-center" style="margin-bottom: {{ section.settings.section_title_margin_bottom }}px;">
+      <h2 style="font-size: {{ section.settings.section_title_size }}px; color: {{ section.settings.section_title_color }};">
+        {{ section.settings.section_title }}
+      </h2>
+      {% if section.settings.section_subtitle != blank %}
+        <p style="font-size: {{ section.settings.section_subtitle_size }}px; color: {{ section.settings.section_subtitle_color }}; margin-top: 10px;">
+          {{ section.settings.section_subtitle }}
+        </p>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  <div class="{{ container_class }}" id="cards-container-{{ section.id }}" role="list" aria-label="Product offer cards">
+    {% for block in section.blocks %}
+      {% case block.type %}
+        {% when 'product_card' %}
+          {% assign product = all_products[block.settings.product_ref] | default: blank %}
+          {% assign use_manual = block.settings.remove_product_link %}
+          <div class="product-card" {{ block.shopify_attributes }} role="listitem" tabindex="0">
+            {% if block.settings.show_offer_badge %}
+              <div class="offer-badge">
+                <span class="offer-percent">
+                  {% if product and product != blank and use_manual != true and product.compare_at_price > product.price %}
+                    {% assign price_times_100 = product.price | times: 100 %}
+                    {% assign percent = price_times_100 | divided_by: product.compare_at_price %}
+                    {% assign discount_percent = 100 | minus: percent | round %}
+                    {{ discount_percent }}%
+                  {% else %}
+                    {{ block.settings.offer_percent | default: '25%' }}
+                  {% endif %}
+                </span>
+                <span class="offer-text">{{ block.settings.offer_text | default: 'Offer' }}</span>
+              </div>
+            {% endif %}
+            <div class="product-image-container">
+              {% if product and product != blank and use_manual != true and product.featured_image != blank %}
+                <img 
+                  src="{{ product.featured_image | image_url: width: 500, height: 400 }}"
+                  alt="{{ product.title | escape }}"
+                  class="product-image"
+                  loading="lazy"
+                  width="500"
+                  height="400"
+                  decoding="async"
+                >
+              {% elsif block.settings.product_image != blank %}
+                <img 
+                  src="{{ block.settings.product_image | image_url: width: 500, height: 400 }}" 
+                  alt="{{ block.settings.product_title | default: 'Product' | escape }}" 
+                  class="product-image"
+                  loading="lazy"
+                  width="500"
+                  height="400"
+                  decoding="async"
+                >
+              {% else %}
+                <div class="product-image-placeholder" style="width: 100%; height: 100%; background-color: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #999;" aria-label="Product image placeholder">
+                  <span>Product Image</span>
+                </div>
+              {% endif %}
+              {% if block.settings.show_shop_now_button and block.settings.shop_now_text != blank %}
+                <a 
+                  href="{% if product and product != blank and use_manual != true %}{{ product.url }}{% else %}{{ block.settings.product_link | default: '#' }}{% endif %}" 
+                  class="shop-now"
+                  aria-label="Shop now for {% if product and product != blank %}{{ product.title }}{% else %}{{ block.settings.product_title | default: 'this product' }}{% endif %}"
+                >
+                  {{ block.settings.shop_now_text }}
+                </a>
+              {% endif %}
+            </div>
+            <div class="product-info">
+              {% if product and product != blank and use_manual != true %}
+                <div class="info-row">
+                  <div class="product-title">{% if block.settings.product_title != blank %}{{ block.settings.product_title }}{% else %}{{ product.title }}{% endif %}</div>
+                  <div class="product-price">
+                    <div class="price-stack">
+                      <span class="current-price">{{ product.price | money }}</span>
+                      {% if product.compare_at_price > product.price %}
+                        <span class="original-price">{{ product.compare_at_price | money }}</span>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              {% else %}
+                {% if block.settings.product_title != blank or block.settings.show_price and block.settings.current_price != blank %}
+                  <div class="info-row">
+                    {% if block.settings.product_title != blank %}
+                      <div class="product-title">{{ block.settings.product_title }}</div>
+                    {% endif %}
+                    {% if block.settings.show_price and block.settings.current_price != blank %}
+                      <div class="product-price">
+                        <div class="price-stack">
+                          <span class="current-price">{{ block.settings.current_price }}</span>
+                          {% if block.settings.original_price != blank %}
+                            <span class="original-price">{{ block.settings.original_price }}</span>
+                          {% endif %}
+                        </div>
+                      </div>
+                    {% endif %}
+                  </div>
+                {% endif %}
+              {% endif %}
+            </div>
+          </div>
+      {% endcase %}
+    {% endfor %}
+  </div>
+
+  {% if section.blocks.size > 1 %}
+    <div class="scroll-indicator" id="scroll-indicator-{{ section.id }}">
+      {% for block in section.blocks %}
+        <span data-index="{{ forloop.index0 }}" {% if forloop.first %}class="active"{% endif %}></span>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {% if section.settings.show_view_all and section.settings.view_all_text != blank %}
+    <div class="view-all">
+      <a href="{{ section.settings.view_all_link | default: '#' }}" aria-label="View all products">
+        {{ section.settings.view_all_text }}
+      </a>
+    </div>
+  {% endif %}
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const container = document.getElementById('cards-container-{{ section.id }}');
+    const indicator = document.getElementById('scroll-indicator-{{ section.id }}');
+    
+    if (container && indicator) {
+      const dots = indicator.querySelectorAll('span');
+      const cardWidth = {{ section.settings.card_width | default: 280 }};
+      const gap = {{ section.settings.card_gap | default: 30 }};
+      const mobileCardWidth = window.innerWidth <= 768 ? (window.innerWidth - 60) : cardWidth;
+      const mobileGap = window.innerWidth <= 768 ? {{ section.settings.mobile_card_gap | default: 15 }} : gap;
+      
+      // Function to update active dot
+      function updateActiveDot() {
+        const scrollPosition = container.scrollLeft;
+        const currentCardWidth = window.innerWidth <= 768 ? mobileCardWidth : cardWidth;
+        const currentGap = window.innerWidth <= 768 ? mobileGap : gap;
+        const activeIndex = Math.round(scrollPosition / (currentCardWidth + currentGap));
+        
+        dots.forEach((dot, index) => {
+          dot.classList.toggle('active', index === activeIndex);
+        });
+      }
+      
+      // Throttled scroll handler for better performance
+      let scrollTimeout;
+      container.addEventListener('scroll', function() {
+        if (scrollTimeout) {
+          clearTimeout(scrollTimeout);
+        }
+        scrollTimeout = setTimeout(updateActiveDot, 10);
+      });
+      
+      // Click handler for dots
+      dots.forEach(dot => {
+        dot.addEventListener('click', function() {
+          const index = parseInt(this.getAttribute('data-index'));
+          const currentCardWidth = window.innerWidth <= 768 ? mobileCardWidth : cardWidth;
+          const currentGap = window.innerWidth <= 768 ? mobileGap : gap;
+          
+          container.scrollTo({
+            left: index * (currentCardWidth + currentGap),
+            behavior: 'smooth'
+          });
+        });
+      });
+      
+      // Touch/swipe support for mobile
+      let startX = 0;
+      let scrollLeft = 0;
+      let isDown = false;
+      
+      container.addEventListener('mousedown', function(e) {
+        isDown = true;
+        startX = e.pageX - container.offsetLeft;
+        scrollLeft = container.scrollLeft;
+        container.style.cursor = 'grabbing';
+      });
+      
+      container.addEventListener('mouseleave', function() {
+        isDown = false;
+        container.style.cursor = 'grab';
+      });
+      
+      container.addEventListener('mouseup', function() {
+        isDown = false;
+        container.style.cursor = 'grab';
+      });
+      
+      container.addEventListener('mousemove', function(e) {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - container.offsetLeft;
+        const walk = (x - startX) * 2;
+        container.scrollLeft = scrollLeft - walk;
+      });
+      
+      // Prevent default drag behavior on images
+      const images = container.querySelectorAll('img');
+      images.forEach(img => {
+        img.addEventListener('dragstart', function(e) {
+          e.preventDefault();
+        });
+      });
+      
+      // Initialize active dot
+      updateActiveDot();
+      
+      // Handle window resize
+      window.addEventListener('resize', function() {
+        setTimeout(updateActiveDot, 100);
+      });
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Product Offer Cards",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Content"
+    },
+    {
+      "type": "text",
+      "id": "section_title",
+      "label": "Section Title",
+      "default": "Special Offers",
+      "info": "Required for accessibility"
+    },
+    {
+      "type": "text",
+      "id": "section_subtitle",
+      "label": "Section Subtitle",
+      "default": "Discover our latest deals and discounts"
+    },
+    {
+      "type": "header",
+      "content": "Layout Settings"
+    },
+    {
+      "type": "select",
+      "id": "container_width",
+      "label": "Container Width",
+      "options": [
+        {
+          "value": "default",
+          "label": "Default (1200px)"
+        },
+        {
+          "value": "narrow",
+          "label": "Narrow (1000px)"
+        },
+        {
+          "value": "wide",
+          "label": "Wide (1400px)"
+        }
+      ],
+      "default": "default"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Max Width",
+      "min": 800,
+      "max": 1600,
+      "step": 50,
+      "default": 1200,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "card_width",
+      "label": "Card Width",
+      "min": 200,
+      "max": 400,
+      "step": 10,
+      "default": 280,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "card_gap",
+      "label": "Card Gap",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "default": 30,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "section_padding",
+      "label": "Section Padding",
+      "min": 20,
+      "max": 100,
+      "step": 10,
+      "default": 40,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Card Styling"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Section Background",
+      "default": "#f5f5f5"
+    },
+    {
+      "type": "color",
+      "id": "card_background",
+      "label": "Card Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "card_border_radius",
+      "label": "Card Border Radius",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "default": 10,
+      "unit": "px"
+    },
+    {
+      "type": "text",
+      "id": "card_shadow",
+      "label": "Card Shadow",
+      "default": "0 5px 15px rgba(0, 0, 0, 0.1)"
+    },
+    {
+      "type": "range",
+      "id": "hover_lift",
+      "label": "Hover Lift",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "default": 5,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "hover_animation_duration",
+      "label": "Hover Animation Duration",
+      "min": 0.1,
+      "max": 1.0,
+      "step": 0.1,
+      "default": 0.3,
+      "unit": "s"
+    },
+    {
+      "type": "header",
+      "content": "Image Settings"
+    },
+    {
+      "type": "range",
+      "id": "image_height",
+      "label": "Image Height",
+      "min": 150,
+      "max": 400,
+      "step": 10,
+      "default": 220,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "image_hover_scale",
+      "label": "Image Hover Scale",
+      "min": 1.0,
+      "max": 1.2,
+      "step": 0.1,
+      "default": 1.1
+    },
+    {
+      "type": "range",
+      "id": "image_hover_duration",
+      "label": "Image Hover Duration",
+      "min": 0.1,
+      "max": 1.0,
+      "step": 0.1,
+      "default": 0.5,
+      "unit": "s"
+    },
+    {
+      "type": "header",
+      "content": "Offer Badge"
+    },
+    {
+      "type": "range",
+      "id": "badge_position_top",
+      "label": "Badge Top Position",
+      "min": 5,
+      "max": 30,
+      "step": 1,
+      "default": 15,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "badge_position_left",
+      "label": "Badge Left Position",
+      "min": 5,
+      "max": 30,
+      "step": 1,
+      "default": 15,
+      "unit": "px"
+    },
+    {
+      "type": "color",
+      "id": "badge_background",
+      "label": "Badge Background",
+      "default": "#ff6b6b"
+    },
+    {
+      "type": "color",
+      "id": "badge_text_color",
+      "label": "Badge Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "badge_padding",
+      "label": "Badge Padding",
+      "min": 4,
+      "max": 20,
+      "step": 1,
+      "default": 8,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "badge_border_radius",
+      "label": "Badge Border Radius",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "default": 4,
+      "unit": "px"
+    },
+    {
+      "type": "select",
+      "id": "badge_font_weight",
+      "label": "Badge Font Weight",
+      "options": [
+        {"value": "normal", "label": "Normal"},
+        {"value": "bold", "label": "Bold"},
+        {"value": "600", "label": "Semi Bold"},
+        {"value": "700", "label": "Bold"}
+      ],
+      "default": "bold"
+    },
+    {
+      "type": "range",
+      "id": "badge_percent_size",
+      "label": "Badge Percent Size",
+      "min": 16,
+      "max": 40,
+      "step": 1,
+      "default": 24,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "badge_text_size",
+      "label": "Badge Text Size",
+      "min": 10,
+      "max": 20,
+      "step": 1,
+      "default": 14,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "badge_letter_spacing",
+      "label": "Badge Letter Spacing",
+      "min": 0,
+      "max": 3,
+      "step": 0.1,
+      "default": 1,
+      "unit": "px"
+    },
+    {
+      "type": "select",
+      "id": "badge_text_transform",
+      "label": "Badge Text Transform",
+      "options": [
+        {"value": "none", "label": "None"},
+        {"value": "uppercase", "label": "Uppercase"},
+        {"value": "lowercase", "label": "Lowercase"},
+        {"value": "capitalize", "label": "Capitalize"}
+      ],
+      "default": "uppercase"
+    },
+    {
+      "type": "text",
+      "id": "badge_shadow",
+      "label": "Badge Shadow",
+      "default": "0 3px 6px rgba(0, 0, 0, 0.16)"
+    },
+    {
+      "type": "header",
+      "content": "Shop Now Button"
+    },
+    {
+      "type": "range",
+      "id": "shop_now_bottom",
+      "label": "Button Bottom Position",
+      "min": 5,
+      "max": 30,
+      "step": 1,
+      "default": 15,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "shop_now_right",
+      "label": "Button Right Position",
+      "min": 5,
+      "max": 30,
+      "step": 1,
+      "default": 15,
+      "unit": "px"
+    },
+    {
+      "type": "color",
+      "id": "shop_now_background",
+      "label": "Button Background",
+      "default": "rgba(0, 0, 0, 0.7)"
+    },
+    {
+      "type": "color",
+      "id": "shop_now_text_color",
+      "label": "Button Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "shop_now_hover_background",
+      "label": "Button Hover Background",
+      "default": "rgba(0, 0, 0, 0.9)"
+    },
+    {
+      "type": "color",
+      "id": "shop_now_hover_text_color",
+      "label": "Button Hover Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "shop_now_padding",
+      "label": "Button Padding",
+      "min": 4,
+      "max": 20,
+      "step": 1,
+      "default": 8,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "shop_now_border_radius",
+      "label": "Button Border Radius",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "default": 20,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "shop_now_font_size",
+      "label": "Button Font Size",
+      "min": 10,
+      "max": 18,
+      "step": 1,
+      "default": 12,
+      "unit": "px"
+    },
+    {
+      "type": "select",
+      "id": "shop_now_text_transform",
+      "label": "Button Text Transform",
+      "options": [
+        {"value": "none", "label": "None"},
+        {"value": "uppercase", "label": "Uppercase"},
+        {"value": "lowercase", "label": "Lowercase"},
+        {"value": "capitalize", "label": "Capitalize"}
+      ],
+      "default": "uppercase"
+    },
+    {
+      "type": "range",
+      "id": "shop_now_letter_spacing",
+      "label": "Button Letter Spacing",
+      "min": 0,
+      "max": 3,
+      "step": 0.1,
+      "default": 1,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "shop_now_hover_duration",
+      "label": "Button Hover Duration",
+      "min": 0.1,
+      "max": 1.0,
+      "step": 0.1,
+      "default": 0.3,
+      "unit": "s"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "section_title_size",
+      "label": "Section Title Size",
+      "min": 20,
+      "max": 60,
+      "step": 2,
+      "default": 36,
+      "unit": "px"
+    },
+    {
+      "type": "color",
+      "id": "section_title_color",
+      "label": "Section Title Color",
+      "default": "#333333"
+    },
+    {
+      "type": "range",
+      "id": "section_subtitle_size",
+      "label": "Section Subtitle Size",
+      "min": 14,
+      "max": 24,
+      "step": 1,
+      "default": 16,
+      "unit": "px"
+    },
+    {
+      "type": "color",
+      "id": "section_subtitle_color",
+      "label": "Section Subtitle Color",
+      "default": "#666666"
+    },
+    {
+      "type": "range",
+      "id": "section_title_margin_bottom",
+      "label": "Section Title Margin Bottom",
+      "min": 5,
+      "max": 25,
+      "step": 1,
+      "default": 10,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "info_padding",
+      "label": "Info Padding",
+      "min": 10,
+      "max": 40,
+      "step": 5,
+      "default": 20,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "category_font_size",
+      "label": "Category Font Size",
+      "min": 10,
+      "max": 20,
+      "step": 1,
+      "default": 14,
+      "unit": "px"
+    },
+    {
+      "type": "color",
+      "id": "category_color",
+      "label": "Category Color",
+      "default": "#666666"
+    },
+    {
+      "type": "range",
+      "id": "category_margin_bottom",
+      "label": "Category Margin Bottom",
+      "min": 2,
+      "max": 15,
+      "step": 1,
+      "default": 5,
+      "unit": "px"
+    },
+    {
+      "type": "select",
+      "id": "category_text_transform",
+      "label": "Category Text Transform",
+      "options": [
+        {"value": "none", "label": "None"},
+        {"value": "uppercase", "label": "Uppercase"},
+        {"value": "lowercase", "label": "Lowercase"},
+        {"value": "capitalize", "label": "Capitalize"}
+      ],
+      "default": "uppercase"
+    },
+    {
+      "type": "range",
+      "id": "category_letter_spacing",
+      "label": "Category Letter Spacing",
+      "min": 0,
+      "max": 2,
+      "step": 0.1,
+      "default": 0.5,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "title_font_size",
+      "label": "Title Font Size",
+      "min": 14,
+      "max": 28,
+      "step": 1,
+      "default": 18,
+      "unit": "px"
+    },
+    {
+      "type": "select",
+      "id": "title_font_weight",
+      "label": "Title Font Weight",
+      "options": [
+        {"value": "normal", "label": "Normal"},
+        {"value": "bold", "label": "Bold"},
+        {"value": "600", "label": "Semi Bold"},
+        {"value": "700", "label": "Bold"}
+      ],
+      "default": "bold"
+    },
+    {
+      "type": "range",
+      "id": "title_margin_bottom",
+      "label": "Title Margin Bottom",
+      "min": 5,
+      "max": 25,
+      "step": 1,
+      "default": 10,
+      "unit": "px"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Title Color",
+      "default": "#333333"
+    },
+    {
+      "type": "range",
+      "id": "price_margin_top",
+      "label": "Price Margin Top",
+      "min": 5,
+      "max": 25,
+      "step": 1,
+      "default": 15,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "current_price_size",
+      "label": "Current Price Size",
+      "min": 14,
+      "max": 32,
+      "step": 1,
+      "default": 20,
+      "unit": "px"
+    },
+    {
+      "type": "select",
+      "id": "current_price_weight",
+      "label": "Current Price Weight",
+      "options": [
+        {"value": "normal", "label": "Normal"},
+        {"value": "bold", "label": "Bold"},
+        {"value": "600", "label": "Semi Bold"},
+        {"value": "700", "label": "Bold"}
+      ],
+      "default": "bold"
+    },
+    {
+      "type": "color",
+      "id": "current_price_color",
+      "label": "Current Price Color",
+      "default": "#ff3838"
+    },
+    {
+      "type": "range",
+      "id": "original_price_size",
+      "label": "Original Price Size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "default": 16,
+      "unit": "px"
+    },
+    {
+      "type": "color",
+      "id": "original_price_color",
+      "label": "Original Price Color",
+      "default": "#999999"
+    },
+    {
+      "type": "range",
+      "id": "original_price_margin_left",
+      "label": "Original Price Margin Left",
+      "min": 5,
+      "max": 20,
+      "step": 1,
+      "default": 10,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "View All Button"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show View All Button",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "view_all_text",
+      "label": "Button Text",
+      "default": "View All Offers"
+    },
+    {
+      "type": "url",
+      "id": "view_all_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "color",
+      "id": "view_all_background",
+      "label": "Button Background",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "view_all_text_color",
+      "label": "Button Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "view_all_hover_background",
+      "label": "Button Hover Background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "view_all_hover_text_color",
+      "label": "Button Hover Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Info Row Styling"
+    },
+    {
+      "type": "color",
+      "id": "info_row_title_background",
+      "label": "Title Background Color",
+      "default": "#ffe09d"
+    },
+    {
+      "type": "color",
+      "id": "info_row_title_text_color",
+      "label": "Title Text Color",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "info_row_price_background",
+      "label": "Price Background Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "info_row_price_text_color",
+      "label": "Price Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Mobile Settings"
+    },
+    {
+      "type": "range",
+      "id": "mobile_section_padding",
+      "label": "Mobile Section Padding",
+      "min": 10,
+      "max": 60,
+      "step": 5,
+      "default": 20,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "mobile_section_title_size",
+      "label": "Mobile Section Title Size",
+      "min": 18,
+      "max": 40,
+      "step": 1,
+      "default": 24,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "mobile_section_subtitle_size",
+      "label": "Mobile Section Subtitle Size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "default": 14,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "mobile_card_gap",
+      "label": "Mobile Card Gap",
+      "min": 5,
+      "max": 30,
+      "step": 5,
+      "default": 15,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "mobile_card_border_radius",
+      "label": "Mobile Card Border Radius",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "default": 8,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "mobile_image_height",
+      "label": "Mobile Image Height",
+      "min": 120,
+      "max": 300,
+      "step": 10,
+      "default": 200,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "mobile_badge_position_top",
+      "label": "Mobile Badge Top Position",
+      "min": 5,
+      "max": 20,
+      "step": 1,
+      "default": 10,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "mobile_badge_position_left",
+      "label": "Mobile Badge Left Position",
+      "min": 5,
+      "max": 20,
+      "step": 1,
+      "default": 10,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "mobile_badge_padding",
+      "label": "Mobile Badge Padding",
+      "min": 3,
+      "max": 15,
+      "step": 1,
+      "default": 6,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "mobile_badge_border_radius",
+      "label": "Mobile Badge Border Radius",
+      "min": 0,
+      "max": 15,
+      "step": 1,
+      "default": 3,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "mobile_badge_percent_size",
+      "label": "Mobile Badge Percent Size",
+      "min": 12,
+      "max": 30,
+      "step": 1,
+      "default": 18,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "mobile_badge_text_size",
+      "label": "Mobile Badge Text Size",
+      "min": 8,
+      "max": 16,
+      "step": 1,
+      "default": 12,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "mobile_shop_now_bottom",
+      "label": "Mobile Shop Now Bottom",
+      "min": 5,
+      "max": 20,
+      "step": 1,
+      "default": 10,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "mobile_shop_now_right",
+      "label": "Mobile Shop Now Right",
+      "min": 5,
+      "max": 20,
+      "step": 1,
+      "default": 10,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "mobile_shop_now_padding",
+      "label": "Mobile Shop Now Padding",
+      "min": 3,
+      "max": 15,
+      "step": 1,
+      "default": 6,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "mobile_shop_now_font_size",
+      "label": "Mobile Shop Now Font Size",
+      "min": 8,
+      "max": 14,
+      "step": 1,
+      "default": 10,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "mobile_title_font_size",
+      "label": "Mobile Title Font Size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "default": 16,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "mobile_current_price_size",
+      "label": "Mobile Current Price Size",
+      "min": 12,
+      "max": 28,
+      "step": 1,
+      "default": 18,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "mobile_original_price_size",
+      "label": "Mobile Original Price Size",
+      "min": 10,
+      "max": 20,
+      "step": 1,
+      "default": 14,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Tablet Settings"
+    },
+    {
+      "type": "range",
+      "id": "tablet_card_gap",
+      "label": "Tablet Card Gap",
+      "min": 10,
+      "max": 40,
+      "step": 5,
+      "default": 20,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "tablet_card_width",
+      "label": "Tablet Card Width",
+      "min": 200,
+      "max": 300,
+      "step": 10,
+      "default": 240,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "tablet_image_height",
+      "label": "Tablet Image Height",
+      "min": 150,
+      "max": 350,
+      "step": 10,
+      "default": 240,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "tablet_title_font_size",
+      "label": "Tablet Title Font Size",
+      "min": 14,
+      "max": 26,
+      "step": 1,
+      "default": 16,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "tablet_current_price_size",
+      "label": "Tablet Current Price Size",
+      "min": 14,
+      "max": 30,
+      "step": 1,
+      "default": 18,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Small Mobile Settings"
+    },
+    {
+      "type": "range",
+      "id": "small_mobile_image_height",
+      "label": "Small Mobile Image Height",
+      "min": 100,
+      "max": 250,
+      "step": 10,
+      "default": 180,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "small_mobile_title_font_size",
+      "label": "Small Mobile Title Font Size",
+      "min": 10,
+      "max": 20,
+      "step": 1,
+      "default": 14,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "small_mobile_current_price_size",
+      "label": "Small Mobile Current Price Size",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "default": 16,
+      "unit": "px"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "product_card",
+      "name": "Product Card",
+      "settings": [
+        {
+          "type": "header",
+          "content": "Product Information"
+        },
+        {
+          "type": "product",
+          "id": "product_ref",
+          "label": "Product"
+        },
+        {
+          "type": "checkbox",
+          "id": "remove_product_link",
+          "label": "Remove product link / Use manual fields",
+          "default": false
+        },
+        {
+          "type": "image_picker",
+          "id": "product_image",
+          "label": "Product Image"
+        },
+        {
+          "type": "text",
+          "id": "product_title",
+          "label": "Product Title",
+          "default": "Product Name"
+        },
+        {
+          "type": "text",
+          "id": "product_category",
+          "label": "Product Category",
+          "default": "Category"
+        },
+        {
+          "type": "url",
+          "id": "product_link",
+          "label": "Product Link"
+        },
+        {
+          "type": "header",
+          "content": "Offer Badge"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_offer_badge",
+          "label": "Show Offer Badge",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "offer_percent",
+          "label": "Offer Percentage",
+          "default": "25%"
+        },
+        {
+          "type": "text",
+          "id": "offer_text",
+          "label": "Offer Text",
+          "default": "Offer"
+        },
+        {
+          "type": "header",
+          "content": "Pricing"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_price",
+          "label": "Show Price",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "current_price",
+          "label": "Current Price",
+          "default": "$45.99"
+        },
+        {
+          "type": "text",
+          "id": "original_price",
+          "label": "Original Price",
+          "default": "$61.32"
+        },
+        {
+          "type": "header",
+          "content": "Shop Now Button"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_shop_now_button",
+          "label": "Show Shop Now Button",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "shop_now_text",
+          "label": "Shop Now Text",
+          "default": "Shop Now"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Offer Cards",
+      "blocks": [
+        {
+          "type": "product_card"
+        },
+        {
+          "type": "product_card"
+        },
+        {
+          "type": "product_card"
+        },
+        {
+          "type": "product_card"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
