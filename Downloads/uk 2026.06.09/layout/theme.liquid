@@ -47,7 +47,7 @@
       })();
     </script>
     <!-- puvii added 21st Jan, 2025 for redirection -->
- <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- [SEO-PERFORMANCE] P1-A: Removed blocking DM Sans load — font loaded async via head-assets.liquid -->
 <meta name="google-site-verification" content="yrZJ5nkQV6kiYsEC0nn-tz7Iy0gaaEDKeZbimb3FN6I">
 
     <link rel="canonical" href="{{ canonical_url }}">
@@ -65,7 +65,13 @@
     {% render 'meta-tags' %}
 
     {%- render 'head-assets' -%}
-    {{ 'cart.css' | asset_url | stylesheet_tag: preload: true }}
+    <!-- [SEO-PERFORMANCE] P1-B: cart.css loaded async globally, blocking only on cart template -->
+    {%- if template == 'cart' -%}
+      {{ 'cart.css' | asset_url | stylesheet_tag: preload: true }}
+    {%- else -%}
+      <link rel="preload" href="{{ 'cart.css' | asset_url }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+      <noscript>{{ 'cart.css' | asset_url | stylesheet_tag }}</noscript>
+    {%- endif -%}
 
     <script>
       document.documentElement.className = document.documentElement.className.replace('no-js', 'js');
