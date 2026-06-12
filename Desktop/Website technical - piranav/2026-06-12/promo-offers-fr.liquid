@@ -1,0 +1,353 @@
+<style>
+  .promo-offers-wrap {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    max-width: 600px;
+    margin: 0 auto 20px;
+  }
+
+  .promo-offers-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    background: #fff;
+    border: 1.5px solid #1D4ED8;
+    border-radius: 14px;
+    padding: 14px 18px;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.2s ease, border-color 0.2s ease;
+  }
+
+  .promo-offers-toggle:hover {
+    background: #EFF6FF;
+  }
+
+  .promo-offers-toggle:focus-visible {
+    outline: 3px solid #1D4ED8;
+    outline-offset: 2px;
+  }
+
+  .promo-toggle-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .promo-toggle-icon {
+    font-size: 20px;
+    line-height: 1;
+  }
+
+  .promo-toggle-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1D4ED8;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    display: block;
+    line-height: 1.2;
+  }
+
+  .promo-toggle-sub {
+    font-size: 11px;
+    color: #6B7280;
+    display: block;
+    margin-top: 2px;
+  }
+
+  .promo-chevron {
+    width: 20px;
+    height: 20px;
+    color: #1D4ED8;
+    transition: transform 0.25s ease;
+    flex-shrink: 0;
+  }
+
+  .promo-offers-wrap[data-open="true"] .promo-chevron {
+    transform: rotate(180deg);
+  }
+
+  .promo-offers-panel {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.3s ease;
+  }
+
+  .promo-offers-wrap[data-open="true"] .promo-offers-panel {
+    max-height: 800px;
+  }
+
+  .promo-offers-inner {
+    border: 1.5px solid #E5E7EB;
+    border-top: none;
+    border-radius: 0 0 14px 14px;
+    overflow: hidden;
+  }
+
+  .promo-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 18px;
+    background: #fff;
+    border-bottom: 1px solid #F3F4F6;
+    flex-wrap: wrap;
+  }
+
+  .promo-card:last-child {
+    border-bottom: none;
+  }
+
+  .promo-card-left {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .promo-card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #111827;
+    margin: 0 0 6px;
+    line-height: 1.3;
+  }
+
+  .promo-code-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #F3F4F6;
+    border: 1px dashed #D1D5DB;
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: #1F2937;
+    letter-spacing: 0.05em;
+    user-select: all;
+  }
+
+  .promo-action-btn {
+    flex-shrink: 0;
+    min-height: 44px;
+    min-width: 110px;
+    border: none;
+    border-radius: 10px;
+    padding: 0 18px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    transition: background 0.2s ease, color 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    text-decoration: none;
+  }
+
+  .promo-action-btn.copy-btn {
+    background: #1D4ED8;
+    color: #fff;
+  }
+
+  .promo-action-btn.copy-btn:hover {
+    background: #1E40AF;
+  }
+
+  .promo-action-btn.copy-btn.copied {
+    background: #059669;
+    color: #fff;
+    pointer-events: none;
+  }
+
+  .promo-action-btn.copy-btn:focus-visible {
+    outline: 3px solid #1D4ED8;
+    outline-offset: 2px;
+  }
+
+  .promo-action-btn.activate-btn {
+    background: #1D4ED8;
+    color: #fff;
+  }
+
+  .promo-action-btn.activate-btn:hover {
+    background: #1E40AF;
+  }
+
+  .promo-action-btn.activate-btn:focus-visible {
+    outline: 3px solid #1D4ED8;
+    outline-offset: 2px;
+  }
+
+  @media (max-width: 480px) {
+    .promo-card {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .promo-action-btn {
+      width: 100%;
+      min-height: 48px;
+    }
+  }
+</style>
+
+<div class="promo-offers-wrap" id="promoOffersWrap" data-open="false">
+  <button
+    class="promo-offers-toggle"
+    id="promoOffersToggle"
+    aria-expanded="false"
+    aria-controls="promoOffersPanel"
+    onclick="togglePromoOffers()"
+  >
+    <span class="promo-toggle-left">
+      <span class="promo-toggle-icon" aria-hidden="true">🎁</span>
+      <span>
+        <span class="promo-toggle-title">Offres exclusives</span>
+        <span class="promo-toggle-sub">Cliquez pour copier votre code promo</span>
+      </span>
+    </span>
+    <svg class="promo-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <polyline points="6 9 12 15 18 9"></polyline>
+    </svg>
+  </button>
+
+  <div class="promo-offers-panel" id="promoOffersPanel" role="region" aria-labelledby="promoOffersToggle">
+    <div class="promo-offers-inner">
+
+      <div class="promo-card">
+        <div class="promo-card-left">
+          <p class="promo-card-title">Remise première commande</p>
+          <span class="promo-code-pill" id="code-LEDNEWOT">LEDNEWOT</span>
+        </div>
+        <button
+          class="promo-action-btn copy-btn"
+          id="btn-LEDNEWOT"
+          onclick="copyCode('LEDNEWOT')"
+          aria-label="Copier le code promo LEDNEWOT"
+        >Copier</button>
+      </div>
+
+      <div class="promo-card">
+        <div class="promo-card-left">
+          <p class="promo-card-title">10% de réduction — 2 appliques murales</p>
+          <span class="promo-code-pill" id="code-LUMIERE10">LUMIÈRE10</span>
+        </div>
+        <button
+          class="promo-action-btn copy-btn"
+          id="btn-LUMIERE10"
+          onclick="copyCode('LUMIÈRE10')"
+          aria-label="Copier le code promo LUMIÈRE10"
+        >Copier</button>
+      </div>
+
+      <div class="promo-card">
+        <div class="promo-card-left">
+          <p class="promo-card-title">10% de réduction — 2 luminaires araignée</p>
+          <span class="promo-code-pill" id="code-SPIDER10">SPIDER10</span>
+        </div>
+        <button
+          class="promo-action-btn copy-btn"
+          id="btn-SPIDER10"
+          onclick="copyCode('SPIDER10')"
+          aria-label="Copier le code promo SPIDER10"
+        >Copier</button>
+      </div>
+
+      <div class="promo-card">
+        <div class="promo-card-left">
+          <p class="promo-card-title">10% de réduction — 2 lampes suspendues</p>
+          <span class="promo-code-pill" id="code-PLIGHT10">PLIGHT10</span>
+        </div>
+        <button
+          class="promo-action-btn copy-btn"
+          id="btn-PLIGHT10"
+          onclick="copyCode('PLIGHT10')"
+          aria-label="Copier le code promo PLIGHT10"
+        >Copier</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  function togglePromoOffers() {
+    var wrap = document.getElementById('promoOffersWrap');
+    var btn = document.getElementById('promoOffersToggle');
+    var isOpen = wrap.getAttribute('data-open') === 'true';
+    wrap.setAttribute('data-open', isOpen ? 'false' : 'true');
+    btn.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+  }
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      var wrap = document.getElementById('promoOffersWrap');
+      wrap.setAttribute('data-open', 'false');
+      document.getElementById('promoOffersToggle').setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  function copyCode(code) {
+    var btnId = 'btn-' + code.replace(/[^A-Z0-9]/gi, '');
+    var btn = document.getElementById(btnId);
+    if (!btn) {
+      var allBtns = document.querySelectorAll('.copy-btn');
+      for (var i = 0; i < allBtns.length; i++) {
+        if (allBtns[i].getAttribute('aria-label') && allBtns[i].getAttribute('aria-label').indexOf(code) !== -1) {
+          btn = allBtns[i];
+          break;
+        }
+      }
+    }
+
+    function onSuccess() {
+      if (!btn) return;
+      btn.textContent = '✓ Copié';
+      btn.classList.add('copied');
+      btn.setAttribute('aria-label', 'Code ' + code + ' copié');
+      setTimeout(function() {
+        btn.textContent = 'Copier';
+        btn.classList.remove('copied');
+        btn.setAttribute('aria-label', 'Copier le code promo ' + code);
+      }, 2000);
+    }
+
+    function onFail() {
+      if (!btn) return;
+      btn.textContent = 'Erreur';
+      setTimeout(function() {
+        btn.textContent = 'Copier';
+      }, 2000);
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(onSuccess).catch(function() {
+        copyFallback(code, onSuccess, onFail);
+      });
+    } else {
+      copyFallback(code, onSuccess, onFail);
+    }
+  }
+
+  function copyFallback(code, onSuccess, onFail) {
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = code;
+      ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none;';
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      var ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      ok ? onSuccess() : onFail();
+    } catch(e) {
+      onFail();
+    }
+  }
+</script>
