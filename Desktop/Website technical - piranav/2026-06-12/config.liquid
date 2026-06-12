@@ -1,0 +1,61 @@
+{% assign faq_source = nil %}
+{% if product.metafields.custom.faq_schema != blank %}
+  {% assign faq_source = 'product' %}
+{% elsif collection.metafields.custom.faq_schema != blank %}
+  {% assign faq_source = 'collection' %}
+{% endif %}
+
+{% if faq_source != nil %}
+  {% if faq_source == 'product' %}
+    {{ product.metafields.custom.faq_schema }}
+  {% else %}
+    {{ collection.metafields.custom.faq_schema }}
+  {% endif %}
+
+  <div id="custom-faq-ui-container-{{ section.id }}"></div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const schemaScripts = document.querySelectorAll('script[type="application/ld+json"]');
+      let faqList = null;
+
+      schemaScripts.forEach(function(script) {
+        try {
+          const json = JSON.parse(script.textContent);
+          if (json['@type'] === 'FAQPage' && json.mainEntity) {
+            faqList = json.mainEntity;
+          }
+        } catch (e) {}
+      });
+
+      if (faqList && faqList.length > 0) {
+        const container = document.getElementById('custom-faq-ui-container-{{ section.id }}');
+
+        if (container) {
+          let html = `
+            <div style="width: 100%; max-width: 1400px; margin: 2rem auto; padding: 0 20px; box-sizing: border-box;">
+              <h2 class="h2" style="margin-bottom: 1rem; text-align: center;">Frequently Asked Questions</h2>
+          `;
+
+          faqList.forEach(function(item) {
+            if (item['@type'] === 'Question' && item.acceptedAnswer) {
+              html += `
+                <details style="margin-bottom: 10px; border: 1px solid #e2e2e2; border-radius: 4px; padding: 15px;">
+                  <summary style="font-weight: 600; cursor: pointer; font-size: 1.1em; list-style-position: inside;">
+                    ${item.name}
+                  </summary>
+                  <div style="padding-top: 12px; line-height: 1.5;">
+                    ${item.acceptedAnswer.text}
+                  </div>
+                </details>
+              `;
+            }
+          });
+
+          html += '</div>';
+          container.innerHTML = html;
+        }
+      }
+    });
+  </script>
+{% endif %}
