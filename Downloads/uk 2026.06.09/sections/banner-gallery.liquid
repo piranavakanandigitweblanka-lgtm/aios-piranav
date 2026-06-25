@@ -169,6 +169,24 @@
       "step": 1,
       "default": 5,
       "info": "Only applies to Carousel mode"
+    },
+    {
+      "type": "header",
+      "content": "Accessibility"
+    },
+    {
+      "type": "text",
+      "id": "main_banner_aria_label",
+      "label": "Banner 1 — Accessible Link Label",
+      "default": "Shop our latest lighting collection",
+      "info": "Describes banner 1 for screen readers and accessibility tools. Falls back to the image alt text if left blank."
+    },
+    {
+      "type": "text",
+      "id": "main_banner_aria_label_2",
+      "label": "Banner 2 — Accessible Link Label",
+      "default": "Shop our latest lighting collection",
+      "info": "Describes banner 2 for screen readers and accessibility tools. Falls back to the image alt text if left blank."
     }
   ],
   "presets": [
@@ -179,10 +197,20 @@
 }
 {% endschema %}
 
+{% if section.settings.main_image %}
+  {% if section.settings.mobile_image %}
+    <link rel="preload" as="image" media="(max-width: 768px)" href="{{ section.settings.mobile_image | image_url: width: 800 }}" imagesrcset="{{ section.settings.mobile_image | image_url: width: 600 }} 600w, {{ section.settings.mobile_image | image_url: width: 800 }} 800w, {{ section.settings.mobile_image | image_url: width: 1000 }} 1000w" imagesizes="100vw" fetchpriority="high">
+  {% endif %}
+  <link rel="preload" as="image" media="(min-width: 769px)" href="{{ section.settings.main_image | image_url: width: 1200 }}" imagesrcset="{{ section.settings.main_image | image_url: width: 600 }} 600w, {{ section.settings.main_image | image_url: width: 800 }} 800w, {{ section.settings.main_image | image_url: width: 1000 }} 1000w, {{ section.settings.main_image | image_url: width: 1200 }} 1200w, {{ section.settings.main_image | image_url: width: 1600 }} 1600w, {{ section.settings.main_image | image_url: width: 2000 }} 2000w" imagesizes="(min-width: 2000px) 1960px, 100vw" fetchpriority="high">
+{% endif %}
+
 <div class="main-container">
   <div class="banner-wrapper">
     {% comment %} Main Banner {% endcomment %}
-    <div class="main-banners-slider {% if section.settings.enable_fade_slider and section.settings.show_second_banner and section.settings.main_image_2 %}fade-enabled{% endif %}" data-fade-time="{{ section.settings.fade_slider_time }}">
+    <div
+      class="main-banners-slider {% if section.settings.enable_fade_slider and section.settings.show_second_banner and section.settings.main_image_2 %}fade-enabled{% endif %}"
+      data-fade-time="{{ section.settings.fade_slider_time }}"
+    >
       {% if section.settings.main_image %}
         <div class="main-banner-slide active">
           {% assign main_banner_url = section.settings.main_banner_url %}
@@ -191,7 +219,11 @@
           {% endunless %}
 
           {% if main_banner_url %}
-            <a href="{{ main_banner_url }}" class="main-banner-link">
+            {% assign banner_1_setting = section.settings.main_banner_aria_label | strip %}
+            {% assign banner_1_alt = section.settings.main_image.alt | strip %}
+            {% assign banner_1_label = banner_1_setting | default: banner_1_alt | default: 'Shop our collection' %}
+            <a href="{{ main_banner_url }}" class="main-banner-link" aria-label="{{ banner_1_label | escape }}">
+              <span style="position: absolute !important; overflow: hidden; clip: rect(0 0 0 0); height: 1px; width: 1px; margin: -1px; padding: 0; border: 0;" class="visually-hidden">{{ banner_1_label | escape }}</span>
           {% endif %}
 
           <picture>
@@ -216,7 +248,7 @@
                 {{ section.settings.main_image | image_url: width: 1600 }} 1600w,
                 {{ section.settings.main_image | image_url: width: 2000 }} 2000w
               "
-              sizes="100vw"
+              sizes="(min-width: 2000px) 1960px, 100vw"
             >
             <img
               src="{{ section.settings.main_image | image_url: width: 1200 }}"
@@ -244,7 +276,11 @@
           {% endunless %}
 
           {% if main_banner_url_2 %}
-            <a href="{{ main_banner_url_2 }}" class="main-banner-link">
+            {% assign banner_2_setting = section.settings.main_banner_aria_label_2 | strip %}
+            {% assign banner_2_alt = section.settings.main_image_2.alt | strip %}
+            {% assign banner_2_label = banner_2_setting | default: banner_2_alt | default: 'Shop our collection' %}
+            <a href="{{ main_banner_url_2 }}" class="main-banner-link" aria-label="{{ banner_2_label | escape }}">
+              <span style="position: absolute !important; overflow: hidden; clip: rect(0 0 0 0); height: 1px; width: 1px; margin: -1px; padding: 0; border: 0;" class="visually-hidden">{{ banner_2_label | escape }}</span>
           {% endif %}
 
           <picture>
@@ -269,7 +305,7 @@
                 {{ section.settings.main_image_2 | image_url: width: 1600 }} 1600w,
                 {{ section.settings.main_image_2 | image_url: width: 2000 }} 2000w
               "
-              sizes="100vw"
+              sizes="(min-width: 2000px) 1960px, 100vw"
             >
             <img
               src="{{ section.settings.main_image_2 | image_url: width: 1200 }}"
@@ -317,7 +353,7 @@
           data-layout="{{ section.settings.mini_banners_layout }}"
           data-max-grid-items="{{ max_grid_items }}"
         >
-          {% for product in collection.products %}
+          {% for product in collection.products limit: 12 %}
             {% assign mini_banner_url = product.url %}
             {% unless section.settings.mini_banners_link_to_products %}
               {% assign mini_banner_url = product.collections.first.url | default: collection.url %}
@@ -330,6 +366,7 @@
               data-display-index="{% assign display_idx = forloop.index0 | modulo: products_per_set %}{{ display_idx }}"
               title="{{ product.title | escape }}"
             >
+              <span style="position: absolute !important; overflow: hidden; clip: rect(0 0 0 0); height: 1px; width: 1px; margin: -1px; padding: 0; border: 0;" class="visually-hidden">{{ product.title | escape }}</span>
               <img
                 src="{{ product.featured_image | image_url: width: 300 }}"
                 srcset="
@@ -343,11 +380,7 @@
                   (max-width: 768px) {{ section.settings.mini_banner_size_mobile }}px,
                   {{ section.settings.mini_banner_size }}px
                 "
-                {% if forloop.index > 4 %}
-                  loading="lazy"
-                {% else %}
-                  loading="eager" fetchpriority="high"
-                {% endif %}
+                loading="lazy"
                 alt="{{ product.title | escape }}"
                 width="300"
                 height="300"
@@ -908,7 +941,7 @@
     const slides = mainBannersSlider.querySelectorAll('.main-banner-slide');
     const miniBannersNode = document.querySelector('.mini-banners');
     const bannerDotsNode = document.querySelector('.banner-dots');
-    
+
     if (slides.length > 1) {
       const fadeTime = parseInt(mainBannersSlider.dataset.fadeTime) || 5;
       let currentSlide = 0;
@@ -917,7 +950,7 @@
         slides[currentSlide].classList.remove('active');
         currentSlide = (currentSlide + 1) % slides.length;
         slides[currentSlide].classList.add('active');
-        
+
         // Hide mini banners and dots on the second slide
         if (miniBannersNode) {
           if (currentSlide === 0) {

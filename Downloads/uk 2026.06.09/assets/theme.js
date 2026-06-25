@@ -1,11 +1,16 @@
 let scriptExecuted = false;
 function BlsOptimize() {
+  if (scriptExecuted) return;
+  scriptExecuted = true;
   document.querySelectorAll("script[type='lazyScriptScroll']").forEach(el => {
-    if (!scriptExecuted) {
-      eval(el.innerHTML)
-      scriptExecuted = true;
+    try {
+      const s = document.createElement('script');
+      s.textContent = el.innerHTML;
+      document.body.appendChild(s);
+    } catch (e) {
+      console.error(e);
     }
-  })
+  });
 }
 "use strict";
 const global = {
@@ -624,6 +629,7 @@ var BlsEventShopify = (function () {
       Shopify.eventFlashingBrowseTab();
     },
     setupEventListeners: function () {
+      window.addEventListener("scroll", BlsOptimize, { once: true });
       window.addEventListener("scroll", () => {
         backToTop();
         mobileStickyBar();
@@ -3419,7 +3425,6 @@ var BlsMainMenuShopify = (function () {
             header.classList.add("header_scroll_down");
             header.classList.add("header_scroll_up");
             header.querySelector(".headerSpace").classList.remove("unvisible");
-            BlsOptimize();
             if(document.querySelector('.extent-button-right-bar')){
               document.querySelector(".extent-button-right-bar").classList.add("d-xxl-block");
               let extentButtonRightBar = document.querySelector('.extent-button-right-bar');
@@ -3709,9 +3714,10 @@ var BlsMainMenuShopify = (function () {
           var dataImgHeight = item?.dataset.height;
           var img = item.querySelector('.image-banner-loaded');
           if (img == null && width > 767 && dataImgBanner != undefined) {
+              var dataAlt = item.dataset.alt || 'Menu banner';
               item.innerHTML = `<img 
               src=${dataImgBanner} 
-              alt="Menu banner" 
+              alt="${dataAlt}" 
               srcset="${dataImgBanner}&amp;width=375 375w, ${dataImgBanner}&amp;width=550 550w, ${dataImgBanner}&amp;width=750 750w, ${dataImgBanner}&amp;width=1100 1100w, ${dataImgBanner}&amp;width=1500 1500w, ${dataImgBanner}&amp;width=1780 1780w, ${dataImgBanner}&amp;width=2000 2000w, ${dataImgBanner}&amp;width=3000 3000w, ${dataImgBanner}&amp;width=3840 3840w" 
               sizes="100vw",
               class="image-banner-loaded"
@@ -3944,7 +3950,7 @@ var BlsSearchShopify = (function () {
       if (document.querySelector(".predictive_search_suggest")) {
         var search_url = `${routes.predictive_search_url}?q=${encodeURIComponent(
           searchTerm
-        )}&resources[options][fields]=title,tag,vendor,product_type,variants.title,variants.sku&resources[options][prefix]=last&resources[options][unavailable_products]=last&resources[type]=product&resources[limit]=6&section_id=${section_id}`
+        )}&resources[options][fields]=title,body,tag,vendor,product_type,variants.title,variants.sku&resources[options][prefix]=last&resources[options][unavailable_products]=last&resources[type]=product&resources[limit]=10&section_id=${section_id}`
       } else {
         var search_url = `${routes.search_url}?q=${encodeURIComponent(
           searchTerm

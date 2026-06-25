@@ -33,27 +33,27 @@ assign enable_catalog_mode = st.enable_catalog_mode
   if compare_at_price > price and compare_at_price != blank
     assign sale = true
   endif
-  assign product_qty = 0
-  assign pre_order = false
-  for variant in product.variants
-    if variant.inventory_quantity > 0
-      assign product_qty = product_qty | plus: variant.inventory_quantity
-    endif
-    if product_qty < 1
-      assign sold_out = false
-    endif
-  endfor
-  for variant in product.variants limit: 1
-    if variant.available
-      assign sold_out = false
-    endif
-    if variant.inventory_quantity > 0
-      assign product_qty = product_qty | plus: variant.inventory_quantity
-    endif
-    if product_qty < 1 and variant.available
+  if product.available == false
+    assign sold_out = true
+    assign pre_order = false
+  else
+    assign sold_out = false
+    assign product_qty = 0
+    assign has_untracked = false
+    for variant in product.variants
+      if variant.inventory_management == null
+        assign has_untracked = true
+      endif
+      if variant.inventory_quantity > 0
+        assign product_qty = product_qty | plus: variant.inventory_quantity
+      endif
+    endfor
+    if product_qty < 1 and has_untracked == false
       assign pre_order = true
+    else
+      assign pre_order = false
     endif
-  endfor
+  endif
   assign label = false
   if sold_out == true or sale == true
     assign label = true
@@ -134,7 +134,7 @@ assign enable_catalog_mode = st.enable_catalog_mode
         {%- endif -%}
       </a>
     {%- else -%}
-      <a class="bls__img-url" href="{{ product.url }}">
+     <a class="bls__img-url" href="{{ product.url | within: collection }}">
         <div class="bls__product-main-img">
           {%- if product.has_only_default_variant -%}
             {%- if product.featured_image != blank -%}
@@ -187,7 +187,7 @@ assign enable_catalog_mode = st.enable_catalog_mode
       <a
         class="limited-line {{ product_name_t_transfrom }}"
         style="--line-clamp: {{ product_name_line }}"
-        href="{{ product.url }}"
+        href="{{ product.url | within: collection }}"
       >
         {{ product.title }}
       </a>

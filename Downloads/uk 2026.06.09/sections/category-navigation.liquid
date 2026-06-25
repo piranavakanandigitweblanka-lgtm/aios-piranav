@@ -117,7 +117,7 @@
             {{ block.settings.title }}
           </span>
           {% if block.settings.tag != blank %}
-            <span class="category-tag" style="background-color: {{ block.settings.tag_color }}; color: {{ block.settings.tag_text_color }};">
+            <span class="category-tag category-tag--{{ block.settings.tag }}">
               {{ block.settings.tag | upcase }}
             </span>
           {% endif %}
@@ -197,6 +197,12 @@
     text-align: center;
     box-shadow: 0 1px 3px rgba(0,0,0,0.2);
   }
+
+  /* Accessible badge colors — WCAG AA compliant (contrast ratio ≥ 4.5:1) */
+  .category-tag--hot  { background-color: #15803d; color: #ffffff; }
+  .category-tag--new  { background-color: #2563eb; color: #ffffff; }
+  .category-tag--deal { background-color: #dc2626; color: #ffffff; }
+  .category-tag--off  { background-color: #7c3aed; color: #ffffff; }
 
   @media screen and (max-width: 749px) {
     .category-nav-bar {

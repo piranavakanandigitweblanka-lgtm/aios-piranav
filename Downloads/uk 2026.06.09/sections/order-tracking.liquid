@@ -355,6 +355,17 @@ document.addEventListener("DOMContentLoaded", function () {
   document.getElementById("deliveryDateMin").innerText = formattedMinDate;
   document.getElementById("deliveryDateMax").innerText = formattedMaxDate;
 });
+
+if (window.navigator && window.navigator.modelContext) {
+  window.navigator.modelContext.registerTool({
+    name: "track_order",
+    description: "Track Order",
+    inputSchema: { type: "object", properties: {} },
+    async execute(args) {
+      trackOrder();
+    }
+  });
+}
 </script>
 
 {% schema %}

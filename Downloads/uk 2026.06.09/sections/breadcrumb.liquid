@@ -37,6 +37,19 @@
           "name": {{ product.title | json }},
           "item": "{{ shop.url }}{{ product.url }}"
         }
+      {%- elsif product.collections.size > 0 -%}
+        ,{
+          "@type": "ListItem",
+          "position": 2,
+          "name": {{ product.collections.first.title | json }},
+          "item": "{{ shop.url }}{{ product.collections.first.url }}"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": {{ product.title | json }},
+          "item": "{{ shop.url }}{{ product.url }}"
+        }
       {%- else -%}
         ,{
           "@type": "ListItem",

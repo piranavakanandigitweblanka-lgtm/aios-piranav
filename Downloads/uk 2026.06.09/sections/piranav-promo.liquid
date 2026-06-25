@@ -300,16 +300,31 @@
 }
 
 .swiper-pagination-bullet {
-  width: 10px;
-  height: 10px;
-  background: #ddd;
-  opacity: 0.8;
-  border-radius: 10px;
+  width: 44px !important;
+  height: 44px !important;
+  background: transparent !important;
+  opacity: 1;
+  border-radius: 0;
+  position: relative;
   transition: all 0.3s ease;
   cursor: pointer;
 }
 
-.swiper-pagination-bullet-active {
+.swiper-pagination-bullet::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 10px;
+  background: #ddd;
+  opacity: 0.8;
+  transition: all 0.3s ease;
+}
+
+.swiper-pagination-bullet-active::before {
   background: #0b1a39;
   opacity: 1;
   width: 24px;
@@ -1145,16 +1160,31 @@ document.addEventListener("DOMContentLoaded", function() {
 }
 
 .swiper-pagination-bullet {
-  width: 10px;
-  height: 10px;
-  background: #ddd;
-  opacity: 0.8;
-  border-radius: 10px;
+  width: 44px !important;
+  height: 44px !important;
+  background: transparent !important;
+  opacity: 1;
+  border-radius: 0;
+  position: relative;
   transition: all 0.3s ease;
   cursor: pointer;
 }
 
-.swiper-pagination-bullet-active {
+.swiper-pagination-bullet::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 10px;
+  background: #ddd;
+  opacity: 0.8;
+  transition: all 0.3s ease;
+}
+
+.swiper-pagination-bullet-active::before {
   background: #0b1a39;
   opacity: 1;
   width: 24px;

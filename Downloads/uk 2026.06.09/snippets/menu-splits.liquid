@@ -143,6 +143,9 @@
                 data-image-banner="{{ image | image_url }}"
                 data-width="{{ image.width }}"
                 data-height="{{ image.height }}"
+                aria-label="Browse {{ block_st.title | default: 'collection' }} collection"
+                data-alt="{{ block_st.title | default: 'collection' }}"
+                style="display: block; aspect-ratio: {{ image.aspect_ratio | default: '1' }};"
               >
               </a>
             {%- else -%}
@@ -198,6 +201,9 @@
               <a
                 class="d-block text-transform menu-banner-loaded"
                 href="{{ collection_link }}"
+                aria-label="Browse {{ collection_name }} collection"
+                data-alt="{{ collection_name }}"
+                style="aspect-ratio: {{ image_col.aspect_ratio | default: '1' }};"
                 {%- if block_st.open_link != blank -%}
                   target="_blank"
                 {%- endif -%}

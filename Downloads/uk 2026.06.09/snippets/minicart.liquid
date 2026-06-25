@@ -1,4 +1,5 @@
 <!-- [SEO-PERFORMANCE] P1-B: cart.css duplicate removed — loaded globally in theme.liquid -->
+{% comment %} {{ 'cart.css' | asset_url | stylesheet_tag: preload: true }} {% endcomment %}
 {%- liquid
   assign th_st = settings
   assign header_layout = th_st.header_layout

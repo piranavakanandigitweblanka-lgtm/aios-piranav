@@ -151,6 +151,28 @@ assign enable_catalog_mode = th_st.enable_catalog_mode
     endfor
   endif
 
+  if product.available == false
+    assign sold_out = true
+    assign pre_order = false
+  else
+    assign sold_out = false
+    assign qty = 0
+    assign has_untracked = false
+    for v in product.variants
+      if v.inventory_management == null
+        assign has_untracked = true
+      endif
+      if v.inventory_quantity > 0
+        assign qty = qty | plus: v.inventory_quantity
+      endif
+    endfor
+    if qty < 1 and has_untracked == false
+      assign pre_order = true
+    else
+      assign pre_order = false
+    endif
+  endif
+
   assign label = false
   if sold_out == true or sale == true or pre_order == true
     assign label = true
@@ -201,7 +223,7 @@ assign enable_catalog_mode = th_st.enable_catalog_mode
     {%- endif -%}
     {%- assign img = product.media -%}
 
-    <a class="bls__img-url{% if enable_hover_image %} bls__hover-image{% endif %}" href="{{ current_variant.url | default: product.url }}">
+    <a class="bls__img-url{% if enable_hover_image %} bls__hover-image{% endif %}" href="{{ current_variant.url | default: product.url | within: collection }}">
       <div class="bls__product-main-img">
         {%- if variant -%}
           {%- if variant.featured_image != blank -%}
@@ -401,7 +423,7 @@ assign enable_catalog_mode = th_st.enable_catalog_mode
       <a
         class="limited-line {{ product_name_t_transfrom }}"
         style="--line-clamp: {{ product_name_line }}"
-        href="{{ current_variant.url | default: product.url }}">
+       href="{{ current_variant.url | default: product.url | within: collection }}">
         {{ product.title }}<span class="variant-title-suffix">{% if variant %} - {{ variant.title }}{% endif %}</span>
       </a>
     </h3>
@@ -548,7 +570,7 @@ assign enable_catalog_mode = th_st.enable_catalog_mode
   font-weight: 500;
 }
 .product-stock .in-stock {
-  color: #27ae60; /* green color */
+  color: #166534; /* green color */
   display: flex;
   align-items: center;
   gap: 6px; /* space between check and text */

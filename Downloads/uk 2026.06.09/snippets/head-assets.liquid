@@ -103,7 +103,8 @@
 {{ 'vendor.min.css' | asset_url | stylesheet_tag: preload: true }}
 {{ 'reset.min.css' | asset_url | stylesheet_tag: preload: true }}
 {{ 'base.min.css' | asset_url | stylesheet_tag: preload: true }}
-<!-- [SEO-PERFORMANCE] P2-A: custom-inner-demo.css deferred — non-critical (SPR badge + hover-zoom only) -->
+{% comment %} {{ 'custom-inner-demo.css' | asset_url | stylesheet_tag: preload: true }} {% endcomment %}
+ <!-- [SEO-PERFORMANCE] P2-A: custom-inner-demo.css deferred — non-critical (SPR badge + hover-zoom only) -->
 <link rel="preload" href="{{ 'custom-inner-demo.css' | asset_url }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
 <noscript>{{ 'custom-inner-demo.css' | asset_url | stylesheet_tag }}</noscript>
 {%- if enable_rtl -%}

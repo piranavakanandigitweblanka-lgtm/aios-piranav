@@ -1,0 +1,298 @@
+/* Predictive Search Redesign */
+.search-list-item {
+  display: flex;
+  flex-direction: column;
+  background-color: #f7f7f7; /* Very light grey matching the screenshot outer */
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.search-results-wrapper {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 30px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.search-suggestions-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.search-products-col {
+  display: flex;
+  flex-direction: column;
+}
+
+
+
+.search-suggestions-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.search-suggestions-list li {
+  margin-bottom: 12px;
+}
+
+.search-suggestions-list a {
+  display: flex;
+  align-items: center;
+  color: #111;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.search-suggestions-list a:hover {
+  text-decoration: underline;
+}
+
+.search-suggestions-list .search-icon {
+  margin-right: 12px;
+  width: 16px;
+  height: 16px;
+  opacity: 0.6;
+}
+
+.search-suggestions-list .arrow-icon {
+  margin-left: auto;
+  width: 12px;
+  height: 12px;
+  opacity: 0.4;
+}
+
+.search-term-highlight {
+  color: #e00000; /* Red highlight as shown in screenshot */
+}
+
+.search-results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.predictive-heading-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.predictive-heading {
+  font-size: 16px;
+  font-weight: 500;
+  color: #111;
+  margin: 0;
+}
+
+.predictive-search-view-all-link {
+  font-size: 14px;
+  font-weight: 500;
+  color: #111;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+.predictive-search-view-all-link:hover {
+  text-decoration-thickness: 2px;
+}
+
+.predictive-search-close-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 15px;
+}
+
+.predictive-search-close {
+  font-size: 13px;
+  text-decoration: underline;
+  color: #555;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+
+
+/* Product Item Redesign - Horizontal Row */
+#search-results-list .bls__product-item {
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  padding: 15px;
+  transition: box-shadow 0.2s ease;
+  margin-bottom: 0;
+  text-decoration: none;
+}
+
+#search-results-list .bls__product-item:hover,
+#search-results-list .bls__product-item:focus-within {
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+}
+
+#search-results-list .bls__product-item .bls__product-img {
+  width: 60px;
+  min-width: 60px;
+  height: 60px;
+  margin-right: 20px;
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: #f6f5f3; /* Light beige/grey backing from screenshot */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#search-results-list .bls__product-item .bls__product-img img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+#search-results-list .bls__product-item .bls__product-details {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#search-results-list .bls__product-item .bls__product-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  margin: 0;
+  line-height: 1.4;
+  padding-right: 15px;
+}
+
+#search-results-list .bls__product-item .bls__product-name a {
+  outline: none;
+  color: inherit;
+  text-decoration: none;
+}
+
+#search-results-list .bls__product-item .bls__product-price {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.shopify-product-reviews-badge {
+  display: none !important;
+}
+
+.predictive-stock-status {
+  display: none !important;
+}
+
+/* ── Mobile Predictive Search (max 767px) ─────────────────── */
+@media (max-width: 767px) {
+
+  /* 1. Outer shell: remove padding so white card fills edge-to-edge;
+        cap height so panel never pushes page content off screen */
+  .search-list-item {
+    padding: 0;
+    border-radius: 0;
+    background-color: #fff;
+    max-height: calc(100vh - 80px);
+    max-height: calc(100svh - 80px); /* svh = small viewport (excludes browser chrome) */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* 2. Inner card: tighter padding, no shadow or rounding needed at full width */
+  .search-results-wrapper {
+    padding: 16px;
+    gap: 12px;
+    border-radius: 0;
+    box-shadow: none;
+    border-top: 1px solid #f0f0f0;
+  }
+
+  /* 3. Close button: float to top of the flex column, stay sticky while
+        user scrolls results; minimum 44×44 px touch target */
+  .predictive-search-close-container {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #fff;
+    border-bottom: 1px solid #f0f0f0;
+    margin-top: 0;
+    padding: 0 16px;
+    justify-content: flex-end;
+  }
+
+  .predictive-search-close {
+    min-height: 44px;
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: #111;
+    font-weight: 500;
+    padding: 0 4px;
+  }
+
+  /* 4. Heading row */
+  .predictive-heading-wrapper {
+    margin-bottom: 12px;
+  }
+
+  .predictive-heading {
+    font-size: 14px;
+  }
+
+  /* 5. "Show all" link: tall enough to tap comfortably */
+  .predictive-search-view-all-link {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    font-size: 13px;
+  }
+
+  /* 6. Product card: compact but still readable */
+  #search-results-list .bls__product-item {
+    padding: 10px 12px;
+    border-radius: 6px;
+  }
+
+  #search-results-list .bls__product-item .bls__product-img {
+    width: 52px;
+    min-width: 52px;
+    height: 52px;
+    margin-right: 12px;
+  }
+
+  #search-results-list .bls__product-item .bls__product-name {
+    font-size: 13px;
+    padding-right: 8px;
+  }
+
+  #search-results-list .bls__product-item .bls__product-price {
+    font-size: 13px;
+  }
+
+  /* 7. Tighter gap between cards */
+  .search-results-list {
+    gap: 10px;
+  }
+
+  /* 8. Cap visible results at 4 on mobile.
+        Items 5–6 are rendered server-side but hidden here, keeping
+        the "Show all" prompt as the natural next step. */
+  #search-results-list .bls__product-item:nth-child(n+5) {
+    display: none;
+  }
+}

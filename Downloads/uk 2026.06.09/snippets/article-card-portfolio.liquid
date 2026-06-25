@@ -13,7 +13,7 @@
   {% endif %}
 >
   <div class="bls__blog-posts-image hover-effect hover-{{ hover_effect }}">
-    <a href="{{ article.url }}">
+        <a href="{{ article.url }}" aria-hidden="true" tabindex="-1">
       {% render 'responsive-image', image: article.image, aspect_ratio: aspect_ratio, custom_ratio: custom_ratio %}
     </a>
   </div>

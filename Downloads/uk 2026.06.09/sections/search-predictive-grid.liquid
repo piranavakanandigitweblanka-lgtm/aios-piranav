@@ -99,26 +99,53 @@
         endif
     -%}
     <div class="search-list-item">
+        <link rel="stylesheet" href="{{ 'predictive-search-redesign.css' | asset_url }}" media="print" onload="this.media='all'">
+        <noscript><link rel="stylesheet" href="{{ 'predictive-search-redesign.css' | asset_url }}"></noscript>
         {%- if results_count > 0 -%}
-            <div class="h5 text-center m-0 mt-15 ">
-                {{ 'templates.search.search_for_html' | t: terms: predictive_type.terms }}
-            </div>
-            <div id="search-results">
-                <div id="search-results-list" class="search-results-list list list-view-items">
-                    {%- if predictive_search_type == 'search_suggest' -%}
-                        {%- for product in results -%}
-                          {%- render 'product-popular-list-item' | product: product -%}
-                        {%- endfor -%}
-                    {%- else -%}
-                        {%- for product in results limit: 6 -%}
-                          {%- render 'product-popular-list-item' | product: product -%}
-                        {%- endfor -%}
-                    {%- endif -%}
+            <div class="search-results-wrapper">
+
+                <div class="search-products-col">
+                    <div class="predictive-heading-wrapper">
+                        <h4 class="predictive-heading">Items</h4>
+                        <a class="predictive-search-view-all-link" href="{{ routes.search_url }}?type=product&options%5Bfields%5D=title,vendor,product_type,variants.title,variants.sku&options%5Bunavailable_products%5D={{ settings.unavailable_pr }}&options%5Bprefix%5D=last&q={{ key_terms | url_escape }}">Show all</a>
+                    </div>
+                    <div id="search-results">
+                        <div id="search-results-list" class="search-results-list list list-view-items" role="listbox">
+                            {%- assign displayed_count = 0 -%}
+                            {%- if predictive_search_type == 'search_suggest' -%}
+                                {%- for product in results -%}
+                                    {%- render 'product-popular-list-item' | product: product, search_terms: search_terms -%}
+                                    {%- assign displayed_count = displayed_count | plus: 1 -%}
+                                    {%- if displayed_count >= 6 -%}{% break %}{%- endif -%}
+                                {%- endfor -%}
+                            {%- else -%}
+                                {%- for product in results -%}
+                                    {%- render 'product-popular-list-item' | product: product, search_terms: search_terms -%}
+                                    {%- assign displayed_count = displayed_count | plus: 1 -%}
+                                    {%- if displayed_count >= 4 -%}{% break %}{%- endif -%}
+                                {%- endfor -%}
+                            {%- endif -%}
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="viewAll">
-                <a class="btn btn-primary" href="{{ routes.search_url }}?type=product&options%5Bfields%5D=title,vendor,product_type,variants.title,variants.sku&options%5Bunavailable_products%5D={{ settings.unavailable_pr }}&options%5Bprefix%5D=last&q={{ key_terms | url_escape }}">{{ 'general.search.more_results' | t }}</a>
-            </div>
+            <script>
+              if (!window.predictiveClickOutsideInit) {
+                document.addEventListener('click', function(e) {
+                  var pred = document.querySelector('#predictive-search');
+                  var searchBlock = document.querySelector('.block-search');
+                  if (pred && pred.classList.contains('results')) {
+                    if (!pred.contains(e.target) && (!searchBlock || !searchBlock.contains(e.target))) {
+                      if(window.BlsSearchShopify) BlsSearchShopify.close(true);
+                      document.documentElement.classList.remove('hside_opened', 'open-search');
+                      var form = document.querySelector('#search-form');
+                      if(form) form.classList.remove('bls__opend-popup-header');
+                    }
+                  }
+                });
+                window.predictiveClickOutsideInit = true;
+              }
+            </script>
         {%- else -%}
             <div id="search-results-empty">
                 {{ 'templates.search.search_empty_html' | t: terms: search_terms }}

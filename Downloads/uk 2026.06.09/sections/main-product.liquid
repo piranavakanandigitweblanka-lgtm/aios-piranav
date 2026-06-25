@@ -1,6 +1,7 @@
 {{ 'product-details.css' | asset_url | stylesheet_tag: preload: true  }}
 {{ 'product.css' | asset_url | stylesheet_tag: preload: true  }}
-<!-- [SEO-PERFORMANCE] P2-C: glightbox.min.css deferred — only needed on user image click -->
+{% comment %} {{ 'glightbox.min.css' | asset_url | stylesheet_tag: preload: true  }} {% endcomment %}
+ <!-- [SEO-PERFORMANCE] P2-C: glightbox.min.css deferred — only needed on user image click -->
 <link rel="preload" href="{{ 'glightbox.min.css' | asset_url }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
 <noscript>{{ 'glightbox.min.css' | asset_url | stylesheet_tag }}</noscript>
 {{ 'skeleton.css' | asset_url | stylesheet_tag: preload: true  }}

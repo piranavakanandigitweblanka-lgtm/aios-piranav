@@ -18,13 +18,15 @@
           <td class="product-cell">
             <div class="product-content">
               {% if product.featured_image %}
-                <img
+                {% comment %} <img
                   src="{{ product.featured_image | img_url: '' }}"
                   width="40" height="40"
                   data-full="{{ product.featured_image | img_url: '' }}"
                   alt="{{ product.title | escape }}"
                   class="product-img"
-                  onclick="showImageModal(this)">
+                  onclick="showImageModal(this)"> {% endcomment %}
+                    {% assign full_image_url = product.featured_image | image_url %}
+                {{ product.featured_image | image_url: width: 40 | image_tag: width: 40, height: 40, data-full: full_image_url, alt: product.title, class: 'product-img', onclick: 'showImageModal(this)' }}
               {% endif %}
               <a href="{{ product.url }}" class="table-product-title" title="{{ product.title }}">
                 {{ product.title }}

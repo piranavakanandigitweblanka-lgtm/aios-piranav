@@ -492,7 +492,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: #888;
+  color: #374151;
   margin: 0;
 }
 
@@ -646,7 +646,7 @@
   margin: 0;
 }
 
-.cpop__avail--in  { color: #2a8a2a; }
+.cpop__avail--in  { color: #166534; }
 .cpop__avail--out { color: #cc3333; }
 
 /* Add row */

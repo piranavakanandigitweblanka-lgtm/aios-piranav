@@ -18,33 +18,12 @@
               <span aria-hidden="true" class="bls__breadcrumb-separator pr-4">/</span>
             </li>
           {% else %}
-            <!-- puvii added to show collection in breadcumbs, it is one of internal backlinks -->
-            {% if product.collections.size > 5 %}
-              {% assign collection = product.collections[5] %}
+            {% if product.collections.size > 0 %}
               <li class="bls__breadcrumb-item d-inline">
-                {{ collection.title | link_to: collection.url }}
-                <span aria-hidden="true" class="bls__breadcrumb-separator pr-4">/</span>
-              </li>
-            {% elsif product.collections.size > 4 %}
-              {% assign collection = product.collections[4] %}
-              <li class="bls__breadcrumb-item d-inline">
-                {{ collection.title | link_to: collection.url }}
-                <span aria-hidden="true" class="bls__breadcrumb-separator pr-4">/</span>
-              </li>
-            {% elsif product.collections.size > 3 %}
-              {% assign collection = product.collections[3] %}
-              <li class="bls__breadcrumb-item d-inline">
-                {{ collection.title | link_to: collection.url }}
-                <span aria-hidden="true" class="bls__breadcrumb-separator pr-4">/</span>
-              </li>
-            {% elsif product.collections.size > 2 %}
-              {% assign collection = product.collections[2] %}
-              <li class="bls__breadcrumb-item d-inline">
-                {{ collection.title | link_to: collection.url }}
+                {{ product.collections.first.title | link_to: product.collections.first.url }}
                 <span aria-hidden="true" class="bls__breadcrumb-separator pr-4">/</span>
               </li>
             {% endif %}
-            <!-- puvii added to show collection in breadcumbs, it is one of internal backlinks -->
           {%- endif -%}
         
           <li class="bls__breadcrumb-item d-inline">

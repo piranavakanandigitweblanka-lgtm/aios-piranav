@@ -6,9 +6,11 @@
   font-weight: var(--bls__product-name-weight);
 }
 
-.bls__product-type,
-.bls__product-vendor a {
+.bls__product-type {
   color: var(--grey-color);
+}
+.bls__product-vendor a {
+  color: #374151;
 }
 
 .bls__product-vendor {

@@ -50,7 +50,7 @@
                   class="bls__product-quickview"
                 {%- endif -%}
               {% else %}
-                href="{{ product.url }}"
+                href="{{ product.url | within: collection }}"
               {% endif %}
             >
               <span class="icon-dot icon">
@@ -90,7 +90,7 @@
                 class="bls__product-quickview"
               {%- endif -%}
             {% else %}
-              href="{{ product.url }}"
+             href="{{ product.url | within: collection }}"
             {% endif %}
           >
         {% comment %}

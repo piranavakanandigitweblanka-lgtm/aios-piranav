@@ -25,7 +25,7 @@
   {% endif %}
 >
   <div class="bls__blog-posts-image hover-effect hover-{{ hover_effect }}">
-    <a href="{{ article.url }}">
+        <a href="{{ article.url }}" aria-hidden="true" tabindex="-1">
       {% render 'responsive-image', image: article.image, aspect_ratio: aspect_ratio, custom_ratio: custom_ratio %}
     </a>
   </div>
@@ -75,8 +75,9 @@
         </div>
       {%- endif -%}
       {%- if show_readmore -%}
-        <a class="mt-5 fw-500 fs-12 uppercase blog-posts-readmore" href="{{ article.url }}">
+         <a class="mt-5 fw-500 fs-12 uppercase blog-posts-readmore" href="{{ article.url }}" aria-label="{{ 'blog_post.read_more' | t }} about {{ article.title | escape }}" title="{{ 'blog_post.read_more' | t }} about {{ article.title | escape }}">
           {{- 'blog_post.read_more' | t -}}
+          <span class="visually-hidden"> about {{ article.title | escape }}</span>
         </a>
       {%- endif -%}
     </div>

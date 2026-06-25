@@ -37,7 +37,7 @@
               {% for article in blogs[blog.handle].articles limit: block.settings.maximum %}
                 <div class="flex flex-nowrap mb-20">
                   <div class="bls__blog-posts-image width-75 mr-15">
-                    <a href="{{ article.url }}">
+                        <a href="{{ article.url }}" aria-hidden="true" tabindex="-1">
                       {% render 'responsive-image',
                         image: article.image,
                         aspect_ratio: block.settings.aspect_ratio,

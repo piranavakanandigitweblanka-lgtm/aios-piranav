@@ -47,7 +47,7 @@
       })();
     </script>
     <!-- puvii added 21st Jan, 2025 for redirection -->
-<!-- [SEO-PERFORMANCE] P1-A: Removed blocking DM Sans load — font loaded async via head-assets.liquid -->
+ {% comment %} <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"> {% endcomment %}
 <meta name="google-site-verification" content="yrZJ5nkQV6kiYsEC0nn-tz7Iy0gaaEDKeZbimb3FN6I">
 
     <link rel="canonical" href="{{ canonical_url }}">
@@ -65,7 +65,7 @@
     {% render 'meta-tags' %}
 
     {%- render 'head-assets' -%}
-    <!-- [SEO-PERFORMANCE] P1-B: cart.css loaded async globally, blocking only on cart template -->
+   <!-- [SEO-PERFORMANCE] P1-B: cart.css loaded async globally, blocking only on cart template -->
     {%- if template == 'cart' -%}
       {{ 'cart.css' | asset_url | stylesheet_tag: preload: true }}
     {%- else -%}
@@ -75,7 +75,7 @@
 
     <script>
       document.documentElement.className = document.documentElement.className.replace('no-js', 'js');
-      if (Shopify.designMode) {
+       if (typeof Shopify !== 'undefined' && Shopify.designMode) {
         document.documentElement.classList.add('shopify-design-mode');
       }
     </script>
@@ -219,7 +219,7 @@
 
      {% render 'seo-noindex' %}
 
-    <link rel="preload" href="{{ 'blueskytechco.woff' | asset_url }}" as="font" type="font/woff" crossorigin>
+    {% comment %} <link rel="preload" href="{{ 'blueskytechco.woff' | asset_url }}" as="font" type="font/woff" crossorigin> {% endcomment %}
   </head>
   <body class="{% if page.handle == 'led-sone-products-configurator' or template.suffix == 'config-pk' %}full-width-layout{% endif %} {% if template.name == 'collection' %}template-collection{% endif %}{% if template.name == 'product' %}template-product {% endif %}{% if template.name == 'index' %}template-index{% endif %} {%- if settings.general_layout == 'boxed' -%}box-layout{% elsif settings.general_layout == 'full_width' %}full-width-layout{% else %}{%- endif -%} {% if settings.content_center %}item-center{% endif %} product-images-style-{{ settings.product_images_style }} {% if template.suffix contains 'layout-2' %}product-layout-2{% endif %}">
     {% render 'scroll-progress' %}

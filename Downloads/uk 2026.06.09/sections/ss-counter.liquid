@@ -363,7 +363,7 @@
 
   document.addEventListener('DOMContentLoaded', initCounter);
   
-  if (Shopify.designMode) {
+if (typeof Shopify !== 'undefined' && Shopify.designMode){
      document.addEventListener('shopify:section:unload', initCounter);
      document.addEventListener('shopify:section:load', initCounter);
   }

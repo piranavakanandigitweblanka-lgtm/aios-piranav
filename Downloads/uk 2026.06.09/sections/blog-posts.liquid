@@ -171,8 +171,9 @@
                           </span>
                         </div>
                       </div>
-                      <a class="mt-5 fw-500 fs-12 uppercase blog-posts-readmore" href="/blogs/news/new-summer">
+                      <a class="mt-5 fw-500 fs-12 uppercase blog-posts-readmore" href="/blogs/news/new-summer" aria-label="{{ 'blog_post.read_more' | t }} about {{ 'blog_post.title' | t | escape }}">
                         {{- 'blog_post.read_more' | t -}}
+                        <span class="visually-hidden"> about {{ 'blog_post.title' | t | escape }}</span>
                       </a>
                     </div>
                   </div>
